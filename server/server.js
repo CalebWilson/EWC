@@ -1,16 +1,16 @@
 //import express
 const express = require('express');
 
-//import routes
-const apiRouter = require('./routes');
-
 //create app
 const app = express();
 
-//send to client as json
+//send/receive data as json
 app.use(express.json());
 
-app.use('/api/chirps', apiRouter);
+//import routes
+const router = require('./routes/index');
+
+app.use('/', router);
 
 app.listen('3000', () =>
 {

@@ -17,9 +17,11 @@ create table ScheduledJobs
 	FOREIGN KEY (JobID) REFERENCES Jobs (JobID)
 );
 
+/*
 insert into
 	ScheduledJobs (JobID,    ScheduleDate, FinalPrice)
 	values       (    1,    "2021-03-16",     100.01)
 ;
+*/
 
 select * from ScheduledJobs;

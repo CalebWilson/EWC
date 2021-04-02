@@ -9,6 +9,7 @@ create table Workers
 	Username   varchar( 25) NOT NULL,
 	Password      char( 40) NOT NULL,
 	WorkerName varchar( 50) NOT NULL,
+	WorkerPhone   char( 10),
 	Email      varchar( 50),
 	Address    varchar(150),
 	StatusID            int NOT NULL,
@@ -25,10 +26,11 @@ create table Workers
 
 show warnings;
 
+/*
 -- test
 insert into
-	Workers (  Username,        Password,           WorkerName,                        Address, StatusID,    HiredDate)
-	values  ("username", SHA("password"), "Firstname Lastname", "000 Street St. Town IN 00000",        1, "2000-01-01")
+	Workers (  Username,        Password,           WorkerName,  WorkerPhone,                        Address, StatusID,    HiredDate)
+	values  ("username", SHA("password"), "Firstname Lastname", "5551234567", "000 Street St. Town IN 00000",        2, "2000-01-01")
 ;
 
 -- insert admin user
@@ -36,5 +38,6 @@ insert into
 	Workers (Username,                                   Password,     WorkerName, StatusID)
 	values  ( "caleb", "65f915fd2c207430eb671f386c17716aaf2762da", "Caleb Wilson",        2)
 ;
+*/
 
 select * from Workers;

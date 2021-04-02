@@ -4,9 +4,9 @@ drop table if exists Assignments;
 
 create table Assignments
 (
-	AssignmentID int NOT NULL AUTO_INCREMENT,
+	AssignmentID   int NOT NULL AUTO_INCREMENT,
 	ScheduledJobID int NOT NULL,
-	WorkerID int NOT NULL,
+	WorkerID       int NOT NULL,
 
 	UNIQUE (ScheduledJobID, WorkerID),
 
@@ -16,8 +16,12 @@ create table Assignments
 	FOREIGN KEY (      WorkerID) REFERENCES       Workers (      WorkerID)
 );
 
+/*
 -- test
 insert into
 	Assignments (ScheduledJobID, WorkerID)
 	values      (             1,        1)
 ;
+*/
+
+select * from Assignments;

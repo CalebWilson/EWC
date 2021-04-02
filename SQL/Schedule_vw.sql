@@ -23,24 +23,26 @@ drop view if exists IndividualWork;
 
 create view IndividualWork
 as
-	select Week, Day, Worker, Job
-	from WeekWork
+	select *
+	from WeekWork as outside
 	where
 	(
 		select count(*) = 1
-		from WeekWork as ww
-		where ww.Worker = WeekWork.Worker
+		from WeekWork as inside
+		where outside.Job = inside.Job
 	)
 ;
 
+drop view if exists GroupWork;
+
 create view GroupWork
 as
-	select Week, Day, Job, Worker
-	from WeekWork
+	select *
+	from WeekWork as outside
 	where
 	(
 		select count(*) > 1
-		from WeekWork as ww
-		where ww.Worker = WeekWork.Worker
+		from WeekWork as inside
+		where outside.Job = inside.Job
 	)
 ;

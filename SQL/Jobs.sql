@@ -38,11 +38,13 @@ create table Jobs
 
 show warnings;
 
+/*
 -- test
 insert into
 	Jobs   (AccountID, JobName,     JobPhone,                     JobAddress, ServiceTypeID, InvoiceProcID, LastScheduled, ServiceInterval, StatusID)
 	values (        1,  "Test", "3175555555", "000 Street St. Town IN 00000",             1,             1,  "2000-01-01",               1,        1)
 ;
+*/
 
 select * from Jobs;
 

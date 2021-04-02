@@ -19,10 +19,12 @@ create table Accounts
 
 show warnings;
 
+/*
 -- test
 insert into
 	Accounts (AccountName,  AccountPhone,                  AccountAddress)
 	values  (      "Test",  "3175555555",  "000 Street St. Town IN 00000")
 ;
+*/
 
 select * from Accounts;
