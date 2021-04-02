@@ -27,13 +27,11 @@ function retrieve_data (db_method)
 	});
 }
 
-/*
 router.get('/', (request, response) =>
 {
 	response.redirect ('/schedule');
 });
-*/
 
-router.get('/', retrieve_data (db.all));
+router.get('/schedule', retrieve_data (db.schedule));
 
 module.exports = router;

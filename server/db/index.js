@@ -11,7 +11,7 @@ const pool = mysql.createPool({
 
 let db = {};
 
-db.all = () =>
+db.schedule = function()
 {
 	return new Promise ((resolve, reject) =>
 	{
