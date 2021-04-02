@@ -13,15 +13,59 @@ let db = {};
 
 db.schedule = function()
 {
-	return new Promise ((resolve, reject) =>
+	var group = new Promise ((resolve, reject) =>
 	{
-		pool.query ('select * from Workers', (err, results) =>
+		pool.query ("select * from GroupWork", (error, results) =>
 		{
-			if (err) return reject (err);
-
+			if (error) return reject (error);
 			return resolve (results);
 		});
+	});
+
+	var indiv = new Promise ((resolve, reject) =>
+	{
+		pool.query ("select * from IndividualWork", (error, results) =>
+		{
+			if (error) return reject (error);
+			return resolve (results);
+		});
+	});
+
+	return Promise.all ([group, indiv]).then ((work_arr) =>
+	{
+		return {"GroupWork": work_arr[0], "IndividualWork": work_arr[1]};
+	});
+
+};
+
+module.exports = db;
+
+/*
+db.schedule = function()
+{
+	return new Promise ((resolve, reject) =>
+	{
+		var group = new Promise ((resolve, reject) =>
+		{
+			pool.query ('select * from GroupWork', (err, results) =>
+			{
+				if (err) return reject (err);
+				return resolve (results);
+			});
+		});
+
+		var indiv = new Promise ((resolve, reject) =>
+		{
+			pool.query ('select * from IndividualWork', (err, results) =>
+			{
+				if (err) return reject (err);
+				return resolve (results);
+			});
+		});
+
+		return resolve ({"GroupWork": group, "IndividualWork": indiv});
 	});
 };
 
 module.exports = db;
+*/
