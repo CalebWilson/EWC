@@ -3,22 +3,30 @@ const db = require('../db');
 
 let router = express.Router();
 
+router.get('/', (request, response) =>
+{
+	response.redirect ('/schedule/0');
+});
+
 /*
 	Retrieve data from the database
 
 	Takes in a method of the `db` object, and returns a function that calls that
 	method and sends a json response created from its results.
 */
-function retrieve_data (db_method)
+function retrieve_data (db_method, params)
 {
+	//handler method to be returned
 	return (async (request, response, next) =>
 	{
+		//invoke db_method and respond with results
 		try
 		{
-			let results = await db_method();
+			let results = await db_method(params);
 			response.json(results);
 		}
 
+		//error handling
 		catch (e)
 		{
 			console.log(e);
@@ -27,11 +35,13 @@ function retrieve_data (db_method)
 	});
 }
 
-router.get('/', (request, response) =>
+router.route('/schedule')
+	.get  (retrieve_data (db.schedule));
+//	.post (
+router.get('/schedule/:week', (request, response, next) =>
 {
-	response.redirect ('/schedule');
+	var handler = retrieve_data (db.schedule, request.params.week);
+	handler (request, response, next);
 });
-
-router.get('/schedule', retrieve_data (db.schedule));
 
 module.exports = router;

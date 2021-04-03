@@ -11,11 +11,12 @@ const pool = mysql.createPool({
 
 let db = {};
 
-db.schedule = function()
+db.schedule = function(week)
 {
+	condition = (week === undefined) ? "" : " where Week = " + week;
 	var group = new Promise ((resolve, reject) =>
 	{
-		pool.query ("select * from GroupWork", (error, results) =>
+		pool.query ("select * from GroupWork" + condition, (error, results) =>
 		{
 			if (error) return reject (error);
 			return resolve (results);
@@ -24,7 +25,7 @@ db.schedule = function()
 
 	var indiv = new Promise ((resolve, reject) =>
 	{
-		pool.query ("select * from IndividualWork", (error, results) =>
+		pool.query ("select * from IndividualWork" + condition, (error, results) =>
 		{
 			if (error) return reject (error);
 			return resolve (results);
