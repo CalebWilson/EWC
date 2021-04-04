@@ -10,6 +10,7 @@ insert into
 				(         "Mos Eisley Cantina",         NULL,                     "Mos Eisley"),
 				(          "Mr. Bilbo Baggins",         NULL,   "End of Bagshot Row, Hobbiton")
 ;
+select * from Accounts;
 
 insert into
 	Jobs   (AccountID,                        JobName,     JobPhone,                        JobAddress,  Price, ServiceTypeID, InvoiceProcID, ServiceInterval, StatusID)
@@ -22,26 +23,36 @@ insert into
 			 (        6,           "Mos Eisley Cantina",         NULL,                      "Mos Eisley",  40.00,             3,             1,            NULL,        1),
 			 (        7,                      "Bag End",         NULL,    "End of Bagshot Row, Hobbiton",  20.00,             2,             2,            NULL,        1)
 ;
+select * from Jobs;
 
 insert into
-	ScheduledJobs (JobID,                                          ScheduleDate, Duration, FinalPrice)
-	values        (    1, date(curdate() - interval weekday(curdate()) - 0 day),        0,      30.00),
-	              (    2, date(curdate() - interval weekday(curdate()) - 0 day),        0,      15.00),
-					  (    3, date(curdate() - interval weekday(curdate()) - 1 day),        0,      30.00),
-					  (    4, date(curdate() - interval weekday(curdate()) - 1 day),        2,     900.00),
-					  (    5, date(curdate() - interval weekday(curdate()) - 2 day),        0,      50.00),
-					  (    6, date(curdate() - interval weekday(curdate()) - 2 day),        0,      50.00),
-					  (    7, date(curdate() - interval weekday(curdate()) - 3 day),        0,      40.00),
-					  (    8, date(curdate() - interval weekday(curdate()) - 4 day),        0,      20.00)
+	ScheduledJobs (JobID,                                          ScheduleDate, FinalPrice)
+	values        (    1, date(curdate() - interval weekday(curdate()) - 0 day),      30.00),
+	              (    2, date(curdate() - interval weekday(curdate()) - 0 day),      15.00),
+					  (    3, date(curdate() - interval weekday(curdate()) - 1 day),      30.00),
+					  (    4, date(curdate() - interval weekday(curdate()) - 1 day),     900.00),
+					  (    5, date(curdate() - interval weekday(curdate()) - 2 day),      50.00),
+					  (    6, date(curdate() - interval weekday(curdate()) - 2 day),      50.00),
+					  (    7, date(curdate() - interval weekday(curdate()) - 3 day),      40.00),
+					  (    8, date(curdate() - interval weekday(curdate()) - 4 day),      20.00)
 ;
+select * from ScheduledJobs;
+
+insert into
+	Continuations (ScheduledJobID, ContinuationDay)
+	values        (             4,               1),
+	              (             4,               2)
+;
+select * from Continuations;
 
 insert into
 	Workers ( Username,    Password,         WorkerName, StatusID)
 	values  ("FrodBag",   "Samwise",    "Frodo Baggins",        1),
 	        (  "Robin", "PoisonIvy",     "Dick Grayson",        1),
 			  (  "Vader", "ihatesand", "Anakin Skywalker",        1),
-			  ("Patrick", "Spungebob",     "Patrick Star",        1)
+			  ("Patrick", "spongebob",     "Patrick Star",        1)
 ;
+select * from Workers;
 
 insert into
 	Assignments (ScheduledJobID, WorkerID)
@@ -58,3 +69,4 @@ insert into
 		         (             7,        3),
 		         (             8,        1)
 ;
+select * from Assignments;

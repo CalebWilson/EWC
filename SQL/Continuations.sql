@@ -13,3 +13,11 @@ create table Continuations
 
 	FOREIGN KEY (ScheduledJobID) REFERENCES ScheduledJobs (ScheduledJobID)
 );
+
+/*
+-- test
+insert into
+	Continuations (ScheduledJobID, ContinuationDay)
+	values        (             1,                ) 
+;
+*/

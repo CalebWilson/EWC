@@ -1,6 +1,7 @@
 use ewc;
 
 drop table if exists Assignments;
+drop table if exists Continuations;
 drop table if exists ScheduledJobs;
 drop table if exists Workers;
 drop table if exists Jobs;
@@ -19,4 +20,7 @@ source      Accounts.sql;
 source          Jobs.sql;
 source       Workers.sql;
 source ScheduledJobs.sql;
+source Continuations.sql;
 source   Assignments.sql;
+
+source test_data.sql;

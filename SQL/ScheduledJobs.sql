@@ -8,7 +8,6 @@ create table ScheduledJobs
 	ScheduledJobID int NOT NULL AUTO_INCREMENT,
 	JobID          int NOT NULL,
 	ScheduleDate  date NOT NULL,
-	Duration       int DEFAULT 0,
 
 	FinalPrice decimal(10,2),
 

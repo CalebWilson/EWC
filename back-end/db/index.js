@@ -13,15 +13,39 @@ let db = {};
 
 db.schedule = function(week)
 {
+	//week specificity
 	condition = (week === undefined) ? "" : " where Week = " + week;
+
+	//get GroupWork
 	var group = new Promise ((resolve, reject) =>
 	{
-		pool.query ("select * from GroupWork" + condition, (error, results) =>
+		pool.query ("select distinct Day, Job from GroupWork" + condition,
+				(error, results) =>
 		{
 			if (error) return reject (error);
 			return resolve (results);
 		});
 	});
+
+	.then ((group_jobs) => //make array of Workers for each ScheduledJob
+	{
+		group_jobs.forEach ((group_job) =>
+		{
+			group_job.Workers = new Promise ((resolve, reject) =>
+			{
+				pool.query (
+						"select Worker from GroupWork where Job = " + group_job.Job,
+						(error, results) =>
+				{
+					if (error) return reject (error);
+					return resolve (results);
+				});
+			});
+		});
+
+		return group_jobs;
+	});
+	//.then (db.get_continuations); //make array of days for each ScheduledJob
 
 	var indiv = new Promise ((resolve, reject) =>
 	{
@@ -31,13 +55,21 @@ db.schedule = function(week)
 			return resolve (results);
 		});
 	});
+	//.then (db.get_continuations);
 
 	return Promise.all ([group, indiv]).then ((work_arr) =>
 	{
 		return {"GroupWork": work_arr[0], "IndividualWork": work_arr[1]};
-	});
-
+	})
 };
+
+/*
+db.get_continuations = function (Work)
+{
+	Work.forEach (() =>
+	{
+*/
+		
 
 module.exports = db;
 
