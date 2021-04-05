@@ -6,16 +6,20 @@ drop view if exists WeekWork;
 create view WeekWork
 as
 	select
-      52 * (year(ScheduledJobs.ScheduleDate) - year(curdate()))
-		   + (week(ScheduledJobs.ScheduleDate) - week(curdate())) as Week,
-		dayname(ScheduledJobs.ScheduleDate) as Day,
-		ScheduledJobs.ScheduleDate as "Date",
+      52 * (year(ScheduledJobs.ScheduleDate + interval ScheduledJobDays.ScheduledJobDay day) - year(curdate()))
+		   + (week(ScheduledJobs.ScheduleDate + interval ScheduledJobDays.ScheduledJobDay day) - week(curdate()))
+			as Week,
+		weekday(ScheduledJobs.ScheduleDate + interval ScheduledJobDays.ScheduledJobDay day)
+			as Day,
+		ScheduledJobs.ScheduleDate + interval ScheduledJobDays.ScheduledJobDay day
+			as "Date",
 		Jobs.JobName as Job,
 		Workers.Workername as Worker
-	from ScheduledJobs, Jobs, Assignments, Workers
+	from Jobs, ScheduledJobs, ScheduledJobDays, Assignments, Workers
 	where
-		ScheduledJobs.JobID = Jobs.JobID and
-		Assignments.ScheduledJobID = ScheduledJobs.ScheduledJobID and
+		Jobs.JobID = ScheduledJobs.JobID and
+		ScheduledJobs.ScheduledJobID = ScheduledJobDays.ScheduledJobID and
+		ScheduledJobDays.ScheduledJobDayID = Assignments.ScheduledJobDayID and
 		Assignments.WorkerID = Workers.WorkerID
 ;
 
@@ -27,9 +31,11 @@ as
 	from WeekWork as outside
 	where
 	(
-		select count(*) = 1
+		select count(*) = 0
 		from WeekWork as inside
-		where outside.Job = inside.Job
+		where
+			outside.Job     = inside.Job and
+			outside.Worker != inside.Worker
 	)
 ;
 
@@ -41,8 +47,10 @@ as
 	from WeekWork as outside
 	where
 	(
-		select count(*) > 1
+		select count(*) > 0
 		from WeekWork as inside
-		where outside.Job = inside.Job
+		where
+			outside.Job     = inside.Job and
+			outside.Worker != inside.Worker
 	)
 ;

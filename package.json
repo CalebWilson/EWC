@@ -11,7 +11,7 @@
     "nodemon": "^2.0.7"
   },
   "scripts": {
-    "dev": "npx nodemon back-end/server.js -w server"
+    "dev": "npx nodemon back-end/server.js -w back-end"
   },
   "repository": {
     "type": "git",

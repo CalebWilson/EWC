@@ -1,15 +1,15 @@
 use ewc;
 
-drop table if exists Continuations;
+drop table if exists ScheduledJobDays;
 
 -- Additional days of a service beyond the first
-create table Continuations
+create table ScheduledJobDays
 (
-	ContinuationID  int NOT NULL AUTO_INCREMENT,
-	ScheduledJobID  int NOT NULL,
-	ContinuationDay int NOT NULL, -- 0-indexed, with 0 omitted
+	ScheduledJobDayID  int NOT NULL AUTO_INCREMENT,
+	ScheduledJobID     int NOT NULL,
+	ScheduledJobDay    int NOT NULL, -- 0-indexed, with 0 omitted
 
-	PRIMARY KEY (ContinuationID),
+	PRIMARY KEY (ScheduledJobDayID),
 
 	FOREIGN KEY (ScheduledJobID) REFERENCES ScheduledJobs (ScheduledJobID)
 );
