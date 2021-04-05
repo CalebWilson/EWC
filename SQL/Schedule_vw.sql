@@ -6,8 +6,10 @@ drop view if exists WeekWork;
 create view WeekWork
 as
 	select
-      52 * (year(ScheduledJobs.ScheduleDate + interval ScheduledJobDays.ScheduledJobDay day) - year(curdate()))
-		   + (week(ScheduledJobs.ScheduleDate + interval ScheduledJobDays.ScheduledJobDay day) - week(curdate()))
+			weeks_between (
+				curdate(),
+				ScheduledJobs.ScheduleDate + interval ScheduledJobDays.ScheduledJobDay day
+			)
 			as Week,
 		weekday(ScheduledJobs.ScheduleDate + interval ScheduledJobDays.ScheduledJobDay day)
 			as Day,
