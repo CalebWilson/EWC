@@ -18,6 +18,6 @@ begin
 		52 * (year(date2) - year(date1))
 		   + (week(date2) - week(date1))
 	;
-end//
+end //
 
 delimiter ;
