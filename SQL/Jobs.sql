@@ -19,9 +19,7 @@ create table Jobs
 	ServiceTypeID int NOT NULL, -- inside, outside, or both
 	InvoiceProcID int NOT NULL, -- C.O.D. or Net 30
 
-	LastScheduled   date, -- last scheduled service
-	ServiceInterval int, -- number of weeks between services
-
+	ServiceInterval int,          -- number of weeks between services
 	StatusID        int NOT NULL, -- Active, Inactive, or Terminated
 
 	UNIQUE (JobName),
