@@ -69,7 +69,7 @@ begin
 		ScheduledJobID int not null
 	);
 
-	-- insert into lastScheduledJobs (JobID, ScheduledJobID)
+	insert into lastScheduledJobs (JobID, ScheduledJobID)
 		select -- distinct
 			ScheduledJobs.ScheduledJobID,
 			ScheduledJobs.JobID
@@ -95,29 +95,32 @@ begin
 
 	-- create ScheduledJobDays for the ScheduledJobs that don't have any yet
 	insert into ScheduledJobDays (ScheduledJobID, ScheduledJobDay)
-		select ScheduledJobs.ScheduledJobID, previousScheduledJobDays.ScheduledJobDay
+		select ScheduledJobs.ScheduledJobID, lastScheduledJobDays.ScheduledJobDay
+
 		from
-			(
-				/*
-					get the ScheduledJobDays for the previous services of the Jobs with
-					ScheduledJobs that have no ScheduledJobDays
-				*/
-				select * 
-				from ScheduledJobDays, lastScheduledJobs, newScheduledJobs
-				where
-					ScheduledJobDays.ScheduledJobID = lastScheduledJobs.ScheduledJobID and
+			ScheduledJobs,
+		(
+			select
+				lastScheduledJobs.JobID
+					as JobID,
+				lastScheduledJobs.ScheduledJobID
+					as ScheduledJobID,
+				ScheduledJobDays.ScheduledJobDay
+						as ScheduledJobDay
+			from ScheduledJobDays, lastScheduledJobs
+			where ScheduledJobDays.ScheduledJobID = lastScheduledJobs.ScheduledJobID
 
-			) as previousScheduledJobDays
+		) as lastScheduledJobDays
 
-		where newScheduledJobs.JobID = previousScheduledJobDays.JobID
-
-		order by ScheduledJobs.ScheduledJobID
+		where
+			ScheduledJobs.JobID           = lastScheduledJobDays.JobID and
+			ScheduledJobs.ScheduledJobID != lastScheduledJobDays.ScheduledJobID
 	;
 
 	-- create Assignments for the ScheduledJobs that don't have any yet
 
 
-
+/*
 end //
 
 delimiter ;

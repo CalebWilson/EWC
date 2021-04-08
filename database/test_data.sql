@@ -54,7 +54,8 @@ insert into
 	                 (             7,                  0),
 	                 (             8,                  0),
 	                 (             8,                  1),
-	                 (             9,                  0)
+	                 (             9,                  0),
+						  (             1,                  1)
 ;
 select * from ScheduledJobDays;
 
@@ -88,6 +89,7 @@ insert into
                (                9,        3),
                (               10,        1),
                (               11,        1),
-					(               12,        1)
+					(               12,        1),
+					(               13,        1)
 ;
 select * from Assignments;

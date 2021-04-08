@@ -2,7 +2,6 @@ use ewc;
 
 -- functions and procedures, and views
 drop procedure if exists Recur;
-drop      view if exists ActiveJobs;
 drop      view if exists GroupWork;
 drop      view if exists IndividualWork;
 drop      view if exists WeekWork;
@@ -38,7 +37,7 @@ source      Assignments.sql;
 -- functions, procedures, and views
 source weeks_between_func.sql;
 source       Schedule_vws.sql;
--- source Recurrence_proc_vw.sql;
+-- source Recur_proc.sql;
 
 -- test data
 source test_data.sql;
