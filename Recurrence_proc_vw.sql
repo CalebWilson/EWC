@@ -1,20 +1,29 @@
 use ewc;
 
-/*
+drop view if exists ActiveJobs;
+
+-- get the Intervals and LastScheduled date from the active recurring jobs
+create view ActiveJobs
+as
+
+	group by JobID
+
+;
+
 drop procedure if exists Recur;
 
 delimiter //
 
 create procedure Recur (in Week int)
 begin
-*/
 
-	drop table if exists newScheduledJobs;
 	-- ScheduledJobs created during this procedure
 	create temporary table newScheduledJobs
 	(
 		JobID         int not null,
-		ScheduleDate date not null
+		ScheduleDate date not null, 
+
+		foreign key (JobID) references Jobs (JobID)
 	);
 
 	-- generate and save recurrences in the given week for the recurring Jobs
@@ -24,7 +33,7 @@ begin
 
 			-- next service date
 			LastScheduled + interval
-				weeks_between (LastScheduled, curdate() + interval /*Week*/2 week) week
+				weeks_between (LastScheduled, curdate() + interval Week week) week
 
 		from
 		(
@@ -44,46 +53,13 @@ begin
 				Jobs.StatusID       = Statuses.StatusID and
 				Statuses.StatusName = "Active"          and
 				Jobs.ServiceInterval is not null
-
-			group by JobID
-
-		) as serviceHistory
+		)
 
 		-- in the given week
 		where
-			weeks_between (LastScheduled, curdate() + interval /*Week*/2 week)
-			% ServiceInterval = 0 and
-
-			-- prevent duplicate ScheduledJobs
-			weeks_between (LastScheduled, curdate() + interval /*Week*/2 week)
-			!= 0
-	;
-
-	select * from newScheduledJobs;
-
-	drop table if exists lastScheduledJobs;
-	-- the previous services of the new ScheduledJobs
-	create temporary table lastScheduledJobs
-	(
-		JobID          int not null,
-		ScheduledJobID int not null
-	);
-
-	-- insert into lastScheduledJobs (JobID, ScheduledJobID)
-		select -- distinct
-			ScheduledJobs.ScheduledJobID,
-			ScheduledJobs.JobID
-
-		from ScheduledJobs, newScheduledJobs
-
-		where
-			ScheduledJobs.JobID = newScheduledJobs.JobID and
-			(
-				-- the ScheduledJob is the latest
-				select ScheduledJobs.ScheduleDate = max(inside.ScheduleDate)
-				from ScheduledJobs as inside
-				where ScheduledJobs.JobID = inside.JobID
-			)
+			weeks_between (LastScheduled, curdate() + interval Week week)
+			% ServiceInterval
+			= 0
 	;
 
 	-- schedule the recurrences
@@ -93,29 +69,59 @@ begin
 	;
 
 
+
 	-- create ScheduledJobDays for the ScheduledJobs that don't have any yet
 	insert into ScheduledJobDays (ScheduledJobID, ScheduledJobDay)
 		select ScheduledJobs.ScheduledJobID, previousScheduledJobDays.ScheduledJobDay
 		from
+			newScheduledJobs,
 			(
 				/*
 					get the ScheduledJobDays for the previous services of the Jobs with
 					ScheduledJobs that have no ScheduledJobDays
 				*/
-				select * 
-				from ScheduledJobDays, lastScheduledJobs, newScheduledJobs
+
+				select previousServices.JobID, ScheduledJobDay
+				from
+					ScheduledJobDays,
+					(
+						-- get the previous service of the new ScheduledJobs
+						select distinct
+							ScheduledJobs.ScheduledJobID,
+							ScheduledJobs.JobID
+
+						from ScheduledJobs, newScheduledJobs
+
+						where
+							ScheduledJobs.JobID = newScheduledJobs.JobID and
+							(
+								-- there are ScheduledJobDays for the ScheduledJob
+								select count(*) > 0
+								from ScheduledJobDays
+								where ScheduledJobDays.ScheduledJobID = ScheduledJobs.ScheduledJobID
+							)
+					) as previousServices
+
 				where
-					ScheduledJobDays.ScheduledJobID = lastScheduledJobs.ScheduledJobID and
-
-			) as previousScheduledJobDays
-
-		where newScheduledJobs.JobID = previousScheduledJobDays.JobID
+					ScheduledJobDays.ScheduledJobID = previousServices.ScheduledJobID
+			)
+				as previousScheduledJobDays
+		where
+			ScheduledJobs.JobID = previousScheduledJobDays.JobID and
+         (
+				-- there are no ScheduledJobDays for the ScheduledJob
+				select count(*) = 0
+				from ScheduledJobDays
+				where ScheduledJobDays.ScheduledJobID = ScheduledJobs.ScheduledJobID
+			)
 
 		order by ScheduledJobs.ScheduledJobID
 	;
+*/
 
 	-- create Assignments for the ScheduledJobs that don't have any yet
 
+/*
 
 
 end //
