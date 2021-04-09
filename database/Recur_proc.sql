@@ -1,13 +1,11 @@
 use ewc;
 
-/*
 drop procedure if exists Recur;
 
 delimiter //
 
 create procedure Recur (in Week int)
 begin
-*/
 
 	drop table if exists newScheduledJobs;
 	-- ScheduledJobs created during this procedure
@@ -24,7 +22,7 @@ begin
 
 			-- next service date
 			LastScheduled + interval
-				weeks_between (LastScheduled, curdate() + interval /*Week*/2 week) week
+				weeks_between (LastScheduled, curdate() + interval Week week) week
 
 		from
 		(
@@ -51,18 +49,16 @@ begin
 
 		-- in the given week
 		where
-			weeks_between (LastScheduled, curdate() + interval /*Week*/2 week)
+			weeks_between (LastScheduled, curdate() + interval Week week)
 			% ServiceInterval = 0 and
 
 			-- prevent duplicate ScheduledJobs
-			weeks_between (LastScheduled, curdate() + interval /*Week*/2 week)
+			weeks_between (LastScheduled, curdate() + interval Week week)
 			!= 0
 	;
 
-	select * from newScheduledJobs;
-
-	drop table if exists lastScheduledJobs;
 	-- the previous services of the new ScheduledJobs
+	drop table if exists lastScheduledJobs;
 	create temporary table lastScheduledJobs
 	(
 		JobID          int not null,
@@ -92,36 +88,100 @@ begin
 		from newScheduledJobs
 	;
 
+	drop table if exists lastScheduledJobDays;
+	create temporary table lastScheduledJobDays
+	(
+		JobID             int not null,
+		ScheduledJobID    int not null,
+		ScheduledJobDayID int not null
+	);
 
-	-- create ScheduledJobDays for the ScheduledJobs that don't have any yet
-	insert into ScheduledJobDays (ScheduledJobID, ScheduledJobDay)
-		select ScheduledJobs.ScheduledJobID, lastScheduledJobDays.ScheduledJobDay
-
-		from
-			ScheduledJobs,
-		(
-			select
-				lastScheduledJobs.JobID
-					as JobID,
-				lastScheduledJobs.ScheduledJobID
-					as ScheduledJobID,
-				ScheduledJobDays.ScheduledJobDay
-						as ScheduledJobDay
-			from ScheduledJobDays, lastScheduledJobs
-			where ScheduledJobDays.ScheduledJobID = lastScheduledJobs.ScheduledJobID
-
-		) as lastScheduledJobDays
-
-		where
-			ScheduledJobs.JobID           = lastScheduledJobDays.JobID and
-			ScheduledJobs.ScheduledJobID != lastScheduledJobDays.ScheduledJobID
+	insert into lastScheduledJobDays (JobID, ScheduledJobID, ScheduledJobDayID)
+		select
+			lastScheduledJobs.JobID,
+			lastScheduledJobs.ScheduledJobID,
+			ScheduledJobDays.ScheduledJobDayID
+		from ScheduledJobDays, lastScheduledJobs
+		where ScheduledJobDays.ScheduledJobID = lastScheduledJobs.ScheduledJobID
 	;
 
-	-- create Assignments for the ScheduledJobs that don't have any yet
+	drop table if exists newScheduledJobDays;
+	create temporary table newScheduledJobDays
+	(
+		ScheduledJobID  int not null,
+		ScheduledJobDay int not null
+	);
 
+	-- create ScheduledJobDays for the ScheduledJobs that don't have any yet
+	insert into newScheduledJobDays (ScheduledJobID, ScheduledJobDay)
+		select ScheduledJobs.ScheduledJobID, ScheduledJobDays.ScheduledJobDay
+		from ScheduledJobs, lastScheduledJobDays, ScheduledJobDays
+		where
+			ScheduledJobs.JobID = lastScheduledJobDays.JobID
+				and
+			lastScheduledJobDays.ScheduledJobID = ScheduledJobDays.ScheduledJobID
+				and
+			lastScheduledJobDays.ScheduledJobDayID = ScheduledJobDays.ScheduledJobDayID
+				and
+			(
+				select count(*) = 0
+				from ScheduledJobDays as inside
+				where inside.ScheduledJobID = ScheduledJobs.ScheduledJobID
+			)
+	;
 
-/*
+	insert into ScheduledJobDays (ScheduledJobID, ScheduledJobDay)
+		select ScheduledJobID, ScheduledJobday
+		from newScheduledJobDays
+	;
+
+	/*
+		create Assignments for the ScheduledJobs with ScheduledJobDays
+		that don't have any yet
+	*/
+
+	-- get the assignments for the lastScheduledJobDays
+	insert into Assignments (ScheduledJobDayID, WorkerID)
+		select ScheduledJobDays.ScheduledJobDayID, lastAssignments.WorkerID
+		from
+			ScheduledJobs,
+			ScheduledJobDays,
+			(
+				select 
+					lastScheduledJobDays.JobID
+						as JobID,
+					ScheduledJobDays.ScheduledJobDay
+						as ScheduledJobDay,
+					Assignments.WorkerID
+						as WorkerID
+
+				from lastScheduledJobDays, ScheduledJobDays, Assignments
+
+				where
+					lastScheduledJobDays.ScheduledJobDayID =
+						ScheduledJobDays.ScheduledJobDayID
+						and
+					ScheduledJobDays.ScheduledJobDayID = Assignments.ScheduledJobDayID
+
+			) as lastAssignments
+	
+		where
+		 	lastAssignments.JobID = ScheduledJobs.JobID and
+		 	ScheduledJobs.ScheduledJobID = ScheduledJobDays.ScheduledJobID and
+		 	ScheduledJobDays.ScheduledJobDay = lastAssignments.ScheduledJobDay and
+			(
+				select count(*) = 0
+				from Assignments
+				where
+					Assignments.ScheduledJobDayID = ScheduledJobDays.ScheduledJobDayID
+			)
+	;
+
+	drop table newScheduledJobs;
+	drop table lastScheduledJobs;
+	drop table lastScheduledJobDays;
+	drop table newScheduledJobDays;
+
 end //
 
 delimiter ;
-*/
