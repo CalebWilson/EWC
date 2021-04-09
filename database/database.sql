@@ -37,7 +37,7 @@ source      Assignments.sql;
 -- functions, procedures, and views
 source weeks_between_func.sql;
 source       Schedule_vws.sql;
--- source Recur_proc.sql;
+source         Recur_proc.sql;
 
 -- test data
 source test_data.sql;

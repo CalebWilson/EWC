@@ -88,6 +88,7 @@ begin
 		from newScheduledJobs
 	;
 
+	-- Job Days of the Jobs' previous ScheduledJobs
 	drop table if exists lastScheduledJobDays;
 	create temporary table lastScheduledJobDays
 	(
@@ -105,6 +106,7 @@ begin
 		where ScheduledJobDays.ScheduledJobID = lastScheduledJobs.ScheduledJobID
 	;
 
+	-- the ScheduledJobDays of the newScheduledJobs
 	drop table if exists newScheduledJobDays;
 	create temporary table newScheduledJobDays
 	(
@@ -112,7 +114,7 @@ begin
 		ScheduledJobDay int not null
 	);
 
-	-- create ScheduledJobDays for the ScheduledJobs that don't have any yet
+	-- create ScheduledJobDays for the newScheduledJobs
 	insert into newScheduledJobDays (ScheduledJobID, ScheduledJobDay)
 		select ScheduledJobs.ScheduledJobID, ScheduledJobDays.ScheduledJobDay
 		from ScheduledJobs, lastScheduledJobDays, ScheduledJobDays
@@ -130,6 +132,7 @@ begin
 			)
 	;
 
+	-- add the newScheduledJobDays
 	insert into ScheduledJobDays (ScheduledJobID, ScheduledJobDay)
 		select ScheduledJobID, ScheduledJobday
 		from newScheduledJobDays
@@ -147,6 +150,7 @@ begin
 			ScheduledJobs,
 			ScheduledJobDays,
 			(
+				-- Assignments for the JobDays of the lastScheduledJobs
 				select 
 					lastScheduledJobDays.JobID
 						as JobID,
@@ -170,6 +174,7 @@ begin
 		 	ScheduledJobs.ScheduledJobID = ScheduledJobDays.ScheduledJobID and
 		 	ScheduledJobDays.ScheduledJobDay = lastAssignments.ScheduledJobDay and
 			(
+				-- there are no Assignments for the ScheduledJobDays
 				select count(*) = 0
 				from Assignments
 				where
@@ -177,6 +182,7 @@ begin
 			)
 	;
 
+	-- drop temporary tables
 	drop table newScheduledJobs;
 	drop table lastScheduledJobs;
 	drop table lastScheduledJobDays;
