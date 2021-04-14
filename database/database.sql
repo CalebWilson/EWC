@@ -1,7 +1,9 @@
 use ewc;
 
 -- functions and procedures, and views
-drop procedure if exists Recur;
+drop procedure if exists GenerateWeek;
+drop procedure if exists createScheduledJob;
+drop procedure if exists RenewServiceData;
 drop      view if exists GroupWork;
 drop      view if exists IndividualWork;
 drop      view if exists WeekWork;
@@ -37,7 +39,7 @@ source      Assignments.sql;
 -- functions, procedures, and views
 source weeks_between_func.sql;
 source       Schedule_vws.sql;
-source         Recur_proc.sql;
+source     Schedule_procs.sql;
 
 -- test data
 source test_data.sql;

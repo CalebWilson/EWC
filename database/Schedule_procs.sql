@@ -1,5 +1,10 @@
 use ewc;
 
+/*
+	Given the temporary table newScheduledJobs, copy the ScheduledJobDays and
+	Assignments from the latest prior ScheduledJobs of the Job of the
+	newScheduledJobs.
+*/
 drop procedure if exists RenewServiceData;
 
 delimiter //
@@ -141,13 +146,76 @@ end //
 
 delimiter ;
 
+-- end procedure RenewServiceData
 
 
-drop procedure if exists Recur;
+/*
+	Create a new ScheduledJob.
+*/
+drop procedure if exists CreateScheduledJob;
 
 delimiter //
 
-create procedure Recur (in Week int)
+create procedure CreateScheduledJob (in newJobID int, in newScheduleDate date)
+begin
+
+	declare firstScheduledJob boolean default 0;
+
+	-- whether this will be the first ScheduledJob for the given Job
+	set firstScheduledJob =
+	(
+		-- there are no ScheduledJobs for the given Job
+		select count(*) = 0
+		from ScheduledJobs
+		where JobID = newJobID
+	);
+
+	if firstScheduledJob
+	then
+		insert into
+			ScheduledJobs (   JobID,    ScheduleDate)
+		   values        (newJobID, newScheduleDate)
+		;
+
+		insert into
+			ScheduledJobDays (  ScheduledJobID, ScheduledJobDay)
+			values           (last_insert_id(),               0)
+		;
+	
+	else
+		create temporary table newScheduledJobs
+		(
+			JobID         int not null,
+			ScheduleDate date not null
+		);
+
+		insert into
+			newScheduledJobs (   JobID,    ScheduleDate)
+			values           (newJobID, newScheduleDate)
+		;
+
+		call RenewServiceData();
+
+		drop table newScheduledJobs;
+	
+	end if;
+
+end //
+
+delimiter ;
+
+-- end procedure createScheduledJob
+
+
+/*
+	Schedule a service for every recurring job that should have a service fall on
+	this week.
+*/
+drop procedure if exists GenerateWeek;
+
+delimiter //
+
+create procedure GenerateWeek (in Week int)
 begin
 
 	drop table if exists newScheduledJobs;
@@ -207,3 +275,5 @@ begin
 end //
 
 delimiter ;
+
+-- end procedure GenerateWeek
