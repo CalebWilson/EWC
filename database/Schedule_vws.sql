@@ -21,23 +21,44 @@ as
 		)
 			as Day,
 
+		-- whether the Job Day is the first
+		ScheduledJobDays.ScheduledJobDay = 0
+			as FirstDay,
+
 		-- date that the work falls on
 		ScheduledJobs.ScheduleDate + interval ScheduledJobDays.ScheduledJobDay day
 			as "Date",
 
-		-- names of Job and Worker
+		-- Job and Worker info
 		Jobs.JobName
-			as Job,
-		Workers.Workername
-			as Worker
+			as JobName,
+		ServiceTypes.ServiceType
+			as ServiceType,
+		ScheduledJobs.FinalPrice
+			as FinalPrice,
+		ScheduledJobs.Complete
+			as Complete,
+		Workers.WorkerName
+			as WorkerName,
+		WorkerStatuses.StatusName
+			as WorkerStatus
 
-	from Jobs, ScheduledJobs, ScheduledJobDays, Assignments, Workers
+	from
+		Jobs,
+		ScheduledJobs,
+		ScheduledJobDays,
+		Assignments,
+		Workers,
+		ServiceTypes,
+		Statuses as WorkerStatuses
 
 	where
 		Jobs.JobID                         = ScheduledJobs.JobID             and
 		ScheduledJobs.ScheduledJobID       = ScheduledJobDays.ScheduledJobID and
 		ScheduledJobDays.ScheduledJobDayID = Assignments.ScheduledJobDayID   and
-		Assignments.WorkerID               = Workers.WorkerID
+		Assignments.WorkerID               = Workers.WorkerID                and
+		Jobs.ServiceTypeID                 = ServiceTypes.ServiceTypeID      and
+		Workers.StatusID                   = WorkerStatuses.StatusID
 ;
 
 drop view if exists IndividualWork;
@@ -53,8 +74,8 @@ as
 		select count(*) = 0
 		from WeekWork as inside
 		where
-			outside.Job     = inside.Job and
-			outside.Worker != inside.Worker
+			outside.JobName     = inside.JobName and
+			outside.WorkerName != inside.WorkerName
 	)
 ;
 
@@ -71,7 +92,7 @@ as
 		select count(*) > 0
 		from WeekWork as inside
 		where
-			outside.Job     = inside.Job and
-			outside.Worker != inside.Worker
+			outside.JobName     = inside.JobName and
+			outside.WorkerName != inside.WorkerName
 	)
 ;

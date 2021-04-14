@@ -14,13 +14,25 @@ let db = {};
 db.schedule = function (week)
 {
 	//week specificity
-	condition = (week === undefined) ? "" : " where Week = " + week;
+	week_condition = (week === undefined) ?  "1" :
+		"Week = " + week +                           //this week's work
+		" or (Week = " + (week - 1) + " and Day > 4)" //last week's overflow
+	;
 
 	//get GroupWork
 	var group = new Promise ((resolve, reject) =>
 	{
 		pool.query (
-				"select distinct Day, Job from GroupWork" + condition,
+				`select
+					distinct
+						Day % 5 as Day,
+						FirstDay,
+						JobName,
+						ServiceType,
+						FinalPrice,
+						Complete
+					from GroupWork
+					where ` + week_condition,
 				(error, results) =>
 		{
 			if (error) return reject (error);
@@ -41,8 +53,14 @@ db.schedule = function (week)
 			teams.push (new Promise ((resolve, reject) =>
 			{
 				pool.query (
-						"select Worker from GroupWork where Job = ? and Day = ?",
-						[group_job.Job, group_job.Day],
+						`select WorkerName, WorkerStatus
+							from GroupWork
+							where
+								JobName = ? and
+								Day           = ? and `
+								+ week_condition
+						,
+						[group_job.JobName, group_job.Day],
 						(error, results) =>
 				{
 					if (error) return reject (error);
@@ -54,11 +72,13 @@ db.schedule = function (week)
 		//match each worker team with its job
 		return Promise.all (teams).then ((teams) =>
 		{
+			/*
 			//replace each Worker JSON with the Worker's name
 			for (i = 0; i < teams.length; i++)
 			{
 				teams[i] = teams[i].map (worker_obj => worker_obj.Worker);
 			}
+			*/
 
 			//add each team as an attribute of the group job
 			group_jobs.forEach ((group_job, index) =>
@@ -75,7 +95,12 @@ db.schedule = function (week)
 	var indiv = new Promise ((resolve, reject) =>
 	{
 		pool.query (
-				"select distinct Day, Worker from IndividualWork" + condition,
+				`select
+					distinct
+						Day % 5 as Day,
+						WorkerName
+					from IndividualWork
+					where ` + week_condition,
 				(error, results) =>
 		{
 			if (error) return reject (error);
@@ -96,8 +121,15 @@ db.schedule = function (week)
 			job_sets.push (new Promise ((resolve, reject) =>
 			{
 				pool.query (
-						"select Job from IndividualWork where Worker = ? and Day = ?",
-						[worker.Worker, worker.Day],
+						`select
+							JobName, FirstDay, ServiceType, FinalPrice, Complete
+							from IndividualWork
+							where
+								WorkerName = ? and
+								Day        = ? and `
+								+ week_condition
+						,
+						[worker.WorkerName, worker.Day],
 						(error, results) =>
 				{
 					if (error) return reject (error);
@@ -109,12 +141,6 @@ db.schedule = function (week)
 		//match each set of jobs with its worker
 		return Promise.all (job_sets).then ((job_sets) =>
 		{
-			//replace each Job JSON with the Job's name
-			for (i = 0; i < job_sets.length; i++)
-			{
-				job_sets[i] = job_sets[i].map (job_obj => job_obj.Job);
-			}
-
 			//add each job set as an attribute of the individual worker
 			indiv_workers.forEach ((worker, index) =>
 			{
