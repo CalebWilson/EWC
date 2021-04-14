@@ -1,61 +1,11 @@
 use ewc;
 
-drop procedure if exists Recur;
+drop procedure if exists RenewServiceData;
 
 delimiter //
 
-create procedure Recur (in Week int)
+create procedure RenewServiceData()
 begin
-
-	drop table if exists newScheduledJobs;
-	-- ScheduledJobs created during this procedure
-	create temporary table newScheduledJobs
-	(
-		JobID         int not null,
-		ScheduleDate date not null
-	);
-
-	-- generate and save recurrences in the given week for the recurring Jobs
-	insert into newScheduledJobs (JobID, ScheduleDate)
-		select
-			JobID,
-
-			-- next service date
-			LastScheduled + interval
-				weeks_between (LastScheduled, curdate() + interval Week week) week
-
-		from
-		(
-			-- get the last service and service interval of active recurring Jobs
-			select
-				ScheduledJobs.JobID
-					as JobID,
-				max(ScheduledJobs.ScheduleDate)
-					as LastScheduled,
-				Jobs.ServiceInterval
-					as ServiceInterval
-
-			from ScheduledJobs, Jobs, Statuses
-
-			where
-				ScheduledJobs.JobID = Jobs.JobID        and
-				Jobs.StatusID       = Statuses.StatusID and
-				Statuses.StatusName = "Active"          and
-				Jobs.ServiceInterval is not null
-
-			group by JobID
-
-		) as serviceHistory
-
-		-- in the given week
-		where
-			weeks_between (LastScheduled, curdate() + interval Week week)
-			% ServiceInterval = 0 and
-
-			-- prevent duplicate ScheduledJobs
-			weeks_between (LastScheduled, curdate() + interval Week week)
-			!= 0
-	;
 
 	-- the previous services of the new ScheduledJobs
 	drop table if exists lastScheduledJobs;
@@ -183,10 +133,76 @@ begin
 	;
 
 	-- drop temporary tables
-	drop table newScheduledJobs;
 	drop table lastScheduledJobs;
 	drop table lastScheduledJobDays;
 	drop table newScheduledJobDays;
+
+end //
+
+delimiter ;
+
+
+
+drop procedure if exists Recur;
+
+delimiter //
+
+create procedure Recur (in Week int)
+begin
+
+	drop table if exists newScheduledJobs;
+	-- ScheduledJobs created during this procedure
+	create temporary table newScheduledJobs
+	(
+		JobID         int not null,
+		ScheduleDate date not null
+	);
+
+	-- generate and save recurrences in the given week for the recurring Jobs
+	insert into newScheduledJobs (JobID, ScheduleDate)
+		select
+			JobID,
+
+			-- next service date
+			LastScheduled + interval
+				weeks_between (LastScheduled, curdate() + interval Week week) week
+
+		from
+		(
+			-- get the last service and service interval of active recurring Jobs
+			select
+				ScheduledJobs.JobID
+					as JobID,
+				max(ScheduledJobs.ScheduleDate)
+					as LastScheduled,
+				Jobs.ServiceInterval
+					as ServiceInterval
+
+			from ScheduledJobs, Jobs, Statuses
+
+			where
+				ScheduledJobs.JobID = Jobs.JobID        and
+				Jobs.StatusID       = Statuses.StatusID and
+				Statuses.StatusName = "Active"          and
+				Jobs.ServiceInterval is not null
+
+			group by JobID
+
+		) as serviceHistory
+
+		-- in the given week
+		where
+			weeks_between (LastScheduled, curdate() + interval Week week)
+			% ServiceInterval = 0 and
+
+			-- prevent duplicate ScheduledJobs
+			weeks_between (LastScheduled, curdate() + interval Week week)
+			!= 0
+	;
+
+	call renewServiceData();
+
+	drop table newScheduledJobs;
 
 end //
 
