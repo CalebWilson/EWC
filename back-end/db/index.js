@@ -11,7 +11,7 @@ const pool = mysql.createPool({
 
 let db = {};
 
-db.schedule = function (week)
+db.schedule_week = function (week)
 {
 	//week specificity
 	week_condition = (week === undefined) ?  "1" :
@@ -19,6 +19,17 @@ db.schedule = function (week)
 		" or (Week = " + (week - 1) + " and Day > 4)" //last week's overflow
 	;
 
+	let schedule = [];
+	for (let day = 0; day < 5; day ++)
+	{
+		schedule.push (db.schedule_day (week_condition, day));
+	}
+
+	return Promise.all (schedule);
+};
+
+db.schedule_day = function (week_condition, day)
+{
 	//get GroupWork
 	var group = new Promise ((resolve, reject) =>
 	{
@@ -32,7 +43,8 @@ db.schedule = function (week)
 						FinalPrice,
 						Complete
 					from GroupWork
-					where ` + week_condition,
+					where Day % 5 = ` + day + ` and `
+					+ week_condition,
 				(error, results) =>
 		{
 			if (error) return reject (error);
@@ -56,8 +68,8 @@ db.schedule = function (week)
 						`select WorkerName, WorkerStatus
 							from GroupWork
 							where
-								JobName = ? and
-								Day           = ? and `
+								JobName = ?           and
+								Day % 5 = ` + day + ` and `
 								+ week_condition
 						,
 						[group_job.JobName, group_job.Day],
@@ -100,7 +112,10 @@ db.schedule = function (week)
 						Day % 5 as Day,
 						WorkerName
 					from IndividualWork
-					where ` + week_condition,
+					where
+						Day % 5 = ` + day + ` and `
+						+ week_condition
+				,
 				(error, results) =>
 		{
 			if (error) return reject (error);

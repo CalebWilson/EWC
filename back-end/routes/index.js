@@ -36,11 +36,11 @@ function retrieve_data (db_method, params)
 }
 
 router.route('/schedule')
-	.get  (retrieve_data (db.schedule));
+	.get  (retrieve_data (db.schedule_week));
 //	.post (
 router.get('/schedule/:week', (request, response, next) =>
 {
-	var handler = retrieve_data (db.schedule, request.params.week);
+	var handler = retrieve_data (db.schedule_week, request.params.week);
 	handler (request, response, next);
 });
 
