@@ -41,7 +41,15 @@ as
 		Workers.WorkerName
 			as WorkerName,
 		WorkerStatuses.StatusName
-			as WorkerStatus
+			as WorkerStatus,
+
+		-- Primary keys for front-end reference
+		ScheduledJobs.ScheduledJobID
+			as ScheduledJobID,
+		ScheduledJobDays.ScheduledJobDayID
+			as ScheduledJobDayID,
+		Workers.WorkerID
+			as WorkerID
 
 	from
 		Jobs,

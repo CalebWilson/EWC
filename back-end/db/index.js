@@ -36,12 +36,13 @@ db.schedule_day = function (week_condition, day)
 		pool.query (
 				`select
 					distinct
-						Day % 5 as Day,
-						FirstDay,
 						JobName,
+						ScheduledJobID,
 						ServiceType,
 						FinalPrice,
-						Complete
+						Complete,
+						ScheduledJobID,
+						FirstDay
 					from GroupWork
 					where Day % 5 = ` + day + ` and `
 					+ week_condition,
@@ -65,7 +66,7 @@ db.schedule_day = function (week_condition, day)
 			teams.push (new Promise ((resolve, reject) =>
 			{
 				pool.query (
-						`select WorkerName, WorkerStatus
+						`select WorkerID, WorkerName, WorkerStatus
 							from GroupWork
 							where
 								JobName = ?           and
@@ -109,7 +110,7 @@ db.schedule_day = function (week_condition, day)
 		pool.query (
 				`select
 					distinct
-						Day % 5 as Day,
+						WorkerID,
 						WorkerName
 					from IndividualWork
 					where
@@ -137,14 +138,20 @@ db.schedule_day = function (week_condition, day)
 			{
 				pool.query (
 						`select
-							JobName, FirstDay, ServiceType, FinalPrice, Complete
+							JobName,
+							ScheduledJobID,
+							ServiceType,
+							FinalPrice,
+							Complete,
+							ScheduledJobDayID,
+							FirstDay
 							from IndividualWork
 							where
-								WorkerName = ? and
-								Day        = ? and `
+								WorkerID = ? and
+								Day      = ? and `
 								+ week_condition
 						,
-						[worker.WorkerName, worker.Day],
+						[worker.WorkerID, day],
 						(error, results) =>
 				{
 					if (error) return reject (error);

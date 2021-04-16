@@ -36,12 +36,18 @@ function retrieve_data (db_method, params)
 }
 
 router.route('/schedule')
-	.get  (retrieve_data (db.schedule_week));
-//	.post (
-router.get('/schedule/:week', (request, response, next) =>
-{
-	var handler = retrieve_data (db.schedule_week, request.params.week);
-	handler (request, response, next);
-});
+	.get (retrieve_data (db.schedule_week));
+
+router.route('/schedule/:week')
+	.get ((request, response, next) =>
+	{
+		var handler = retrieve_data (db.schedule_week, request.params.week);
+		handler (request, response, next);
+	})
+
+	.post ((request, response, next) =>
+	{
+		//invoke db method
+	});
 
 module.exports = router;
