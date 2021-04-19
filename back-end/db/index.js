@@ -1,4 +1,4 @@
-const mysql = require('mysql');
+const mysql = require("mysql");
 
 const pool = mysql.createPool({
 	connectionLimit: 10,
@@ -11,24 +11,63 @@ const pool = mysql.createPool({
 
 let db = {};
 
-db.schedule_week = function (week)
+db.schedule_week = function (params)
 {
+	//extract parameters
+	let week   = params.week;
+	let worker = params.worker;
+
 	//week specificity
-	week_condition = (week === undefined) ?  "1" :
-		"Week = " + week +                           //this week's work
-		" or (Week = " + (week - 1) + " and Day > 4)" //last week's overflow
+	week_condition = (week === undefined) ?  `1` :
+		`(Week = ` + week +                           //this week's work
+		` or (Week = ` + (week - 1) + ` and Day > 4))` //last week's overflow
 	;
 
+	//worker specificity for GroupWork
+	group_worker_condition = (worker === undefined) ? `1` :
+		//there is a day of the ScheduledJob to which the Worker is assigned
+		`(
+			select count(*) > 0
+			from GroupWork as inside
+			where
+				inside.ScheduledJobID = GroupWork.ScheduledJobID and
+				inside.Day            = GroupWork.Day            and
+				WorkerID              = ` + worker +
+		`)`
+	;
+
+	//worker specificity for IndividualWork
+	indiv_worker_condition = (worker === undefined) ? `1` : `WorkerID = ` + worker;
+
+//	group_worker_condition = `1`;
+//	indiv_worker_condition = `1`;
+
+	//build schedule by day
 	let schedule = [];
 	for (let day = 0; day < 5; day ++)
 	{
-		schedule.push (db.schedule_day (week_condition, day));
+		schedule.push
+		(
+			db.schedule_day
+			(
+				day,
+				week_condition,
+				group_worker_condition,
+				indiv_worker_condition
+			)
+		);
 	}
 
 	return Promise.all (schedule);
 };
 
-db.schedule_day = function (week_condition, day)
+db.schedule_day = function
+	(
+		day,
+		week_condition,
+		group_worker_condition,
+		indiv_worker_condition
+	)
 {
 	//get GroupWork
 	var group = new Promise ((resolve, reject) =>
@@ -45,7 +84,9 @@ db.schedule_day = function (week_condition, day)
 						FirstDay
 					from GroupWork
 					where Day % 5 = ` + day + ` and `
-					+ week_condition,
+					+ week_condition + ` and `
+					+ group_worker_condition,
+					+ `1`,
 				(error, results) =>
 		{
 			if (error) return reject (error);
@@ -115,7 +156,8 @@ db.schedule_day = function (week_condition, day)
 					from IndividualWork
 					where
 						Day % 5 = ` + day + ` and `
-						+ week_condition
+						+ week_condition  + ` and `
+						+ indiv_worker_condition
 				,
 				(error, results) =>
 		{
