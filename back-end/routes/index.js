@@ -38,6 +38,18 @@ function retrieve_data (db_method, params)
 router.route ('/schedule')
 	.get (retrieve_data (db.schedule_week))
 
+	/*
+		request.body will be a JSON of the form:
+		{
+			JobID: int,
+			ScheduleDate: date,
+			ScheduledJobDays:
+			[{
+					Day: int,
+					WorkersIDs: int[]
+			}]
+		}
+	*/
 	.post ((request, response, next) =>
 	{
 		//invoke db method
@@ -47,7 +59,7 @@ router.route ('/schedule')
 router.route ('/schedule/:week')
 	.get ((request, response, next) =>
 	{
-		let handler = retrieve_data (db.schedule_week, {week: request.params.week});
+		let handler = retrieve_data (db.schedule_week, request.params);
 		handler (request, response, next);
 	})
 ;
@@ -55,17 +67,8 @@ router.route ('/schedule/:week')
 router.route ('/schedule/:week/:worker')
 	.get ((request, response, next) =>
 	{
-		let handler = retrieve_data
-		(
-			db.schedule_week,
-			{
-				week:   request.params.week,
-				worker: request.params.worker
-			}
-		);
-
+		let handler = retrieve_data (db.schedule_week, request.params);
 		handler (request, response, next);
-
 	})
 ;
 
