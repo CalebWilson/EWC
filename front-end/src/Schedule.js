@@ -8,7 +8,7 @@ class Schedule extends Component
 	constructor (props)
 	{
 		super (props);
-		this.state = { schedule: "" };
+		this.state = { schedule: [] };
 	}
 
 	callAPI()
@@ -17,8 +17,9 @@ class Schedule extends Component
 			.then  (response => response.json())
 			.then  ((data) =>
 			{
-				console.log (data);
+				console.log("Hello");
 				this.setState ({ schedule: data});
+				console.log (this.state.schedule);
 			})
 			.catch (error => error)
 		;
@@ -31,29 +32,25 @@ class Schedule extends Component
 
 	render()
 	{
-		console.log("Hello");
 		return (
 			<div className="App">
 				<table>
 					<tr>
 						<th>Notes</th>
-						<th>Sunday</th>
 						<th>Monday</th>
 						<th>Tuesday</th>
 						<th>Wednesday</th>
 						<th>Thursday</th>
 						<th>Friday</th>
-						<th>Saturday</th>
 					</tr>
 					<tr>
 						<Day content="Notes Content" />
-						<Day content="Sunday Content" />
-						<Day content={this.state.schedule[0]} />
-						<Day content="Tuesday Content" />
-						<Day content="Wednesday Content" />
-						<Day content="Thursday Content" />
-						<Day content="Friday Content" />
-						<Day content="Saturday Content" />
+						{
+							this.state.schedule.map
+							(
+								(value, index) => (<Day content={value} />)
+							)
+						}
 					</tr>
 				</table>
 			</div>
