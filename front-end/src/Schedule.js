@@ -8,14 +8,18 @@ class Schedule extends Component
 	constructor (props)
 	{
 		super (props);
-		this.state = { apiResponse: "" };
+		this.state = { schedule: "" };
 	}
 
 	callAPI()
 	{
-		fetch ("http://localhost:8080")
-			.then  (response => response.text())
-			.then  (response => this.setState ({ apiResponse: response }))
+		fetch ("http://localhost:8080/schedule/-1")
+			.then  (response => response.json())
+			.then  ((data) =>
+			{
+				console.log (data);
+				this.setState ({ schedule: data});
+			})
 			.catch (error => error)
 		;
 	}
@@ -27,11 +31,9 @@ class Schedule extends Component
 
 	render()
 	{
+		console.log("Hello");
 		return (
 			<div className="App">
-				<p className="App-intro">
-					Response: {this.state.apiResponse}
-				</p>
 				<table>
 					<tr>
 						<th>Notes</th>
@@ -46,7 +48,7 @@ class Schedule extends Component
 					<tr>
 						<Day content="Notes Content" />
 						<Day content="Sunday Content" />
-						<Day content="Monday Content" />
+						<Day content={this.state.schedule[0]} />
 						<Day content="Tuesday Content" />
 						<Day content="Wednesday Content" />
 						<Day content="Thursday Content" />

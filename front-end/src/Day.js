@@ -6,7 +6,7 @@ class Day extends Component
 	render()
 	{
 		return (
-			<td><div className="scrollable">{this.props.content}</div></td>
+			<td><div className="scrollable">{JSON.stringify(this.props.content)}</div></td>
 		);
 	}
 }
