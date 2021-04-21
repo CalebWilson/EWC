@@ -13,3 +13,7 @@ td {
 	overflow-y: auto;
 	table-layout: fixed;
 }
+
+.indent {
+	margin-left: 20%
+}

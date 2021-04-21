@@ -35,23 +35,23 @@ class Schedule extends Component
 		return (
 			<div className="App">
 				<table>
-					<tr>
+					<thead><tr>
 						<th>Notes</th>
 						<th>Monday</th>
 						<th>Tuesday</th>
 						<th>Wednesday</th>
 						<th>Thursday</th>
 						<th>Friday</th>
-					</tr>
-					<tr>
+					</tr></thead>
+					<tbody><tr>
 						<Day content="Notes Content" />
 						{
 							this.state.schedule.map
 							(
-								(value, index) => (<Day content={value} />)
+								(value, index) => (<Day key={index} content={value} />)
 							)
 						}
-					</tr>
+					</tr></tbody>
 				</table>
 			</div>
 		);
