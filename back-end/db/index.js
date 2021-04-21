@@ -11,6 +11,9 @@ const pool = mysql.createPool({
 
 let db = {};
 
+/*
+	Get all Assignments for the given week and worker
+*/
 db.schedule_week = function (params)
 {
 	//extract parameters
@@ -39,9 +42,6 @@ db.schedule_week = function (params)
 	//worker specificity for IndividualWork
 	indiv_worker_condition = (worker === undefined) ? `1` : `WorkerID = ` + worker;
 
-//	group_worker_condition = `1`;
-//	indiv_worker_condition = `1`;
-
 	//build schedule by day
 	let schedule = [];
 	for (let day = 0; day < 5; day ++)
@@ -61,6 +61,9 @@ db.schedule_week = function (params)
 	return Promise.all (schedule);
 };
 
+/*
+	Get all Assignments on the given day, given conditions for week and worker
+*/
 db.schedule_day = function
 	(
 		day,
@@ -106,34 +109,29 @@ db.schedule_day = function
 			//add the team that will work on that job to teams array
 			teams.push (new Promise ((resolve, reject) =>
 			{
-				pool.query (
-						`select WorkerID, WorkerName, WorkerStatus
-							from GroupWork
-							where
-								JobName = ?           and
-								Day % 5 = ` + day + ` and `
-								+ week_condition
-						,
-						[group_job.JobName, group_job.Day],
-						(error, results) =>
-				{
-					if (error) return reject (error);
-					return resolve (results);
-				});
+				pool.query
+				(
+					`select WorkerID, WorkerName, WorkerStatus
+						from GroupWork
+						where
+							JobName = ?           and
+							Day % 5 = ` + day + ` and `
+							+ week_condition
+					,
+					group_job.JobName,
+
+					(error, results) =>
+					{
+						if (error) return reject (error);
+						return resolve (results);
+					}
+				);
 			}));
 		});
 
 		//match each worker team with its job
 		return Promise.all (teams).then ((teams) =>
 		{
-			/*
-			//replace each Worker JSON with the Worker's name
-			for (i = 0; i < teams.length; i++)
-			{
-				teams[i] = teams[i].map (worker_obj => worker_obj.Worker);
-			}
-			*/
-
 			//add each team as an attribute of the group job
 			group_jobs.forEach ((group_job, index) =>
 			{
@@ -221,6 +219,43 @@ db.schedule_day = function
 		return {"GroupWork": work_arr[0], "IndividualWork": work_arr[1]};
 	})
 };
+
+
+/*
+	Create a new scheduled job.
+
+	params will be a JSON of the form:
+	{
+		JobID: int,
+		ScheduleDate: date,
+		DayAssignments:
+		[{
+			Day: int,
+			WorkersIDs: int[]
+		}]
+	}
+*/
+db.create_scheduled_job = function (params)
+{
+	//create new scheduled job in the database
+	return new Promise ((resolve, reject) =>
+	{
+		pool.query
+		(
+			`call CreateScheduledJob (?, ?);
+			select last_insert_id()`,
+
+			[params.JobID, params.ScheduleDate],
+
+			(error, results) =>
+			{
+				if (error) return reject (error);
+				return resolve (results);
+			}
+		);
+	})
+};
+			
 
 
 module.exports = db;

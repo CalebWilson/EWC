@@ -3,18 +3,13 @@ const db = require('../db');
 
 let router = express.Router();
 
-router.get('/', (request, response) =>
-{
-	response.redirect ('/schedule/0');
-});
-
 /*
 	Retrieve data from the database
 
 	Takes in a method of the `db` object, and returns a function that calls that
 	method and sends a json response created from its results.
 */
-function retrieve_data (db_method, params)
+function access_database (db_method, params)
 {
 	//handler method to be returned
 	return (async (request, response, next) =>
@@ -35,15 +30,21 @@ function retrieve_data (db_method, params)
 	});
 }
 
+router.get('/', (request, response) =>
+{
+	//response.redirect ('/schedule/0');
+	response.send ("API is working alright yup");
+});
+
 router.route ('/schedule')
-	.get (retrieve_data (db.schedule_week))
+	.get (access_database (db.schedule_week))
 
 	/*
 		request.body will be a JSON of the form:
 		{
 			JobID: int,
 			ScheduleDate: date,
-			ScheduledJobDays:
+			DayAssignments:
 			[{
 					Day: int,
 					WorkersIDs: int[]
@@ -52,14 +53,15 @@ router.route ('/schedule')
 	*/
 	.post ((request, response, next) =>
 	{
-		//invoke db method
+		let handler = access_database (db.create_scheduled_job, request.body);
+		handler (request, response, next);
 	})
 ;
 
 router.route ('/schedule/:week')
 	.get ((request, response, next) =>
 	{
-		let handler = retrieve_data (db.schedule_week, request.params);
+		let handler = access_database (db.schedule_week, request.params);
 		handler (request, response, next);
 	})
 ;
@@ -67,7 +69,7 @@ router.route ('/schedule/:week')
 router.route ('/schedule/:week/:worker')
 	.get ((request, response, next) =>
 	{
-		let handler = retrieve_data (db.schedule_week, request.params);
+		let handler = access_database (db.schedule_week, request.params);
 		handler (request, response, next);
 	})
 ;

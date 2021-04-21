@@ -1,0 +1,17 @@
+table {
+	position: absolute;
+	top:    10%;
+	bottom: 10%;
+	left:    2%;
+	right:   2%;
+	height: 80%;
+	width:  96%;
+
+	table-layout: fixed;
+	border-collapse: collapse;
+}
+
+th, td {
+	width: 12.5%;
+	padding: 10px;
+}
