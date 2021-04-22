@@ -3,7 +3,7 @@ import "./Schedule.css";
 
 import Day from "./Day";
 
-class Schedule extends Component
+export default class Schedule extends Component
 {
 	constructor (props)
 	{
@@ -44,12 +44,16 @@ class Schedule extends Component
 						<th>Friday</th>
 					</tr></thead>
 					<tbody><tr>
-						<Day content="Notes Content" />
+						<Day work_day="Notes Content" />
 						{
-							this.state.schedule.map
+							this.state.schedule.map ((schedule_work_day, index) =>
 							(
-								(value, index) => (<Day key={index} content={value} />)
-							)
+								<Day
+									day={index}
+									key={index}
+									work_day={schedule_work_day}
+								/>
+							))
 						}
 					</tr></tbody>
 				</table>
@@ -57,5 +61,3 @@ class Schedule extends Component
 		);
 	}
 }
-
-export default Schedule;

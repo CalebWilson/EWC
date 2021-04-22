@@ -84,6 +84,7 @@ db.schedule_day = function
 						FinalPrice,
 						Complete,
 						ScheduledJobID,
+						ScheduledJobDayID,
 						FirstDay
 					from GroupWork
 					where Day % 5 = ` + day + ` and `

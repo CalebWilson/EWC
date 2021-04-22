@@ -1,59 +1,45 @@
 import React, { Component } from "react";
-import './Day.css';
+import "./Day.css";
 
-class Day extends Component
+import      GroupWorkItem from      "./GroupWorkItem";
+import IndividualWorkItem from "./IndividualWorkItem";
+
+export default class Day extends Component
 {
 	render()
 	{
-		const { GroupWork, IndividualWork} = this.props.content;
+		const { GroupWork, IndividualWork, day} = this.props.work_day;
 		console.log ("GroupWork: " + GroupWork);
 		console.log ("IndividualWork: " + IndividualWork);
 
-		if (GroupWork === undefined) return (<td>{this.props.content}</td>);
+		if (GroupWork === undefined) return (<td>{this.props.work_day}</td>);
 
 		return (
+
 			<td><div className="scrollable">
 			{
-				//JSON.stringify(this.props.content)
+				//GroupWork
 				GroupWork.map ((group_job) =>
 				(
-					<div>
-						{group_job.JobName} {group_job.ServiceType} {group_job.FinalPrice}<br/>
-						Workers:
-						<div className="indent">
-						{
-							group_job.Workers.map ((Worker) =>
-							(
-								<div>{Worker.WorkerName}<br/></div>
-							))
-						}
-						</div>
-						<br/>
-					</div>
+					<GroupWorkItem
+						key={group_job.ScheduledJobDayID}
+						job={group_job}
+					/>
 				))
 			}
-			{
-				IndividualWork.map ((indiv_worker) =>
-				(
-					<div>
-						{indiv_worker.WorkerName}<br/>
 
-						Jobs:
-						<div className="indent">
-						{
-							indiv_worker.Jobs.map ((Job) =>
-							(
-								<div>{Job.JobName} {Job.ServiceType} {Job.FinalPrice}<br/></div>
-							))
-						}
-						</div>
-						<br/>
-					</div>
+			{
+				//IndividualWork
+				IndividualWork.map ((indiv_worker_day) =>
+				(
+					<IndividualWorkItem
+						key={day + " " + indiv_worker_day.WorkerID}
+						worker_day={indiv_worker_day}
+					/>
 				))
 			}
+
 			</div></td>
 		);
 	}
 }
-
-export default Day;
