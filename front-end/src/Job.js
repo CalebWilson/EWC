@@ -10,7 +10,7 @@ export default class Job extends Component
 		return (
 
 		<div>
-			{job_name} {service_type} {final_price}<br/>
+			<div>{job_name}</div><div>{service_type} {final_price}</div><br/>
 		</div>
 		);
 	}
