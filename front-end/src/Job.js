@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-//import "./WorkItem.css";
+import "./Job.css";
 
 export default class Job extends Component
 {
@@ -9,7 +9,7 @@ export default class Job extends Component
 
 		return (
 
-		<div>
+		<div className="flex-row">
 			<div>{job_name}</div><div>{service_type} {final_price}</div><br/>
 		</div>
 		);

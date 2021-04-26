@@ -189,7 +189,7 @@ db.schedule_day = function
 							from IndividualWork
 							where
 								WorkerID = ? and
-								Day      = ? and `
+								Day % 5  = ? and `
 								+ week_condition
 						,
 						[worker.WorkerID, day],
