@@ -18,7 +18,6 @@ export default class GroupWorkItem extends Component
 					service_type={job.ServiceType}
 					final_price={job.FinalPrice}
 				/>
-
 				Workers:
 				<div className="indent">
 				{

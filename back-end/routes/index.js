@@ -74,4 +74,8 @@ router.route ('/schedule/:week/:worker')
 	})
 ;
 
+/*
+router.route ('/
+*/
+
 module.exports = router;

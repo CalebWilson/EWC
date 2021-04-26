@@ -1,7 +1,7 @@
 @import "styles/scrollable.css";
 
 td {
-	border: 1px solid black;
+	border: 5px solid black;
 	vertical-align: top;
 	height: 70vh;
 	width: 12.5%;

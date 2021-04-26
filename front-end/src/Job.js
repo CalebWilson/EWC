@@ -13,7 +13,7 @@ export default class Job extends Component
 			<div className="flex-row">
 				<div className="right-item">{service_type} {final_price}</div>
 				<div className="left-item" >{job_name}</div>
-			</div><br/>
+			</div>
 		</div>
 		);
 	}
