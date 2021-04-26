@@ -14,14 +14,27 @@ export default class Schedule extends Component
 	callAPI()
 	{
 		fetch ("http://localhost:8080/schedule/-1")
-			.then  (response => response.json())
-			.then  ((data) =>
+			.then ((response) =>
 			{
-				console.log("Hello");
-				this.setState ({ schedule: data});
+				console.log (response.status);
+				if (response.status !== 200)
+				{
+					throw response.status;
+				}
+
+				return response.json();
+			})
+			.then ((data) =>
+			{
+				this.setState ({ schedule: data });
 				console.log (this.state.schedule);
 			})
-			.catch (error => error)
+			.catch ((status_error) =>
+			{
+				this.setState ({ error: status_error });
+
+				return status_error;
+			})
 		;
 	}
 
@@ -32,6 +45,15 @@ export default class Schedule extends Component
 
 	render()
 	{
+		if (this.state.error)
+		return (
+			<div>
+			<h1 style={{textAlign:"center"}}>
+				Sorry, there was an error retrieving your data.<br/><br/>
+				Error Code: {this.state.error}
+			</h1>
+			</div>
+		);
 		return (
 			<div className="App">
 				<table>
