@@ -10,7 +10,8 @@ export default class Job extends Component
 		return (
 
 		<div className="flex-row">
-			<div>{job_name}</div><div>{service_type} {final_price}</div><br/>
+			<div>{job_name}</div>
+			<div style={{paddingLeft:"10px"}}>{service_type} {final_price}</div><br/>
 		</div>
 		);
 	}

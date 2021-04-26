@@ -13,7 +13,7 @@ export default class Schedule extends Component
 
 	callAPI()
 	{
-		fetch ("http://localhost:8080/schedule/-1")
+		fetch ("http://localhost:8080/schedule/" + this.props.match.params.week)
 			.then ((response) =>
 			{
 				console.log (response.status);
