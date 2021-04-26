@@ -1,5 +1,14 @@
 .flex-row {
 	display: flex;
-	flex-direction: row;
+	flex-direction: row-reverse;
 	justify-content: space-between;
+}
+
+.right-item {
+	padding-left: 10px;
+	text-align: right;
+	white-space: nowrap;
+}
+
+.left-item {
 }
