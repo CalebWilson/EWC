@@ -12,7 +12,7 @@ app.use(express.json());
 app.use(cors());
 
 //import routes
-const router = require("./routes/index");
+const router = require("./routes/app");
 
 app.use("/", router);
 
