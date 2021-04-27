@@ -29,39 +29,45 @@ db_scheduled_job.get = function (ScheduledJobID)
 			if (error) return reject (error);
 			return resolve (results);
 		})
-	});
-};
+	})
 
-/*
-		//make an array of the Days of the ScheduledJob
-		.then ((scheduled_job) =>
+	//extract scheduled_job from array
+	.then (scheduled_job_array => scheduled_job_array[0])
+
+	//make an array of the days of the scheduled job
+	.then ((scheduled_job) =>
+	{
+		//get the days
+		return new Promise ((resolve, reject) =>
 		{
-			scheduled_job.days = new Promise ((resolve, reject) =>
-			{
-				db.query
-				(
-					`select
-							Date,
-							FirstDay
-						from WeekWork
-						where ScheduledJobID = ?`,
+			db.query
+			(
+				`select
+					distinct
+						Date,
+						FirstDay
+					from WeekWork
+					where ScheduledJobID = ?`,
 
 				ScheduledJobID,
 
-					(error, results) =>
+				(error, results) =>
 				{
 					if (error) return reject (error);
 					return resolve (results);
-				});
-			})
-
-			.then
-
-
-			})
+				}
+			);
 		})
-		;
-*/
+
+		//make the days a property of the scheduled job
+		.then ((days) =>
+		{
+			scheduled_job.Days = days;
+
+			return scheduled_job;
+		});
+	});
+};
 
 /*
 	Create a new scheduled job.
