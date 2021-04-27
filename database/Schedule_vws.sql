@@ -32,6 +32,8 @@ as
 		-- Job and Worker info
 		Jobs.JobName
 			as JobName,
+		Jobs.JobID
+			as JobID,
 		ServiceTypes.ServiceType
 			as ServiceType,
 		ScheduledJobs.FinalPrice
