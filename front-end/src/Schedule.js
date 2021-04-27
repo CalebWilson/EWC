@@ -46,14 +46,17 @@ export default class Schedule extends Component
 	render()
 	{
 		if (this.state.error)
-		return (
-			<div>
-			<h1 style={{textAlign:"center"}}>
-				Sorry, there was an error retrieving your data.<br/><br/>
-				Error Code: {this.state.error}
-			</h1>
-			</div>
-		);
+		{
+			return (
+				<div>
+				<h1 style={{textAlign:"center"}}>
+					Sorry, there was an error retrieving your data.<br/><br/>
+					Error: "{this.state.error.toString()}"
+				</h1>
+				</div>
+			);
+		}
+
 		return (
 			<div className="App">
 				<table>
