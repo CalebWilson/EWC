@@ -5,7 +5,7 @@ let db_scheduled_job = {};
 /*
 	Get information about a scheduled job.
 */
-db_scheduled_job.get = function (ScheduledJobID)
+db_scheduled_job.get = function (scheduled_job_id)
 {
 	return new Promise ((resolve, reject) =>
 	{
@@ -22,7 +22,7 @@ db_scheduled_job.get = function (ScheduledJobID)
 				from WeekWork
 				where ScheduledJobID = ?`,
 
-			ScheduledJobID,
+			scheduled_job_id,
 
 			(error, results) =>
 		{
@@ -45,11 +45,12 @@ db_scheduled_job.get = function (ScheduledJobID)
 				`select
 					distinct
 						Date,
-						FirstDay
+						FirstDay,
+						ScheduledJobDayID
 					from WeekWork
 					where ScheduledJobID = ?`,
 
-				ScheduledJobID,
+				scheduled_job_id,
 
 				(error, results) =>
 				{
@@ -59,13 +60,55 @@ db_scheduled_job.get = function (ScheduledJobID)
 			);
 		})
 
+		//get the workers for each day
+		.then ((days) =>
+		{
+			//every element will be an array of JSONs like {Worker: "Worker Name"}
+			teams = [];
+
+			days.forEach ((day) =>
+			{
+				//push an array of Worker JSONs onto teams
+				teams.push (new Promise ((resolve, reject) =>
+				{
+					db.query
+					(
+						`select WorkerID, WorkerName, WorkerStatus
+							from WeekWork
+							where
+								ScheduledJobID    = ? and
+								ScheduledJobDayID = ?`,
+
+						[scheduled_job_id, day.ScheduledJobDayID],
+
+						(error, results) =>
+						{
+							if (error) return reject (error);
+							return resolve (results);
+						}
+					);
+				}));
+			});
+
+			//match each worker team with its day
+			return Promise.all (teams).then ((teams) =>
+			{
+				days.forEach ((day, index) =>
+				{
+					day.Workers = teams[index];
+				});
+
+				return days;
+			});
+		})
+
 		//make the days a property of the scheduled job
 		.then ((days) =>
 		{
 			scheduled_job.Days = days;
 
 			return scheduled_job;
-		});
+		})
 	});
 };
 
