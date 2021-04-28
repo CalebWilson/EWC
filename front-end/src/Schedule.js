@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import "./Schedule.css";
 
-import Day from "./Day";
+import Day     from "./Day";
+import Details from "./Details";
 
 export default class Schedule extends Component
 {
@@ -98,7 +99,9 @@ export default class Schedule extends Component
 				{
 					this.state.details_visible
 					?
-						<div>Details visible: {JSON.stringify(this.state.details)}</div>
+						<Details
+							details={this.state.details}
+							hide_details={this.hide_details}/>
 					:
 						<div>Details invisible</div>
 				}
