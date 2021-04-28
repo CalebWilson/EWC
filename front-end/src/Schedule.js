@@ -8,15 +8,14 @@ export default class Schedule extends Component
 	constructor (props)
 	{
 		super (props);
-		this.state = { schedule: [] };
+		this.state = { schedule: [], details_visible: false };
 	}
 
-	callAPI()
+	get_schedule()
 	{
 		fetch ("http://localhost:8080/schedule/" + this.props.match.params.week)
 			.then ((response) =>
 			{
-				console.log (response.status);
 				if (response.status !== 200)
 				{
 					throw response.status;
@@ -27,7 +26,6 @@ export default class Schedule extends Component
 			.then ((data) =>
 			{
 				this.setState ({ schedule: data });
-				console.log (this.state.schedule);
 			})
 			.catch ((status_error) =>
 			{
@@ -38,9 +36,19 @@ export default class Schedule extends Component
 		;
 	}
 
+	show_details = (new_details) =>
+	{
+		this.setState ({ details_visible: true, details: new_details});
+	}
+
+	hide_details = () =>
+	{
+		this.setState ({ details_visible: false });
+	}
+
 	componentDidMount()
 	{
-		this.callAPI();
+		this.get_schedule();
 	}
 
 	render()
@@ -69,7 +77,10 @@ export default class Schedule extends Component
 						<th>Friday</th>
 					</tr></thead>
 					<tbody><tr>
-						<Day work_day="Notes Content" />
+						<Day
+							work_day="Notes Content"
+							show_details={this.show_details}
+						/>
 						{
 							this.state.schedule.map ((schedule_work_day, index) =>
 							(
@@ -77,11 +88,22 @@ export default class Schedule extends Component
 									day={index}
 									key={index}
 									work_day={schedule_work_day}
+									show_details={this.show_details}
 								/>
 							))
 						}
 					</tr></tbody>
-				</table>
+				</table><br />
+				
+				{
+					this.state.details_visible
+					?
+						<div>Details visible: {JSON.stringify(this.state.details)}</div>
+					:
+						<div>Details invisible</div>
+				}
+
+
 			</div>
 		);
 	}

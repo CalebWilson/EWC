@@ -6,11 +6,14 @@ import IndividualWorkItem from "./IndividualWorkItem";
 
 export default class Day extends Component
 {
+	constructor (props)
+	{
+		super (props);
+	}
+
 	render()
 	{
 		const { GroupWork, IndividualWork, day} = this.props.work_day;
-		console.log ("GroupWork: " + GroupWork);
-		console.log ("IndividualWork: " + IndividualWork);
 
 		if (GroupWork === undefined) return (<td>{this.props.work_day}</td>);
 
@@ -24,6 +27,7 @@ export default class Day extends Component
 					<GroupWorkItem
 						key={group_job.ScheduledJobDayID}
 						job={group_job}
+						show_details={this.props.show_details}
 					/>
 				))
 			}
@@ -35,6 +39,7 @@ export default class Day extends Component
 					<IndividualWorkItem
 						key={day + " " + indiv_worker_day.WorkerID}
 						worker_day={indiv_worker_day}
+						show_details={this.props.show_details}
 					/>
 				))
 			}

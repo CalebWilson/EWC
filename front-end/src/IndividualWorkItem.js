@@ -24,6 +24,7 @@ export default class IndividualWorkItem extends Component
 							job_name={job.JobName}
 							service_type={job.ServiceType}
 							final_price={job.FinalPrice}
+							show_details={this.props.show_details}
 						/>
 					))
 				}
