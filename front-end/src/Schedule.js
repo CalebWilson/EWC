@@ -14,33 +14,6 @@ export default class Schedule extends Component
 		this.state = { data: [], details_visible: false };
 	}
 
-/*
-	get_schedule()
-	{
-		fetch ("http://localhost:8080/schedule/" + this.props.match.params.week)
-			.then ((response) =>
-			{
-				if (response.status !== 200)
-				{
-					throw response.status;
-				}
-
-				return response.json();
-			})
-			.then ((data) =>
-			{
-				this.setState ({ schedule: data });
-			})
-			.catch ((status_error) =>
-			{
-				this.setState ({ error: status_error });
-
-				return status_error;
-			})
-		;
-	}
-*/
-
 	show_details = (new_details) =>
 	{
 		this.setState ({ details_visible: true, details: new_details});
