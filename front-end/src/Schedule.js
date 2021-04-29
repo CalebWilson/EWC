@@ -1,17 +1,20 @@
 import React, { Component } from "react";
 import "./Schedule.css";
 
-import Day     from "./Day";
-import Details from "./Details";
+import Day      from "./Day";
+import Details  from "./Details";
+
+import get_data from "./get_data";
 
 export default class Schedule extends Component
 {
 	constructor (props)
 	{
 		super (props);
-		this.state = { schedule: [], details_visible: false };
+		this.state = { data: [], details_visible: false };
 	}
 
+/*
 	get_schedule()
 	{
 		fetch ("http://localhost:8080/schedule/" + this.props.match.params.week)
@@ -36,6 +39,7 @@ export default class Schedule extends Component
 			})
 		;
 	}
+*/
 
 	show_details = (new_details) =>
 	{
@@ -49,21 +53,19 @@ export default class Schedule extends Component
 
 	componentDidMount()
 	{
-		this.get_schedule();
+		get_data ("schedule/" + this.props.match.params.week)
+
+		.then ((data) =>
+		{
+			this.setState (data);
+		});
 	}
 
 	render()
 	{
 		if (this.state.error)
 		{
-			return (
-				<div>
-				<h1 style={{textAlign:"center"}}>
-					Sorry, there was an error retrieving your data.<br/><br/>
-					Error: "{this.state.error.toString()}"
-				</h1>
-				</div>
-			);
+			return this.state.error;
 		}
 
 		return (
@@ -83,7 +85,7 @@ export default class Schedule extends Component
 							show_details={this.show_details}
 						/>
 						{
-							this.state.schedule.map ((schedule_work_day, index) =>
+							this.state.data.map ((schedule_work_day, index) =>
 							(
 								<Day
 									day={index}
