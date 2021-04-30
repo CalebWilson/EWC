@@ -32,8 +32,8 @@ db_schedule.get_week = function (params)
 
 	//week specificity
 	week_condition = (week === undefined) ?  `1` :
-		`(Week = ` + week +                           //this week's work
-		` or (Week = ` + (week - 1) + ` and Day > 4))` //last week's overflow
+		`((Week = ` +  week +      ` and Day <= 4) or ` + //this week's work
+		` (Week = ` + (week - 1) + ` and Day >  4))`      //last week's overflow
 	;
 
 	//worker specificity for GroupWork
