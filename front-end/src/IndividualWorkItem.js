@@ -21,6 +21,7 @@ export default class IndividualWorkItem extends Component
 					(
 						<Job
 							key={job.ScheduledJobID}
+							scheduled_job_id={job.ScheduledJobID}
 							job_name={job.JobName}
 							service_type={job.ServiceType}
 							final_price={job.FinalPrice}
