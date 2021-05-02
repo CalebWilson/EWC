@@ -30,10 +30,10 @@ db_schedule.get_week = function (params)
 		worker = params.worker;
 	}
 
-	//week specificity
+	//does the work day fall the given week?
 	week_condition = (week === undefined) ?  `1` :
-		`((Week = ` +  week +      ` and Day <= 4) or ` + //this week's work
-		` (Week = ` + (week - 1) + ` and Day >  4))`      //last week's overflow
+		//use integer division to convert days to weeks
+		`(Week + (Day div 5) = ` + week + `)`
 	;
 
 	//worker specificity for GroupWork
@@ -82,6 +82,8 @@ db_schedule.get_day = function
 		indiv_worker_condition
 	)
 {
+	let day_condition = `(Day % 5 = ` + day + `)`;
+
 	//get GroupWork
 	var group = new Promise ((resolve, reject) =>
 	{
@@ -97,10 +99,12 @@ db_schedule.get_day = function
 						ScheduledJobDayID,
 						FirstDay
 					from GroupWork
-					where Day % 5 = ` + day + ` and `
-					+ week_condition + ` and `
-					+ group_worker_condition,
-					+ `1`,
+					where `
+						+  day_condition + ` and `
+						+ week_condition + ` and `
+						+ group_worker_condition
+				,
+
 				(error, results) =>
 		{
 			if (error) return reject (error);
@@ -125,8 +129,8 @@ db_schedule.get_day = function
 					`select WorkerID, WorkerName, WorkerStatus
 						from GroupWork
 						where
-							JobName = ?           and
-							Day % 5 = ` + day + ` and `
+							JobName = ?         and `
+							+ day_condition + ` and `
 							+ week_condition
 					,
 					group_job.JobName,
@@ -163,9 +167,9 @@ db_schedule.get_day = function
 						WorkerID,
 						WorkerName
 					from IndividualWork
-					where
-						Day % 5 = ` + day + ` and `
-						+ week_condition  + ` and `
+					where `
+						+  day_condition + ` and `
+						+ week_condition + ` and `
 						+ indiv_worker_condition
 				,
 				(error, results) =>
@@ -198,11 +202,13 @@ db_schedule.get_day = function
 							FirstDay
 							from IndividualWork
 							where
-								WorkerID = ? and
-								Day % 5  = ? and `
+								WorkerID = ?         and `
+								+  day_condition + ` and `
 								+ week_condition
 						,
-						[worker.WorkerID, day],
+
+						worker.WorkerID,
+
 						(error, results) =>
 				{
 					if (error) return reject (error);
