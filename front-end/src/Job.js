@@ -22,9 +22,9 @@ export default class Job extends Component
 		//job name on the left, service type and price on the right
 		return (
 			<div>
-				<div className="flex-row" onClick={this.show_details}>
-					<div className="right-item">{service_type} {final_price}</div>
-					<div className="left-item" >{job_name}</div>
+				<div className="job" onClick={this.show_details}>
+					<div className="type-price">{service_type} {final_price}</div>
+					<div className="job-name" >{job_name}</div>
 				</div>
 			</div>
 		);

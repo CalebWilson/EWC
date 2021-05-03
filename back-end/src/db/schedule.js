@@ -1,17 +1,4 @@
-/*
-const mysql = require("mysql");
-
-const pool = mysql.createPool({
-	connectionLimit: 10,
-	database: "ewc",
-	user: "root",
-	password: "unixroxmacsux",
-	host: "localhost",
-	port: "3306"
-});
-*/
-
-const db = require("./db");
+const db = require ("./db");
 
 let db_schedule = {};
 
@@ -161,7 +148,8 @@ db_schedule.get_day = function
 	//get IndividualWork
 	var indiv = new Promise ((resolve, reject) =>
 	{
-		db.query (
+		db.query
+		(
 				`select
 					distinct
 						WorkerID,

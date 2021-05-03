@@ -22,8 +22,8 @@ begin
 
 	insert into lastScheduledJobs (JobID, ScheduledJobID)
 		select -- distinct
-			ScheduledJobs.ScheduledJobID,
-			ScheduledJobs.JobID
+			ScheduledJobs.JobID,
+			ScheduledJobs.ScheduledJobID
 
 		from ScheduledJobs, newScheduledJobs
 
@@ -69,6 +69,7 @@ begin
 		ScheduledJobDay int not null
 	);
 
+	-- broken
 	-- create ScheduledJobDays for the newScheduledJobs
 	insert into newScheduledJobDays (ScheduledJobID, ScheduledJobDay)
 		select ScheduledJobs.ScheduledJobID, ScheduledJobDays.ScheduledJobDay
@@ -138,8 +139,8 @@ begin
 	;
 
 	-- drop temporary tables
-	drop table lastScheduledJobs;
-	drop table lastScheduledJobDays;
+	-- drop table lastScheduledJobs;
+	-- drop table lastScheduledJobDays;
 	drop table newScheduledJobDays;
 
 end //

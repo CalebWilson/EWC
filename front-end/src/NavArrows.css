@@ -1,13 +1,6 @@
+@import "styles/buttons.css"; /* .nav-arrow*/
+
 .nav-container {
 	text-align: center;
 	position: relative;
-	padding-top: 1%;
-}
-
-.nav-arrow, .nav-arrow:visited {
-	background-color: lightgray;
-	color: black;
-	border: 2px solid black;
-	padding-left: 1rem;
-	padding-right: 1rem;
 }

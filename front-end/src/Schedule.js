@@ -1,12 +1,14 @@
 import React, { Component } from "react";
-import "./Schedule.css";
 
-import Day     from "./Day";
-import Details from "./Details";
-
-import NavArrow from "./NavArrows";
+import Day            from "./Day";
+import Details        from "./Details";
+import NavArrow       from "./NavArrows";
+import GenerateButton from "./GenerateButton";
 
 import get_data from "./get_data";
+
+import "./Schedule.css";
+import "./styles/buttons.css";
 
 export default class Schedule extends Component
 {
@@ -29,6 +31,16 @@ export default class Schedule extends Component
 		this.setState ({ details: null});
 	}
 
+	generate = () =>
+	{
+		get_data ("generate/" + this.week)
+
+		.then ((data) =>
+		{
+			this.setState (data);
+		});
+	}
+
 	componentDidMount()
 	{
 		get_data ("schedule/" + this.props.match.params.week)
@@ -48,6 +60,16 @@ export default class Schedule extends Component
 
 		return (
 			<div className="App">
+				<div className="schedule-top">
+
+					<div className="month">
+						Month
+					</div>
+
+					<GenerateButton generate={this.generate}/>
+				
+				</div>
+
 				{/* Previous week*/}
 				<NavArrow
 					direction="up"
@@ -80,7 +102,7 @@ export default class Schedule extends Component
 							))
 						}
 					</tr></tbody>
-				</table>
+				</table><br />
 
 				{/* Next week*/}
 				<NavArrow

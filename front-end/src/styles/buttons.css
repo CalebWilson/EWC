@@ -1,0 +1,9 @@
+.button, .nav-arrow, .nav-arrow:visited {
+	cursor: pointer;
+	font-size: large;
+	background-color: lightgray;
+	color: black;
+	border: 2px solid black;
+	padding-left: 1rem;
+	padding-right: 1rem;
+}

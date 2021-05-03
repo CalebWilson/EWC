@@ -1,1 +1,14 @@
-@import "styles/flex-row.css";
+.job {
+	display: flex;
+	flex-direction: row-reverse;
+	justify-content: space-between;
+}
+
+.type-price {
+	padding-left: 10px;
+	text-align: right;
+	white-space: nowrap;
+}
+
+.job-name {
+}

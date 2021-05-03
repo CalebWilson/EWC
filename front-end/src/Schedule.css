@@ -1,11 +1,12 @@
 table {
 	position: relative;
+
 	top:    10%;
-	bottom: 5%;
+	bottom:  5%;
 	left:    2%;
 	right:   2%;
-	height: 80%;
 	width:  96%;
+	height: 80%;
 
 	table-layout: fixed;
 	border-collapse: collapse;
@@ -19,4 +20,17 @@ th {
 	font-size: xx-large;
 	width: 12.5%;
 	padding: 5px;
+}
+
+.schedule-top {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: stretch;
+}
+
+.month {
+	font-size: xxx-large;
+	font-weight: bold;
+	padding-left: 1%;
 }
