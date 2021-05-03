@@ -13,7 +13,7 @@ export default class Schedule extends Component
 	constructor (props)
 	{
 		super (props);
-		this.state = { data: [], details_visible: false };
+		this.state = { data: [], details: null };
 
 		//get the week from the URL
 		this.week = parseInt(this.props.match.params.week);
@@ -21,12 +21,12 @@ export default class Schedule extends Component
 
 	show_details = (new_details) =>
 	{
-		this.setState ({ details_visible: true, details: new_details});
+		this.setState ({ details: new_details});
 	}
 
 	hide_details = () =>
 	{
-		this.setState ({ details_visible: false });
+		this.setState ({ details: null});
 	}
 
 	componentDidMount()
@@ -46,7 +46,6 @@ export default class Schedule extends Component
 			return this.state.error;
 		}
 
-					//href={this.props.match.params.path + 
 		return (
 			<div className="App">
 				{/* Previous week*/}
@@ -90,7 +89,7 @@ export default class Schedule extends Component
 				/> 
 				
 				{
-					this.state.details_visible
+					this.state.details
 					?
 						<Details
 							details={this.state.details}
