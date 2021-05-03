@@ -1,8 +1,13 @@
-.up, .down {
-	textAlign: center;
+.nav-container {
+	text-align: center;
+	position: relative;
+	padding-top: 1%;
 }
 
-.up {
-	position: fixed;
-	padding: 10px;
+.nav-arrow, .nav-arrow:visited {
+	background-color: lightgray;
+	color: black;
+	border: 2px solid black;
+	padding-left: 1rem;
+	padding-right: 1rem;
 }

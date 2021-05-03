@@ -1,28 +1,16 @@
 import React, { Component } from "react";
 import "./NavArrows.css";
 
-class UpArrow extends Component
+export default class NavArrow extends Component
 {
 	render()
 	{
 		return (
-			<div style={{textAlign: "center"}}>
-				<button><i class="fa fa-angle-up"></i></button>
+			<div className="nav-container">
+				<a className="nav-arrow" href={this.props.href}>
+					<i class={"fa fa-angle-" + this.props.direction}></i>
+				</a>
 			</div>
 		);
 	}
 }
-
-class DownArrow extends Component
-{
-	render()
-	{
-		return (
-			<div className="up">
-				<button><i class="fa fa-angle-up"></i></button>
-			</div>
-		);
-	}
-}
-
-export {UpArrow, DownArrow};

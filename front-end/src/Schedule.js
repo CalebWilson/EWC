@@ -4,7 +4,7 @@ import "./Schedule.css";
 import Day     from "./Day";
 import Details from "./Details";
 
-import {UpArrow, DownArrow} from "./NavArrows";
+import NavArrow from "./NavArrows";
 
 import get_data from "./get_data";
 
@@ -14,6 +14,9 @@ export default class Schedule extends Component
 	{
 		super (props);
 		this.state = { data: [], details_visible: false };
+
+		//get the week from the URL
+		this.week = parseInt(this.props.match.params.week);
 	}
 
 	show_details = (new_details) =>
@@ -43,10 +46,15 @@ export default class Schedule extends Component
 			return this.state.error;
 		}
 
+					//href={this.props.match.params.path + 
 		return (
 			<div className="App">
-				{/* Nav Arrows*/}
-				<UpArrow />
+				{/* Previous week*/}
+				<NavArrow
+					direction="up"
+					href={"/schedule/" + (this.week - 1)}
+				/> 
+
 				<table>
 					<thead><tr>
 						<th>Notes</th>
@@ -73,7 +81,13 @@ export default class Schedule extends Component
 							))
 						}
 					</tr></tbody>
-				</table><br />
+				</table>
+
+				{/* Next week*/}
+				<NavArrow
+					direction="down"
+					href={"/schedule/" + (this.week + 1)}
+				/> 
 				
 				{
 					this.state.details_visible
