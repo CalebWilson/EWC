@@ -1,8 +1,10 @@
 import React, { Component } from "react";
 import "./Schedule.css";
 
-import Day      from "./Day";
-import Details  from "./Details";
+import Day     from "./Day";
+import Details from "./Details";
+
+import {UpArrow, DownArrow} from "./NavArrows";
 
 import get_data from "./get_data";
 
@@ -43,6 +45,8 @@ export default class Schedule extends Component
 
 		return (
 			<div className="App">
+				{/* Nav Arrows*/}
+				<UpArrow />
 				<table>
 					<thead><tr>
 						<th>Notes</th>
