@@ -262,11 +262,17 @@ begin
 		-- in the given week
 		where
 			weeks_between (LastScheduled, curdate() + interval Week week)
-			% ServiceInterval = 0 and
+				% ServiceInterval = 0 and
 
 			-- prevent duplicate ScheduledJobs
-			weeks_between (LastScheduled, curdate() + interval Week week)
-			!= 0
+			(
+				select count(*) = 0
+				from Jobs, ScheduledJobs
+				where
+					ScheduledJobs.JobID = Jobs.JobID  and
+					Jobs.JobID = serviceHistory.JobID and
+					weeks_between (ScheduledJobs.ScheduleDate, curdate() + interval Week week) = 0
+			)
 	;
 
 	call renewServiceData();
