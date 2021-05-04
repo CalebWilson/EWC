@@ -3,8 +3,6 @@ const db_schedule = require ("./schedule");
 
 const generate = (week) =>
 {
-	console.log ("in generate");
-
 	return new Promise ((resolve, reject) =>
 	{
 		db.query
