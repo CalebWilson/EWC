@@ -28,12 +28,31 @@ export default class Schedule extends Component
 		return date;
 	}
 
-/*
 	get_month = () =>
 	{
-		let monday = get_date (0);
-	}
+		let monday = this.get_date (0);
+		let friday = this.get_date (4);
+
+		let monday_month = new Intl.DateTimeFormat ('en-US', {month: "long"}).format(monday);
+		let friday_month = new Intl.DateTimeFormat ('en-US', {month: "long"}).format(friday);
+
+		//this works
+/*
+		if (monday_month != friday_month)
+			monday_month += " - " + friday_month;
+
+		return monday_month;
 */
+
+		//but this is cooler
+		return
+			(monday_month == friday_month)
+			?
+				monday_month
+			: 
+				monday_month + " - " + friday_month
+		;
+	}
 
 	show_details = (new_details) =>
 	{
@@ -77,7 +96,7 @@ export default class Schedule extends Component
 				<div className="schedule-top">
 
 					<div className="month">
-						Month
+						{this.get_month()}
 					</div>
 
 					<GenerateButton generate={this.generate}/>
