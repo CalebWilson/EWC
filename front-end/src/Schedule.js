@@ -21,6 +21,20 @@ export default class Schedule extends Component
 		this.week = parseInt(this.props.match.params.week);
 	}
 
+	get_date = (day) =>
+	{
+		let date = new Date (Date.now());
+		date.setDate (date.getDate() + (this.week * 7) - date.getDay() + day);
+		return date;
+	}
+
+/*
+	get_month = () =>
+	{
+		let monday = get_date (0);
+	}
+*/
+
 	show_details = (new_details) =>
 	{
 		this.setState ({ details: new_details});
@@ -87,15 +101,17 @@ export default class Schedule extends Component
 					</tr></thead>
 					<tbody><tr>
 						<Day
+							date="A"
 							work_day="Notes Content"
 							show_details={this.show_details}
 						/>
 						{
-							this.state.data.map ((schedule_work_day, index) =>
+							this.state.data.map ((schedule_work_day, day) =>
 							(
 								<Day
-									day={index}
-									key={index}
+									date={this.get_date(day + 1).getDate()}
+									day={day}
+									key={day}
 									work_day={schedule_work_day}
 									show_details={this.show_details}
 								/>

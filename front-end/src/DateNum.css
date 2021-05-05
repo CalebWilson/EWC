@@ -1,0 +1,14 @@
+.date-num-container {
+	text-align: right;
+	padding-bottom: 1rem;
+}
+
+.date-num {
+	font-size: x-large;
+	font-weight: bold;
+
+	background-color: lightgray;
+
+	padding-left: 0.5rem;
+	padding-right: 0.5rem;
+}
