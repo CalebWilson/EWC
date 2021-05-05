@@ -45,9 +45,8 @@ export default class Schedule extends Component
 */
 
 		//but this is cooler
-		return
-			(monday_month == friday_month)
-			?
+		return (monday_month == friday_month)
+		?
 				monday_month
 			: 
 				monday_month + " - " + friday_month
