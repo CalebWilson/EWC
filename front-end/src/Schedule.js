@@ -1,10 +1,10 @@
 import React, { Component } from "react";
 
-import Day            from "./Day";
-import Details        from "./Details";
-import NavArrow       from "./NavArrows";
-import WorkerDropdown from "./WorkerDropdown";
-import GenerateButton from "./GenerateButton";
+import Day               from "./Day";
+import NavArrow          from "./NavArrows";
+import WorkerDropdown    from "./WorkerDropdown";
+import GenerateButton    from "./GenerateButton";
+import ScheduledJobModal from "./ScheduledJobModal";
 
 import get_data from "./get_data";
 
@@ -53,7 +53,7 @@ export default class Schedule extends Component
 */
 
 		//but this is cooler
-		return (monday_month == friday_month)
+		return (monday_month === friday_month)
 		?
 				monday_month
 			: 
@@ -82,7 +82,6 @@ export default class Schedule extends Component
 			this.setState (data);
 		});
 	}
-
 
 	//tell the back-end to generate the current week's recurring jobs
 	generate = () =>
@@ -114,80 +113,88 @@ export default class Schedule extends Component
 		}
 
 		return (
-			<div className="App">
+			<div>
 
-				{/* top of the schedule */}
-				<div className="schedule-top">
+				{/* main schedule page */}
+				<div onClick={this.hide_details}>
 
-					{/* month name */}
-					<div className="month">
-						{this.get_month()}
+					{/* top of the schedule */}
+					<div className="schedule-top">
+
+						{/* month name */}
+						<div className="month">
+							{this.get_month()}
+						</div>
+
+						<div className="schedule-top-right">
+							<WorkerDropdown
+								workers={this.state.workers}
+								select_worker={this.select_worker}
+							/>
+							<GenerateButton generate={this.generate} />
+						</div>
+					
 					</div>
 
-					<div className="schedule-top-right">
-						<WorkerDropdown
-							workers={this.state.workers}
-							select_worker={this.select_worker}
-						/>
-						<GenerateButton generate={this.generate} />
-					</div>
-				
+					{/* previous week button */}
+					<NavArrow
+						direction="up"
+						href={"/schedule/" + (this.week - 1)}
+					/> 
+
+					{/* schedule table */}
+					<table>
+						<thead><tr>
+							<th>Notes</th>
+							<th>Monday</th>
+							<th>Tuesday</th>
+							<th>Wednesday</th>
+							<th>Thursday</th>
+							<th>Friday</th>
+						</tr></thead>
+						<tbody><tr>
+							{/* notes for the week */}
+							<Day
+								date={this.state.data.week_letter}
+								work_day="Notes Content"
+								show_details={this.show_details}
+							/>
+							{
+								//work days
+								this.state.data.schedule.map ((schedule_work_day, day) =>
+								(
+									<Day
+										date={this.get_date(day + 1).getDate()}
+										day={day}
+										key={day}
+										work_day={schedule_work_day}
+										show_details={this.show_details}
+									/>
+								))
+							}
+						</tr></tbody>
+					</table><br />
+
+					{/* next week button */}
+					<NavArrow
+						direction="down"
+						href={"/schedule/" + (this.week + 1)}
+					/> 
 				</div>
 
-				{/* previous week button */}
-				<NavArrow
-					direction="up"
-					href={"/schedule/" + (this.week - 1)}
-				/> 
-
-				{/* schedule table */}
-				<table>
-					<thead><tr>
-						<th>Notes</th>
-						<th>Monday</th>
-						<th>Tuesday</th>
-						<th>Wednesday</th>
-						<th>Thursday</th>
-						<th>Friday</th>
-					</tr></thead>
-					<tbody><tr>
-						<Day
-							date={this.state.data.week_letter}
-							work_day="Notes Content"
-							show_details={this.show_details}
-						/>
-						{
-							this.state.data.schedule.map ((schedule_work_day, day) =>
-							(
-								<Day
-									date={this.get_date(day + 1).getDate()}
-									day={day}
-									key={day}
-									work_day={schedule_work_day}
-									show_details={this.show_details}
-								/>
-							))
-						}
-					</tr></tbody>
-				</table><br />
-
-				{/* next week button */}
-				<NavArrow
-					direction="down"
-					href={"/schedule/" + (this.week + 1)}
-				/> 
-				
 				{/* display details, if any */}
+				<div>
 				{
 					this.state.details
 					?
-						<Details
+						<ScheduledJobModal
 							details={this.state.details}
-							hide_details={this.hide_details}/>
+							hide_details={this.hide_details}
+						/>
 					:
-						<div>Details invisible</div>
+						<div></div>
 				}
-
+				</div>
 
 			</div>
 		);

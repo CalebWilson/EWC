@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-import get_data from "./get_data";
+//import get_data from "./get_data";
 
 //import "./GenerateButton.css";
 

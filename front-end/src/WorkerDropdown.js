@@ -27,7 +27,7 @@ export default class WorkerDropdown extends Component
 		//worker options
 		get_data ("workers").then ((workers) =>
 		{
-			workers.data.splice (0, 0, {WorkerID: "", WorkerName: "All"});
+			workers.data.splice (0, 0, {WorkerID: "", WorkerName: "MASTER"});
 			this.setState ({ workers: workers.data });
 		});
 	}
