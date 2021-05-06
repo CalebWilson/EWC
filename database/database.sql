@@ -7,6 +7,7 @@ drop procedure if exists RenewServiceData;
 drop      view if exists GroupWork;
 drop      view if exists IndividualWork;
 drop      view if exists WeekWork;
+drop      view if exists WorkerStatuses;
 drop  function if exists weeks_between;
 
 -- dynamic tables
@@ -37,9 +38,10 @@ source ScheduledJobDays.sql;
 source      Assignments.sql;
 
 -- functions, procedures, and views
-source week_funcs.sql;
-source       Schedule_vws.sql;
-source     Schedule_procs.sql;
+source        week_funcs.sql;
+source      Schedule_vws.sql;
+source WorkerStatuses_vw.sql;
+source    Schedule_procs.sql;
 
 -- test data
 source test_data.sql;
