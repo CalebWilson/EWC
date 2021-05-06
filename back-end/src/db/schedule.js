@@ -55,7 +55,10 @@ db_schedule.get_week = function (params)
 		);
 	}
 
-	return Promise.all (schedule);
+	return Promise.all (schedule).then ((schedule) =>
+	{
+		new Date (Date.now());
+	});
 };
 
 /*

@@ -21,6 +21,7 @@ export default class Schedule extends Component
 		this.week = parseInt(this.props.match.params.week);
 	}
 
+	//date of the given day of the current week
 	get_date = (day) =>
 	{
 		let date = new Date (Date.now());
@@ -28,6 +29,7 @@ export default class Schedule extends Component
 		return date;
 	}
 
+	//month(s) of the current week
 	get_month = () =>
 	{
 		let monday = this.get_date (0);
@@ -53,16 +55,20 @@ export default class Schedule extends Component
 		;
 	}
 
+	//show the given details of a job
+	//to be passed as a prop to the Job component
 	show_details = (new_details) =>
 	{
 		this.setState ({ details: new_details});
 	}
 
+	//hide job details
 	hide_details = () =>
 	{
 		this.setState ({ details: null});
 	}
 
+	//tell the back-end to generate the current week's recurring jobs
 	generate = () =>
 	{
 		get_data ("generate/" + this.week)
@@ -73,6 +79,7 @@ export default class Schedule extends Component
 		});
 	}
 
+	//get the week's work from the back-end
 	componentDidMount()
 	{
 		get_data ("schedule/" + this.props.match.params.week)
@@ -92,8 +99,11 @@ export default class Schedule extends Component
 
 		return (
 			<div className="App">
+
+				{/* top of the schedule */}
 				<div className="schedule-top">
 
+					{/* month name */}
 					<div className="month">
 						{this.get_month()}
 					</div>
@@ -102,12 +112,13 @@ export default class Schedule extends Component
 				
 				</div>
 
-				{/* Previous week*/}
+				{/* previous week button */}
 				<NavArrow
 					direction="up"
 					href={"/schedule/" + (this.week - 1)}
 				/> 
 
+				{/* schedule table */}
 				<table>
 					<thead><tr>
 						<th>Notes</th>
@@ -138,12 +149,13 @@ export default class Schedule extends Component
 					</tr></tbody>
 				</table><br />
 
-				{/* Next week*/}
+				{/* next week button */}
 				<NavArrow
 					direction="down"
 					href={"/schedule/" + (this.week + 1)}
 				/> 
 				
+				{/* display details, if any */}
 				{
 					this.state.details
 					?

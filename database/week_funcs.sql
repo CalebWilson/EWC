@@ -1,13 +1,11 @@
+use ewc;
+
 /*
 	Returns the number of weeks between the given dates.
 
 	If date1 < date2, then weeks_between (date1, date2) >= 0.
 	If date1 > date2, then weeks_between (date1, date2) <= 0.
 */
-
-
-use ewc;
-
 drop function if exists weeks_between; 
 
 delimiter //
@@ -21,3 +19,17 @@ begin
 end //
 
 delimiter ;
+
+/*
+	Returns the letter of the given week.
+*/
+
+drop function if exists week_letter; 
+
+delimiter //
+
+create function week_letter (week int) returns char(1)
+begin
+	declare week_num;
+
+	set week_num = (week(curdate()) + week) % 4;
