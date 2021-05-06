@@ -28,8 +28,24 @@ drop function if exists week_letter;
 
 delimiter //
 
-create function week_letter (week int) returns char(1)
+create function week_letter (week int) returns char(1) reads sql data
 begin
-	declare week_num;
 
-	set week_num = (week(curdate()) + week) % 4;
+	-- 0, 1, 2, or 3
+	declare week_num int;
+
+	set week_num =
+	(
+		select
+			( week(curdate())  -- present week
+			+ week             -- given week
+			+ max(Offset)) % 4 -- offset for client's sake
+		from WeekOffset
+	);
+
+	-- convert to char: A, B, C, or D
+	return char (ascii('A') + week_num using utf8);
+
+end //
+
+delimiter ;
