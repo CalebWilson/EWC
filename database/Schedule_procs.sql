@@ -38,9 +38,10 @@ begin
 	;
 
 	-- schedule the recurrences
-	insert into ScheduledJobs (JobID, ScheduleDate)
-		select JobID, ScheduleDate
-		from newScheduledJobs
+	insert into ScheduledJobs (JobID, ScheduleDate, FinalPrice)
+		select Jobs.JobID, ScheduleDate, Price
+		from newScheduledJobs, Jobs
+		where newScheduledJobs.JobID = Jobs.JobID
 	;
 
 	-- Job Days of the Jobs' previous ScheduledJobs
