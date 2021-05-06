@@ -15,7 +15,11 @@ export default class Schedule extends Component
 	constructor (props)
 	{
 		super (props);
-		this.state = { data: [], details: null };
+		this.state =
+		{
+			data: { week_letter: null, schedule: [] },
+			details: null
+		};
 
 		//get the week from the URL
 		this.week = parseInt(this.props.match.params.week);
@@ -130,12 +134,12 @@ export default class Schedule extends Component
 					</tr></thead>
 					<tbody><tr>
 						<Day
-							date="A"
+							date={this.state.data.week_letter}
 							work_day="Notes Content"
 							show_details={this.show_details}
 						/>
 						{
-							this.state.data.map ((schedule_work_day, day) =>
+							this.state.data.schedule.map ((schedule_work_day, day) =>
 							(
 								<Day
 									date={this.get_date(day + 1).getDate()}

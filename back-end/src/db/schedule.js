@@ -79,7 +79,7 @@ db_schedule.get_week = function (params)
 
 	return Promise.all ([week_letter, final_schedule]).then ((week_arr) =>
 	{
-		return { WeekLetter: week_arr[0], Schedule: week_arr[1]};
+		return { week_letter: week_arr[0], schedule: week_arr[1]};
 	});
 };
 
