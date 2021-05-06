@@ -55,9 +55,31 @@ db_schedule.get_week = function (params)
 		);
 	}
 
-	return Promise.all (schedule).then ((schedule) =>
+	let final_schedule = Promise.all (schedule);
+
+	let week_letter = new Promise ((resolve, reject) =>
 	{
-		new Date (Date.now());
+		db.query
+		(
+			`select week_letter(?) as week_letter`,
+			week,
+
+			(error, results) =>
+			{
+				if (error) return reject (error);
+				return resolve (results);
+			}
+		);
+	})
+	.then ((results) =>
+	{
+		return results[0].week_letter;
+	});
+
+
+	return Promise.all ([week_letter, final_schedule]).then ((week_arr) =>
+	{
+		return { WeekLetter: week_arr[0], Schedule: week_arr[1]};
 	});
 };
 
@@ -77,7 +99,8 @@ db_schedule.get_day = function
 	//get GroupWork
 	var group = new Promise ((resolve, reject) =>
 	{
-		db.query (
+		db.query
+		(
 				`select
 					distinct
 						JobName,
@@ -123,6 +146,7 @@ db_schedule.get_day = function
 							+ day_condition + ` and `
 							+ week_condition
 					,
+
 					group_job.JobName,
 
 					(error, results) =>
