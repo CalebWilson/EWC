@@ -3,6 +3,7 @@ import React, { Component } from "react";
 import Day            from "./Day";
 import Details        from "./Details";
 import NavArrow       from "./NavArrows";
+import WorkerDropdown from "./WorkerDropdown";
 import GenerateButton from "./GenerateButton";
 
 import get_data from "./get_data";
@@ -17,7 +18,8 @@ export default class Schedule extends Component
 		super (props);
 		this.state =
 		{
-			data: { week_letter: null, schedule: [] },
+			data: { week_letter: null, schedule: []},
+			workers: [],
 			details: null
 		};
 
@@ -59,18 +61,28 @@ export default class Schedule extends Component
 		;
 	}
 
-	//show the given details of a job
-	//to be passed as a prop to the Job component
+	//show the given details of a job; to be passed as a prop to the Job component
 	show_details = (new_details) =>
 	{
 		this.setState ({ details: new_details});
 	}
 
-	//hide job details
+	//hide job details; to be passed as a prop to the Job component
 	hide_details = () =>
 	{
 		this.setState ({ details: null});
 	}
+
+	//get worker-specific schedule from the back-end
+	select_worker = (worker_id) =>
+	{
+		get_data ("schedule/" + this.props.match.params.week + "/" + worker_id)
+		.then ((data) =>
+		{
+			this.setState (data);
+		});
+	}
+
 
 	//tell the back-end to generate the current week's recurring jobs
 	generate = () =>
@@ -83,11 +95,11 @@ export default class Schedule extends Component
 		});
 	}
 
-	//get the week's work from the back-end
+	//get main schedule from the back-end
 	componentDidMount()
 	{
+		//schedule data
 		get_data ("schedule/" + this.props.match.params.week)
-
 		.then ((data) =>
 		{
 			this.setState (data);
@@ -112,7 +124,13 @@ export default class Schedule extends Component
 						{this.get_month()}
 					</div>
 
-					<GenerateButton generate={this.generate}/>
+					<div className="schedule-top-right">
+						<WorkerDropdown
+							workers={this.state.workers}
+							select_worker={this.select_worker}
+						/>
+						<GenerateButton generate={this.generate} />
+					</div>
 				
 				</div>
 

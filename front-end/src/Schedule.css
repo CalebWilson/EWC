@@ -29,6 +29,12 @@ th {
 	align-items: stretch;
 }
 
+.schedule-top-right {
+	font-size: large;
+	padding-top: 1.5%;
+	padding-right: 1%;
+}
+
 .month {
 	font-size: xxx-large;
 	font-weight: bold;
