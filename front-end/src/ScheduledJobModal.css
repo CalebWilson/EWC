@@ -17,5 +17,11 @@
 }
 
 .scheduled-job-modal-content {
+	font-size: x-large;
 	padding: 2%;
+}
+
+.scheduled-job-name {
+	font-size: xx-large;
+	font-weight: bold;
 }

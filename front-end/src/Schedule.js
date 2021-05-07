@@ -41,8 +41,8 @@ export default class Schedule extends Component
 		let monday = this.get_date (0);
 		let friday = this.get_date (4);
 
-		let monday_month = new Intl.DateTimeFormat ('en-US', {month: "long"}).format(monday);
-		let friday_month = new Intl.DateTimeFormat ('en-US', {month: "long"}).format(friday);
+		let monday_month = new Intl.DateTimeFormat ("en-US", {month: "long"}).format(monday);
+		let friday_month = new Intl.DateTimeFormat ("en-US", {month: "long"}).format(friday);
 
 		//this works
 /*
@@ -131,6 +131,7 @@ export default class Schedule extends Component
 								workers={this.state.workers}
 								select_worker={this.select_worker}
 							/>
+
 							<GenerateButton generate={this.generate} />
 						</div>
 					
@@ -188,7 +189,7 @@ export default class Schedule extends Component
 					this.state.details
 					?
 						<ScheduledJobModal
-							details={this.state.details}
+							scheduled_job={this.state.details}
 							hide_details={this.hide_details}
 						/>
 					:

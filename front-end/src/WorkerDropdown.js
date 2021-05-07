@@ -36,7 +36,7 @@ export default class WorkerDropdown extends Component
 	{
 		return (
 			<span>
-				Worker: {this.state.worker}
+				<label>Worker: {this.state.worker}</label>
 				<span className="worker-dropdown">
 					<select>
 						{
