@@ -4,9 +4,9 @@ import CloseButton  from "./CloseButton";
 import DeleteButton from "./DeleteButton";
 
 import "./styles/indent.css";
-import "./ScheduledJobModal.css";
+import "./ServiceModal.css";
 
-export default class ScheduledJobModal extends Component
+export default class ServiceModal extends Component
 {
 	constructor (props)
 	{
@@ -45,12 +45,20 @@ export default class ScheduledJobModal extends Component
 
 		return (
 
-			<div className="scheduled-job-modal">
-				<div className="scheduled-job-modal-content">
+			<div className="service-modal">
+				<div className="service-modal-content">
 
 					<CloseButton close={this.props.hide_details} />
 
-					<div className="scheduled-job-name">{this.state.JobName}</div>
+					{/*
+						this.state.editing_name
+						?
+					*/}
+							<div className="service-name">{this.state.JobName}</div>
+					{/*
+					<Button
+					*/}
+
 					<br />
 					<div>
 						Days:

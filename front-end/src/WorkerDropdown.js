@@ -1,59 +1,23 @@
-import React, { Component } from "react";
+import Dropdown from "./Dropdown";
 
-import get_data from "./get_data";
-
-import "./WorkerDropdown.css";
-
-export default class WorkerDropdown extends Component
+export default class WorkerDropdown extends Dropdown
 {
 	constructor (props)
 	{
 		super (props);
 
-		this.state = { workers: [], worker: "" };
+		this.style = "large";
+		this.label = "Worker: ";
+		this.options_endpoint = "workers";
 	}
 
-	select_worker = (worker_id) =>
+	get_option_id (worker)
 	{
-		return (() =>
-		{
-			//this.setState ({ worker: worker });
-			this.props.select_worker (worker_id);
-		});
+		return worker.WorkerID;
 	}
 
-	componentDidMount()
+	get_option_name (worker)
 	{
-		//worker options
-		get_data ("workers").then ((workers) =>
-		{
-			workers.data.splice (0, 0, {WorkerID: "", WorkerName: "MASTER"});
-			this.setState ({ workers: workers.data });
-		});
-	}
-
-	render()
-	{
-		return (
-			<span>
-				<label>Worker: {this.state.worker}</label>
-				<span className="worker-dropdown">
-					<select>
-						{
-							this.state.workers.map ((worker) =>
-							(
-								<option
-									key={worker.WorkerID}
-									value={worker.WorkerID}
-									onClick={this.select_worker (worker.WorkerID)}
-								>
-									{worker.WorkerName}
-								</option>
-							))
-						}
-					</select>
-				</span>
-			</span>
-		);
+		return worker.WorkerName;
 	}
 }

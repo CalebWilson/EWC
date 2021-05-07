@@ -1,12 +1,12 @@
 import React, { Component } from "react";
 
-import Day               from "./Day";
-import NavArrow          from "./NavArrows";
-import WorkerDropdown    from "./WorkerDropdown";
-import GenerateButton    from "./GenerateButton";
-import ScheduledJobModal from "./ScheduledJobModal";
+import Day            from "./Day";
+import NavArrow       from "./NavArrows";
+import WorkerDropdown from "./WorkerDropdown";
+import Button         from "./Button";
+import ServiceModal   from "./ServiceModal";
 
-import get_data from "./get_data";
+import Uplink from "./Uplink";
 
 import "./Schedule.css";
 import "./styles/buttons.css";
@@ -19,7 +19,6 @@ export default class Schedule extends Component
 		this.state =
 		{
 			data: { week_letter: null, schedule: []},
-			workers: [],
 			details: null
 		};
 
@@ -76,17 +75,23 @@ export default class Schedule extends Component
 	//get worker-specific schedule from the back-end
 	select_worker = (worker_id) =>
 	{
-		get_data ("schedule/" + this.props.match.params.week + "/" + worker_id)
+		Uplink.get_data ("schedule/" + this.props.match.params.week + "/" + worker_id)
 		.then ((data) =>
 		{
 			this.setState (data);
 		});
 	}
 
+	//tell the back-end to add a scheduled job
+	add_service = () =>
+	{
+
+	}
+
 	//tell the back-end to generate the current week's recurring jobs
 	generate = () =>
 	{
-		get_data ("generate/" + this.week)
+		Uplink.get_data ("generate/" + this.week)
 
 		.then ((data) =>
 		{
@@ -98,7 +103,7 @@ export default class Schedule extends Component
 	componentDidMount()
 	{
 		//schedule data
-		get_data ("schedule/" + this.props.match.params.week)
+		Uplink.get_data ("schedule/" + this.props.match.params.week)
 		.then ((data) =>
 		{
 			this.setState (data);
@@ -128,11 +133,11 @@ export default class Schedule extends Component
 
 						<div className="schedule-top-right">
 							<WorkerDropdown
-								workers={this.state.workers}
-								select_worker={this.select_worker}
+								select_option={this.select_worker}
 							/>
 
-							<GenerateButton generate={this.generate} />
+							<Button label="Add Service" action={this.add_service} />
+							<Button label="Generate"    action={this.generate}    />
 						</div>
 					
 					</div>
@@ -188,7 +193,7 @@ export default class Schedule extends Component
 				{
 					this.state.details
 					?
-						<ScheduledJobModal
+						<ServiceModal
 							scheduled_job={this.state.details}
 							hide_details={this.hide_details}
 						/>

@@ -1,8 +1,9 @@
-select {
+.large {
 	font-size: large;
 }
 
-.worker-dropdown {
+.dropdown {
+	font-size: large;
 	padding-left: 0.5rem;
 	padding-right: 2rem;
 }

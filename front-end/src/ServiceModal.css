@@ -1,4 +1,4 @@
-.scheduled-job-modal {
+.service-modal {
 	position: fixed;
 	z-index: 1;
 	margin: auto;
@@ -16,12 +16,12 @@
 	box-shadow: 10px 10px gray;
 }
 
-.scheduled-job-modal-content {
+.service-modal-content {
 	font-size: x-large;
 	padding: 2%;
 }
 
-.scheduled-job-name {
+.service-name {
 	font-size: xx-large;
 	font-weight: bold;
 }

@@ -1,13 +1,13 @@
 import React, { Component } from "react";
 import "./Job.css";
 
-import get_data from "./get_data";
+import Uplink from "./Uplink";
 
 export default class Job extends Component
 {
 	show_details = () =>
 	{
-		get_data ("scheduled_job/" + this.props.scheduled_job_id)
+		Uplink.get_data ("scheduled_job/" + this.props.scheduled_job_id)
 
 		.then ((data) =>
 		{

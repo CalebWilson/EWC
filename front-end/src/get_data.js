@@ -1,6 +1,7 @@
-var get_data = function (endpoint)
+/*
+const get_data = function (endpoint)
 {
-	let retval = fetch ("http://localhost:8080/" + endpoint)
+	return fetch (back_end + endpoint)
 		.then ((response) =>
 		{
 			if (response.status !== 200)
@@ -30,8 +31,7 @@ var get_data = function (endpoint)
 			})
 		})
 	;
-
-	return retval;
 }
 
 export default get_data;
+*/
