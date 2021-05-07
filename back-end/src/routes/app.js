@@ -26,9 +26,8 @@ router.use ("/generate", generate_router)
 const get_workers = require ("../db/workers");
 router.get ("/workers", access_database (get_workers));
 
-/*
-const workers_router = require ("./workers");
-router.use ("
-*/
+//jobs
+const get_jobs = require ("../db/jobs");
+router.get ("/jobs", access_database (get_jobs));
 
 module.exports = router;

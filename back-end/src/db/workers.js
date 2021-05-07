@@ -15,10 +15,10 @@ const get_workers = () =>
 			}
 		);
 	})
-	
+
 	.then ((workers) =>
 	{
-		workers.splice (0, 0, {WorkerID: "", WorkerName: "MASTER"});
+		workers.splice (0, 0, { WorkerID: "", WorkerName: "MASTER" });
 
 		return workers;
 	});
