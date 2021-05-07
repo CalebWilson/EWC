@@ -1,7 +1,10 @@
 import React, { Component } from "react";
 
-import CloseButton  from "./CloseButton";
+import       Button from "./Button";
+import  CloseButton from "./CloseButton";
 import DeleteButton from "./DeleteButton";
+
+import JobDropdown from "./JobDropdown";
 
 import "./styles/indent.css";
 import "./ServiceModal.css";
@@ -12,14 +15,18 @@ export default class ServiceModal extends Component
 	{
 		super (props);
 
-		this.state = this.props.scheduled_job.data;
+		this.state =
+		{
+			service: this.props.scheduled_job.data,
+			editing_job_name: false
+		};
 	}
 
 	delete_day = (day_index) =>
 	{
 		return (() =>
 		{
-			this.state.Days.splice (day_index, 1);
+			this.state.service.Days.splice (day_index, 1);
 			this.forceUpdate();
 		});
 	}
@@ -28,7 +35,7 @@ export default class ServiceModal extends Component
 	{
 		return (() =>
 		{
-			this.state.Days[day_index].Workers.splice (worker_index, 1);
+			this.state.service.Days[day_index].Workers.splice (worker_index, 1);
 			this.forceUpdate();
 		});
 	}
@@ -50,49 +57,77 @@ export default class ServiceModal extends Component
 
 					<CloseButton close={this.props.hide_details} />
 
-					{/*
-						this.state.editing_name
+					{
+						this.state.editing_job_name
 						?
-					*/}
-							<div className="service-name">{this.state.JobName}</div>
-					{/*
-					<Button
-					*/}
+							<div>
+								<JobDropdown
+									default={this.state.service.JobID}
+									select_option={(job_id, job_name) =>
+									{
+										this.state.service.JobName = job_name;
+										this.state.service.JobID   = job_id;
+
+										this.setState ({ editing_job_name: false });
+									}}
+								/>
+							</div>
+						:
+							<div className="service-name">
+								<div>{this.state.service.JobName}</div>
+								<Button
+									label="Change"
+									action={() =>
+									{
+										this.setState ({ editing_job_name: true });
+									}}
+								/>
+							</div>
+					}
 
 					<br />
 					<div>
 						Days:
 						<div className="indent">
 						{
-							this.state.Days.map ((day, day_index) =>
+							//days and workers
+							this.state.service.Days.map ((day, day_index) =>
 							(
 								<div>
+
+									{/* date */}
 									<DeleteButton delete={this.delete_day (day_index)} />
 									{
 										new Intl.DateTimeFormat ("en-US", date_options)
 											.format (new Date (day.Date))
 									}
+
+									{/* workers */}
 									<div className="indent">
-										{
-											day.Workers.map ((worker, worker_index) =>
-											(
-												<div>
-									<DeleteButton
-										delete={
-											this.delete_worker (day_index, worker_index)
-										}
-									/>
-													{worker.WorkerName}
-												</div>
-											))
-										}
+									{
+										day.Workers.map ((worker, worker_index) =>
+										(
+											<div>
+												<DeleteButton
+													delete=
+													{
+														this.delete_worker (
+															day_index, worker_index
+														)
+													}
+												/>
+												{worker.WorkerName}
+											</div>
+										))
+									}
 									</div><br />
+
 								</div>
 							))
 						}
 						</div>
 
-						Final Price: {this.state.FinalPrice}
+						Final Price: {this.state.service.FinalPrice}
 
 					</div>
 				</div>

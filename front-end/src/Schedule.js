@@ -75,7 +75,9 @@ export default class Schedule extends Component
 	//get worker-specific schedule from the back-end
 	select_worker = (worker_id) =>
 	{
-		Uplink.get_data ("schedule/" + this.props.match.params.week + "/" + worker_id)
+		Uplink.get_data (
+			"schedule/" + this.props.match.params.week + "/" + worker_id
+		)
 		.then ((data) =>
 		{
 			this.setState (data);
@@ -132,12 +134,12 @@ export default class Schedule extends Component
 						</div>
 
 						<div className="schedule-top-right">
-							<WorkerDropdown
-								select_option={this.select_worker}
-							/>
+							<WorkerDropdown select_option={this.select_worker} />
 
 							<Button label="Add Service" action={this.add_service} />
-							<Button label="Generate"    action={this.generate}    />
+							<span className="button-container">
+								<Button label="Generate"    action={this.generate}    />
+							</span>
 						</div>
 					
 					</div>

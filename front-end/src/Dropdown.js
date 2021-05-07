@@ -23,11 +23,11 @@ export default class Dropdown extends Component
 	get_option_name (option)
 	{}
 
-	select_option = (option_id) =>
+	select_option = (option_id, option_name) =>
 	{
 		return (() =>
 		{
-			this.props.select_option (option_id);
+			this.props.select_option (option_id, option_name);
 		});
 	}
 
@@ -36,8 +36,6 @@ export default class Dropdown extends Component
 		//worker options
 		Uplink.get_data (this.options_endpoint).then ((options) =>
 		{
-			//console.log (options);
-			//options.data.splice (0, 0, {WorkerID: "", WorkerName: "MASTER"});
 			this.setState ({ options: options.data });
 		});
 	}
@@ -52,15 +50,30 @@ export default class Dropdown extends Component
 						{
 							this.state.options.map ((option) =>
 							{
-								let id = this.get_option_id (option);
+								let   id = this.get_option_id   (option);
+								let name = this.get_option_name (option);
+
+								if (this.props.default)
+								{
+									if (this.props.default === id) return (
+										<option
+											key={id}
+											value={id}
+											onClick={this.select_option (id, name)}
+											selected
+										>
+											{name}
+										</option>
+									);
+								}
 
 								return (
 									<option
 										key={id}
 										value={id}
-										onClick={this.select_option (id)}
+										onClick={this.select_option (id, name)}
 									>
-										{this.get_option_name (option)}
+										{name}
 									</option>
 								);
 							})
