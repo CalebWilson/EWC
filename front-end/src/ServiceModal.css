@@ -21,7 +21,16 @@
 	padding: 2%;
 }
 
-.service-name {
+.service-modal-top {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+
 	font-size: xx-large;
 	font-weight: bold;
+	padding-bottom: 1rem;
+}
+
+.close {
+	align-self: start;
 }

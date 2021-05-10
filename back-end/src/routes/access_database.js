@@ -12,15 +12,15 @@ function access_database (db_method, params)
 		//invoke db_method and respond with results
 		try
 		{
-			let results = await db_method(params);
+			let results = await db_method (params);
 			response.json(results);
 		}
 
 		//error handling
-		catch (e)
+		catch (error)
 		{
-			console.log(e);
-			response.sendStatus(500);
+			console.log (error);
+			response.sendStatus (500);
 		}
 	});
 }

@@ -45,7 +45,7 @@ export default class Dropdown extends Component
 	{
 		return (
 			<span>
-				<label>{this.label}</label>
+				<label style={{fontSize: this.size}}>{this.label}</label>
 				<span className="dropdown">
 					<select style={{fontSize: this.size}}>
 						{

@@ -19,7 +19,7 @@ export default class Schedule extends Component
 		this.state =
 		{
 			data: { week_letter: null, schedule: []},
-			details: null
+			mode: null
 		};
 
 		//get the week from the URL
@@ -63,13 +63,19 @@ export default class Schedule extends Component
 	//show the given details of a job; to be passed as a prop to the Job component
 	show_details = (new_details) =>
 	{
-		this.setState ({ details: new_details});
+		this.setState ({ details: new_details, mode: "Edit"});
 	}
 
-	//hide job details; to be passed as a prop to the Job component
+	//tell the back-end to add a scheduled job
+	add_service = () =>
+	{
+		this.setState ({ mode: "Add" });
+	}
+
+	//hide job details; to be passed as a prop to the ServiceModal component
 	hide_details = () =>
 	{
-		this.setState ({ details: null});
+		this.setState ({ mode: null});
 	}
 
 	//get worker-specific schedule from the back-end
@@ -82,12 +88,6 @@ export default class Schedule extends Component
 		{
 			this.setState (data);
 		});
-	}
-
-	//tell the back-end to add a scheduled job
-	add_service = () =>
-	{
-
 	}
 
 	//tell the back-end to generate the current week's recurring jobs
@@ -123,7 +123,7 @@ export default class Schedule extends Component
 			<div>
 
 				{/* main schedule page */}
-				<div onClick={this.hide_details}>
+				<div onClickCapture={this.hide_details}>
 
 					{/* top of the schedule */}
 					<div className="schedule-top">
@@ -193,10 +193,11 @@ export default class Schedule extends Component
 				{/* display details, if any */}
 				<div>
 				{
-					this.state.details
+					this.state.mode
 					?
 						<ServiceModal
-							scheduled_job={this.state.details}
+							service={this.state.details}
+							mode={this.state.mode}
 							hide_details={this.hide_details}
 						/>
 					:

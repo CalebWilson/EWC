@@ -8,7 +8,9 @@ export default class Button extends Component
 	{
 		return (
 			<button
-				className="button"
+				className={
+					"button" + (this.props.className ? " " + this.props.className : "")
+				}
 				onClick={this.props.action}
 			>
 				{this.props.label}

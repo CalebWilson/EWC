@@ -35,6 +35,10 @@ scheduled_job_router.route ("/:scheduled_job_id")
 			}]
 		}
 	*/
+	.post ((request, response, next) =>
+	{
+		let handler = access_database (db_scheduled_job.post, request.body);
+	})
 ;
 
 module.exports = scheduled_job_router;

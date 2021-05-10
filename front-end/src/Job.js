@@ -11,7 +11,7 @@ export default class Job extends Component
 
 		.then ((data) =>
 		{
-			this.props.show_details (data);
+			this.props.show_details (data.data);
 		});
 	}
 

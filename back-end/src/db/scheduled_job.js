@@ -126,7 +126,7 @@ db_scheduled_job.get = function (scheduled_job_id)
 		}]
 	}
 */
-db_scheduled_job.create = function (params)
+db_scheduled_job.post = function (params)
 {
 	//create new scheduled job in the database
 	return new Promise ((resolve, reject) =>

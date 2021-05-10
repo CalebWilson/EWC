@@ -15,11 +15,19 @@ export default class ServiceModal extends Component
 	{
 		super (props);
 
-		this.state =
-		{
-			service: this.props.scheduled_job.data,
-			editing_job_name: false
-		};
+		//if new service, start in edit mode with empty service
+		this.state = (this.props.mode == "Add")
+		?
+			{
+				service: { Days: [] },
+				editing_job_name: true
+			}
+		:
+			//else, initialize from props
+			{
+				service: this.props.service,
+				editing_job_name: false
+			};
 	}
 
 	delete_day = (day_index) =>
@@ -54,14 +62,21 @@ export default class ServiceModal extends Component
 
 			<div className="service-modal">
 				<div className="service-modal-content">
-
-					<CloseButton close={this.props.hide_details} />
+					<div className="service-modal-top">
+						<div>{this.props.mode} Service</div>
+						<Button
+							label="X"
+							action={this.props.hide_details}
+							className="close"
+						/>
+					</div>
 
 					{
 						this.state.editing_job_name
 						?
 							<div>
 								<JobDropdown
+									size="x-large"
 									default={this.state.service.JobID}
 									select_option={(job_id, job_name) =>
 									{
@@ -74,7 +89,7 @@ export default class ServiceModal extends Component
 							</div>
 						:
 							<div className="service-name">
-								<div>{this.state.service.JobName}</div>
+								<div>Job: {this.state.service.JobName}</div>
 								<Button
 									label="Change"
 									action={() =>
