@@ -12,9 +12,10 @@ export default class Dropdown extends Component
 
 		this.state = { options: [], current: "" };
 
-		this.style = "";
-		this.label = "";
-		this.options_endpoint = "";
+		this.size  = this.props.size  ? this.props.size  : "large";
+		this.label = this.props.label ? this.props.label : "Options: ";
+
+		this.options_endpoint = this.props.options_endpoint;
 	}
 
 	get_option_id (option)
@@ -46,7 +47,7 @@ export default class Dropdown extends Component
 			<span>
 				<label>{this.label}</label>
 				<span className="dropdown">
-					<select className={this.style}>
+					<select style={{fontSize: this.size}}>
 						{
 							this.state.options.map ((option) =>
 							{

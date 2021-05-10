@@ -6,8 +6,9 @@ export default class JobDropdown extends Dropdown
 	{
 		super (props);
 
-		this.style = "large";
-		this.label = "Job: ";
+		this.size  = this.props.size  ? this.props.size  : "x-large";
+		this.label = this.props.label ? this.props.label : "Job: ";
+
 		this.options_endpoint = "jobs";
 	}
 
