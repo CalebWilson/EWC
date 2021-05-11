@@ -26,10 +26,11 @@ export default class ServiceModal extends Component
 					JobID: null,
 					Days:
 					[{
-						date: null,
+						Date: "",
 						Workers: []
 					}]
 				},
+				editing_day: 0,
 				editing_job_name: true
 			}
 		:
@@ -132,15 +133,24 @@ export default class ServiceModal extends Component
 										<div>
 											<div className="delete-row">
 
-												{/* delete day */}
-												<DeleteButton
-													delete={this.delete_day (day_index)}
-												/>
+												{// delete day
+														/*
+														<DeleteButton
+															delete={() => {}}
+														/>
+														*/
+													day_index > 0
+													?
+														<DeleteButton
+															delete={this.delete_day (day_index)}
+														/>
+													:
+														<button className="delete">=</button>
+												}
 
 												<span className="delete-spacer"></span>
 
-												{/* date */}
-												{
+												{ //edit date
 													day_index === this.state.editing_day
 													?
 														<input
@@ -149,6 +159,18 @@ export default class ServiceModal extends Component
 															value={
 																day.Date.toString().substr(0, 10)
 															}
+															onChange={(change) =>
+															{
+																console.log (change.target.value);
+																this.state.service
+																		.Days[day_index].Date =
+																	change.target.value
+																;
+
+																this.setState (
+																	{ editing_day: null }
+																);
+															}}
 														/>
 													:
 														<span
@@ -160,7 +182,7 @@ export default class ServiceModal extends Component
 																);
 															}}
 														>
-														{ //view date, click to edit (above)
+														{ //view date
 															new Intl.DateTimeFormat (
 																	"en-US",
 																	{
