@@ -29,7 +29,7 @@ export default class Day extends Component
 							<GroupWorkItem
 								key={group_job.ScheduledJobDayID}
 								job={group_job}
-								show_details={this.props.show_details}
+								edit_service={this.props.edit_service}
 							/>
 						))
 					}
@@ -41,7 +41,7 @@ export default class Day extends Component
 							<IndividualWorkItem
 								key={day + " " + indiv_worker_day.WorkerID}
 								worker_day={indiv_worker_day}
-								show_details={this.props.show_details}
+								edit_service={this.props.edit_service}
 							/>
 						))
 					}

@@ -118,16 +118,15 @@ db_scheduled_job.get = function (scheduled_job_id)
 	params will be a JSON of the form:
 	{
 		JobID: int,
-		ScheduleDate: date,
-		DayAssignments:
-		[{
-			Day: int,
-			WorkersIDs: int[]
-		}]
+		ScheduleDate: date
 	}
 */
+
 db_scheduled_job.post = function (params)
 {
+	console.log (params);
+	return new Promise ((resolve, reject) => { return resolve(1); })
+/*
 	//create new scheduled job in the database
 	return new Promise ((resolve, reject) =>
 	{
@@ -145,6 +144,21 @@ db_scheduled_job.post = function (params)
 			}
 		);
 	})
+*/
 };
+/*
+	Edit a scheduled job.
+
+	params will be a JSON of the form:
+	{
+		JobID: int,
+		ScheduleDate: date,
+		Days:
+		[{
+			Day: int,
+			WorkersIDs: int[]
+		}]
+	}
+*/
 
 module.exports = db_scheduled_job;

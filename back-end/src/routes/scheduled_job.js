@@ -22,6 +22,7 @@ scheduled_job_router.route ("/:scheduled_job_id")
 
 		handler (request, response, next);
 	})
+;
 
 	/*
 		request.body will be a JSON of the form:
@@ -35,10 +36,11 @@ scheduled_job_router.route ("/:scheduled_job_id")
 			}]
 		}
 	*/
-	.post ((request, response, next) =>
-	{
-		let handler = access_database (db_scheduled_job.post, request.body);
-	})
-;
+scheduled_job_router.post ("/", (request, response, next) =>
+{
+	let handler = access_database (db_scheduled_job.post, request.body);
+
+	handler (request, response, next);
+});
 
 module.exports = scheduled_job_router;

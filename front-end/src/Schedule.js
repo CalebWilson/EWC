@@ -61,9 +61,9 @@ export default class Schedule extends Component
 	}
 
 	//show the given details of a job; to be passed as a prop to the Job component
-	show_details = (new_details) =>
+	edit_service = (new_service) =>
 	{
-		this.setState ({ details: new_details, mode: "Edit"});
+		this.setState ({ service: new_service, mode: "Edit"});
 	}
 
 	//tell the back-end to add a scheduled job
@@ -73,7 +73,7 @@ export default class Schedule extends Component
 	}
 
 	//hide job details; to be passed as a prop to the ServiceModal component
-	hide_details = () =>
+	close_service = () =>
 	{
 		this.setState ({ mode: null});
 	}
@@ -123,7 +123,7 @@ export default class Schedule extends Component
 			<div>
 
 				{/* main schedule page */}
-				<div onClickCapture={this.hide_details}>
+				<div onClickCapture={this.close_service}>
 
 					{/* top of the schedule */}
 					<div className="schedule-top">
@@ -165,7 +165,7 @@ export default class Schedule extends Component
 							<Day
 								date={this.state.data.week_letter}
 								work_day="Notes Content"
-								show_details={this.show_details}
+								edit_service={this.edit_service}
 							/>
 							{
 								//work days
@@ -176,7 +176,7 @@ export default class Schedule extends Component
 										day={day}
 										key={day}
 										work_day={schedule_work_day}
-										show_details={this.show_details}
+										edit_service={this.edit_service}
 									/>
 								))
 							}
@@ -190,15 +190,15 @@ export default class Schedule extends Component
 					/> 
 				</div>
 
-				{/* display details, if any */}
+				{/* display service, if any */}
 				<div>
 				{
 					this.state.mode
 					?
 						<ServiceModal
-							service={this.state.details}
+							service={this.state.service}
 							mode={this.state.mode}
-							hide_details={this.hide_details}
+							close_service={this.close_service}
 						/>
 					:
 						<div></div>
