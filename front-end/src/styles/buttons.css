@@ -1,14 +1,37 @@
-.button, .nav-arrow, .nav-arrow:visited {
+.button-container {
+	padding-left: 1rem;
+	padding-right: 1rem;
+}
+
+.button, .delete, .nav-arrow, .nav-arrow:visited {
 	cursor: pointer;
-	font-size: large;
 	background-color: lightgray;
 	color: black;
+}
+
+.button, .nav-arrow, .nav-arrow:visited {
+	font-size: large;
 	border: 2px solid black;
 	padding-left: 1rem;
 	padding-right: 1rem;
 }
 
-.button-container {
+.delete-row {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.delete {
+	font-size: normal;
+	border: 2px solid black;
+	border-radius: 50%;
+	padding-top: 0rem;
+	padding-bottom: 0.1rem;
+	padding-left: 0.25rem;
+	padding-right: 0.25rem;
+}
+
+.delete-spacer {
 	padding-left: 1rem;
-	padding-right: 1rem;
 }

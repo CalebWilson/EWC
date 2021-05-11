@@ -1,11 +1,13 @@
 import React, { Component } from "react";
 
-export default class Schedule extends Component
+import "./styles/buttons.css";
+
+export default class DeleteButton extends Component
 {
 	render()
 	{
 		return (
-			<button onClick={this.props.delete}>x</button>
+			<button className="delete" onClick={this.props.delete}>×</button>
 		);
 	}
 }

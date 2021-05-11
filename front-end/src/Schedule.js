@@ -121,7 +121,6 @@ export default class Schedule extends Component
 
 		return (
 			<div>
-
 				{/* main schedule page */}
 				<div onClickCapture={this.close_service}>
 

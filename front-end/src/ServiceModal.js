@@ -126,43 +126,62 @@ export default class ServiceModal extends Component
 						<div>
 							Days:
 							<div className="indent">
-							<input type="date" value="05-10-2021"/>
 								{
 									this.state.service.Days.map ((day, day_index) =>
 									(
 										<div>
+											<div className="delete-row">
 
-											{/* date */}
-											{
-												day_index === this.state.editing_day
-												?
-													<input type="date" value="2021-5-10"/>
-												:
-													<div>
-													<DeleteButton
-														delete={this.delete_day (day_index)}
-													/>
-													{
-														new Intl.DateTimeFormat (
-																"en-US",
-																{
-																	weekday: "long",
-																	month: "long",
-																	day: "numeric",
-																	year: "numeric"
-																}
-														)
-															.format (new Date (day.Date))
-													}
-													</div>
-											}
+												{/* delete day */}
+												<DeleteButton
+													delete={this.delete_day (day_index)}
+												/>
+
+												<span className="delete-spacer"></span>
+
+												{/* date */}
+												{
+													day_index === this.state.editing_day
+													?
+														<input
+															type="date"
+															style={{fontSize: "large"}}
+															value={
+																day.Date.toString().substr(0, 10)
+															}
+														/>
+													:
+														<span
+															style={{cursor: "pointer"}}
+															onClick={() =>
+															{
+																this.setState (
+																	{ editing_day: day_index }
+																);
+															}}
+														>
+														{ //view date, click to edit (above)
+															new Intl.DateTimeFormat (
+																	"en-US",
+																	{
+																		weekday: "long",
+																		month: "long",
+																		day: "numeric",
+																		year: "numeric"
+																	}
+															)
+																.format (new Date (day.Date))
+														}
+														</span>
+												}
+											</div>
 
 											{/* workers */}
 											<div className="indent">
 											{
 												day.Workers.map ((worker, worker_index) =>
 												(
-													<div>
+													<div className="delete-row">
 														<DeleteButton
 															delete=
 															{
@@ -171,6 +190,7 @@ export default class ServiceModal extends Component
 																)
 															}
 														/>
+														<span className="delete-spacer"></span>
 														{worker.WorkerName}
 													</div>
 												))
