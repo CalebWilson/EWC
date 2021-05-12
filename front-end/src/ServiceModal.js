@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 
 import       Button from "./Button";
-import  CloseButton from "./CloseButton";
 import DeleteButton from "./DeleteButton";
 
 import JobDropdown from "./JobDropdown";
