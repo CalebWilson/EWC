@@ -30,7 +30,14 @@ export default class Schedule extends Component
 	get_date = (day) =>
 	{
 		let date = new Date (Date.now());
-		date.setDate (date.getDate() + (this.week * 7) - date.getDay() + day);
+		date.setDate
+		(
+			date.getDate()        //today's date
+			+ (this.week * 7)     //same day as today of current week
+			- (date.getDay() - 1) //monday of current week, 0-indexed
+			+ day                 //given day of current week
+		);
+
 		return date;
 	}
 
@@ -40,8 +47,12 @@ export default class Schedule extends Component
 		let monday = this.get_date (0);
 		let friday = this.get_date (4);
 
-		let monday_month = new Intl.DateTimeFormat ("en-US", {month: "long"}).format(monday);
-		let friday_month = new Intl.DateTimeFormat ("en-US", {month: "long"}).format(friday);
+		let monday_month =
+			new Intl.DateTimeFormat ("en-US", {month: "long"}).format(monday)
+		;
+		let friday_month =
+			new Intl.DateTimeFormat ("en-US", {month: "long"}).format(friday)
+		;
 
 		//this works
 /*
@@ -171,7 +182,7 @@ export default class Schedule extends Component
 								this.state.data.schedule.map ((schedule_work_day, day) =>
 								(
 									<Day
-										date={this.get_date(day + 1).getDate()}
+										date={this.get_date(day).getDate()}
 										day={day}
 										key={day}
 										work_day={schedule_work_day}

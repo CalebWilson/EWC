@@ -65,8 +65,23 @@ export default class ServiceModal extends Component
 		Uplink.send_data ("scheduled_job", this.state.service);
 	}
 
+	correct_date = (old_date) =>
+	{
+		let new_date = new Date (old_date);
+
+		new_date.setDate (new_date.getDate() + 1);
+
+		return new_date;
+	}
+
+
 	render()
 	{
+
+/*
+console.log ("2021-05-05");
+console.log (new Date ("2021-05-05"));
+*/
 
 		return (
 
@@ -133,11 +148,6 @@ export default class ServiceModal extends Component
 											<div className="delete-row">
 
 												{// delete day
-														/*
-														<DeleteButton
-															delete={() => {}}
-														/>
-														*/
 													day_index > 0
 													?
 														<DeleteButton
@@ -160,10 +170,12 @@ export default class ServiceModal extends Component
 															}
 															onChange={(change) =>
 															{
-																console.log (change.target.value);
+																//get the new date value
+																//preserve timestamp
 																this.state.service
 																		.Days[day_index].Date =
-																	change.target.value
+																	change.target.value +
+																	day.Date.toString().substr(10)
 																;
 
 																this.setState (
@@ -192,6 +204,7 @@ export default class ServiceModal extends Component
 																	}
 															)
 																.format (new Date (day.Date))
+
 														}
 														</span>
 												}
