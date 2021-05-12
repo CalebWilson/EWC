@@ -171,11 +171,11 @@ console.log (new Date ("2021-05-05"));
 															onChange={(change) =>
 															{
 																//get the new date value
-																//preserve timestamp
+																//reset timestamp to local
 																this.state.service
 																		.Days[day_index].Date =
 																	change.target.value +
-																	day.Date.toString().substr(10)
+																	"T00:00:00.000"
 																;
 
 																this.setState (
