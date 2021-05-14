@@ -26,6 +26,15 @@ export default class Schedule extends Component
 		this.week = parseInt(this.props.match.params.week);
 	}
 
+	get_schedule = () =>
+	{
+		Uplink.get_data ("schedule/" + this.props.match.params.week)
+		.then ((data) =>
+		{
+			this.setState (data);
+		});
+	}
+
 	//date of the given day of the current week
 	get_date = (day) =>
 	{
@@ -84,9 +93,12 @@ export default class Schedule extends Component
 	}
 
 	//hide job details; to be passed as a prop to the ServiceModal component
-	close_service = () =>
+	close_service = (refresh) =>
 	{
 		this.setState ({ mode: null});
+
+		if (refresh)
+			this.get_schedule();
 	}
 
 	//get worker-specific schedule from the back-end
@@ -115,12 +127,7 @@ export default class Schedule extends Component
 	//get main schedule from the back-end
 	componentDidMount()
 	{
-		//schedule data
-		Uplink.get_data ("schedule/" + this.props.match.params.week)
-		.then ((data) =>
-		{
-			this.setState (data);
-		});
+		this.get_schedule();
 	}
 
 	render()

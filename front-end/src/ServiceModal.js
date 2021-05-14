@@ -47,6 +47,17 @@ export default class ServiceModal extends Component
 		return (this.state.service.JobID && this.state.service.Days[0].Date);
 	}
 
+/*
+	sort_days = () =>
+	{
+		this.state.service.Days.sort
+		(
+			(day1, day2) => (day2.Date - day1.Date)
+		);
+
+		console.log ("Sorted: " + JSON.stringify(this.state.service.Days));
+	}
+*/
 
 	create = () =>
 	{
@@ -68,9 +79,12 @@ export default class ServiceModal extends Component
 
 			else
 			{
-				this.setState ({ duplicate_error: false });
-				console.log (response);
-				//this.setState ({ service: response.
+				this.setState
+				({
+					service: response.data,
+					mode: "Edit",
+					duplicate_error: false
+				});
 			}
 		})
 	}
@@ -88,6 +102,7 @@ export default class ServiceModal extends Component
 			{
 				
 			}
+
 		}
 	}
 
@@ -130,6 +145,8 @@ export default class ServiceModal extends Component
 
 	render()
 	{
+		//this.sort_days();
+
 		return (
 
 			<div className="service-modal">
@@ -309,7 +326,10 @@ export default class ServiceModal extends Component
 					</div>
 
 					<div className="service-modal-bottom">
-						<Button label="Save" action={this.create} />
+						<Button
+							label="Save"
+							action={() => {this.props.close_service (true)}}
+						/>
 					</div>
 
 				</div>
