@@ -1,3 +1,10 @@
+//start database
+const { exec } = require ("child_process");
+exec ("sudo service mysql start", (err, stdout, stderr) =>
+{
+	console.log (stdout);
+});
+
 //import express and CORS
 const express = require("express");
 const    cors = require("cors");
