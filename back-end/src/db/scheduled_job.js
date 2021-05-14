@@ -170,7 +170,7 @@ db_scheduled_job.post = function (params)
 		console.log (results);
 
 		return results;
-	});
+	})
 };
 
 /*

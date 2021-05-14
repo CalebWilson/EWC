@@ -17,7 +17,7 @@ export default class ServiceModal extends Component
 		super (props);
 
 		//if new service, start in edit mode with empty service
-		this.state = (this.props.mode == "Add")
+		this.state = (this.props.mode === "Add")
 		?
 			{
 				service:
@@ -30,14 +30,84 @@ export default class ServiceModal extends Component
 					}]
 				},
 				editing_day: 0,
-				editing_job_name: true
+				editing_job_name: true,
+				mode: this.props.mode
 			}
 		:
 			//else, initialize from props
 			{
 				service: this.props.service,
-				editing_job_name: false
+				editing_job_name: false,
+				mode: this.props.mode
 			};
+	}
+
+	has_job_and_date = () =>
+	{
+		return (this.state.service.JobID && this.state.service.Days[0].Date);
+	}
+
+
+	create = () =>
+	{
+		let request_body =
+		{
+			JobID: this.state.service.JobID,
+			ScheduleDate: this.state.service.Days[0].Date
+		};
+
+		Uplink.send_data ("scheduled_job", request_body)
+
+		.then ((response) =>
+		{
+			if (response.error)
+			{
+				this.state.service.Days[0].Date = null;
+				this.setState ({ duplicate_error: true, editing_day: 0 });
+			}
+
+			else
+			{
+				this.setState ({ duplicate_error: false });
+				console.log (response);
+				//this.setState ({ service: response.
+			}
+		})
+	}
+
+	save = () =>
+	{
+		if (this.has_job_and_date())
+		{
+			if (this.state.mode === "Add")
+			{
+				this.create();
+			}
+
+			else
+			{
+				
+			}
+		}
+	}
+
+	update_date = (day_index) =>
+	{
+		return ((update) =>
+		{
+			//get the new date value
+			//reset timestamp to local
+			this.state.service.Days[day_index].Date =
+				update.target.value + "T00:00:00.000"
+			;
+
+			this.setState ({ editing_day: null });
+
+			if (day_index === 0)
+			{
+				this.save();
+			}
+		});
 	}
 
 	delete_day = (day_index) =>
@@ -58,44 +128,15 @@ export default class ServiceModal extends Component
 		});
 	}
 
-	create = () =>
-	{
-		console.log (this.state.service);
-
-		let request_body =
-		{
-			JobID: this.state.service.JobID,
-			ScheduleDate: this.state.service.Days[0].Date
-		};
-
-		Uplink.send_data ("scheduled_job", request_body);
-	}
-
-	correct_date = (old_date) =>
-	{
-		let new_date = new Date (old_date);
-
-		new_date.setDate (new_date.getDate() + 1);
-
-		return new_date;
-	}
-
-
 	render()
 	{
-
-/*
-console.log ("2021-05-05");
-console.log (new Date ("2021-05-05"));
-*/
-
 		return (
 
 			<div className="service-modal">
 				<div className="service-modal-content">
 
 					<div className="service-modal-top">
-						<div>{this.props.mode} Service</div>
+						<div>{this.state.mode} Service</div>
 						<Button
 							label="X"
 							action={this.props.close_service}
@@ -103,8 +144,18 @@ console.log (new Date ("2021-05-05"));
 						/>
 					</div>
 
+
 					{/* scrollable */}
 					<div className="service-modal-inner">
+
+					{
+						this.state.duplicate_error
+						?
+							this.state.service.JobName
+							+ " already has a Service scheduled for this date."
+						:
+							<div></div>
+					}
 
 						{/* job name */}
 						{
@@ -120,7 +171,13 @@ console.log (new Date ("2021-05-05"));
 											this.state.service.JobName = job_name;
 											this.state.service.JobID   = job_id;
 
-											this.setState ({ editing_job_name: false });
+											this.setState
+											({
+												editing_job_name: false,
+												duplicate_error:  false
+											});
+
+											this.save();
 										}}
 									/>
 									<br />
@@ -172,22 +229,14 @@ console.log (new Date ("2021-05-05"));
 															type="date"
 															style={{fontSize: "large"}}
 															value={
-																day.Date.toString().substr(0, 10)
+																day.Date ?
+																	day.Date.toString()
+																	.substr(0, 10)
+																: null
 															}
-															onChange={(change) =>
-															{
-																//get the new date value
-																//reset timestamp to local
-																this.state.service
-																		.Days[day_index].Date =
-																	change.target.value +
-																	"T00:00:00.000"
-																;
-
-																this.setState (
-																	{ editing_day: null }
-																);
-															}}
+															onChange={
+																this.update_date (day_index)
+															}
 														/>
 													:
 														<span
