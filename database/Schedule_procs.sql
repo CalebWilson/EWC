@@ -140,8 +140,8 @@ begin
 	;
 
 	-- drop temporary tables
-	-- drop table lastScheduledJobs;
-	-- drop table lastScheduledJobDays;
+	drop table lastScheduledJobs;
+	drop table lastScheduledJobDays;
 	drop table newScheduledJobDays;
 
 end //

@@ -12,6 +12,8 @@ create table ScheduledJobs
 
 	FinalPrice decimal(10,2),
 
+	UNIQUE (JobID, ScheduleDate),
+
 	PRIMARY KEY (ScheduledJobID),
 
 	FOREIGN KEY (JobID) REFERENCES Jobs (JobID)

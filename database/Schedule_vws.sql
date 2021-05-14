@@ -69,6 +69,8 @@ as
 		Assignments.WorkerID               = Workers.WorkerID                and
 		Jobs.ServiceTypeID                 = ServiceTypes.ServiceTypeID      and
 		Workers.StatusID                   = WorkerStatuses.StatusID
+	
+	order by Week, Day, JobName
 ;
 
 drop view if exists IndividualWork;

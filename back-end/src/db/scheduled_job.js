@@ -125,15 +125,12 @@ db_scheduled_job.get = function (scheduled_job_id)
 db_scheduled_job.post = function (params)
 {
 	console.log (params);
-	return new Promise ((resolve, reject) => { return resolve(1); })
-/*
 	//create new scheduled job in the database
 	return new Promise ((resolve, reject) =>
 	{
 		db.query
 		(
-			`call CreateScheduledJob (?, ?);
-			select last_insert_id()`,
+			`call CreateScheduledJob (?, ?)`,
 
 			[params.JobID, params.ScheduleDate],
 
@@ -144,8 +141,38 @@ db_scheduled_job.post = function (params)
 			}
 		);
 	})
-*/
+
+	.then ((results) =>
+	{
+		return new Promise ((resolve, reject) =>
+		{
+			db.query
+			(
+				`select ScheduledJobID
+					from ScheduledJobs
+					where
+						JobID = ? and
+						ScheduleDate = ?`,
+
+				[params.JobID, params.ScheduleDate],
+
+				(error, results) =>
+				{
+					if (error) return reject (error);
+					return resolve (results);
+				}
+			);
+		})
+	})
+
+	.then ((results) =>
+	{
+		console.log (results);
+
+		return results;
+	});
 };
+
 /*
 	Edit a scheduled job.
 

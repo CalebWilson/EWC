@@ -62,7 +62,13 @@ export default class ServiceModal extends Component
 	{
 		console.log (this.state.service);
 
-		Uplink.send_data ("scheduled_job", this.state.service);
+		let request_body =
+		{
+			JobID: this.state.service.JobID,
+			ScheduleDate: this.state.service.Days[0].Date
+		};
+
+		Uplink.send_data ("scheduled_job", request_body);
 	}
 
 	correct_date = (old_date) =>
