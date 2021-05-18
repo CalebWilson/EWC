@@ -155,12 +155,15 @@ export default class Schedule extends Component
 
 						<div className="schedule-top-right">
 
-							<WorkerDropdown select_option={this.select_worker} />
+							<WorkerDropdown
+								blank={{ WorkerID: "", WorkerName: "MASTER" }}
+								select_option={this.select_worker}
+							/>
 
 							<Button label="Add Service" action={this.add_service} />
 
 							<span className="button-container">
-								<Button label="Generate" action={this.generate}    />
+								<Button label="Generate" action={this.generate} />
 							</span>
 						</div>
 					

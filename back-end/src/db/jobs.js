@@ -14,13 +14,6 @@ const get_jobs = () =>
 				return resolve (results);
 			}
 		);
-	})
-
-	.then ((jobs) =>
-	{
-		jobs.splice (0, 0, { JobID: "", JobName: "" });
-
-		return jobs;
 	});
 }
 

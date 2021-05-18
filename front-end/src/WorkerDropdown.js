@@ -6,9 +6,23 @@ export default class WorkerDropdown extends Dropdown
 	{
 		super (props);
 
-		this.label = this.props.label ? this.props.label : "Worker: ";
+		this.label =
+			(this.props.label !== undefined)
+			?
+				this.props.label
+			:
+				"Worker: "
+		;
 
 		this.options_endpoint = "workers";
+
+		this.blank =
+			(this.props.blank !== undefined)
+			?
+				this.props.blank
+			:
+				{ WorkerID: "", WorkerName: "" }
+		;
 	}
 
 	get_option_id (worker)

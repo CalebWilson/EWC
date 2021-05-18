@@ -10,11 +10,12 @@ export default class Dropdown extends Component
 	{
 		super (props);
 
-		this.state = { options: [], current: "" };
+		this.state = { options: [], current: "", test: ""};
 
 		this.size  = this.props.size  ? this.props.size  : "large";
 		this.label = this.props.label ? this.props.label : "Options: ";
 
+		//endpoint from which to get options
 		this.options_endpoint = this.props.options_endpoint;
 	}
 
@@ -37,6 +38,10 @@ export default class Dropdown extends Component
 		//worker options
 		Uplink.get_data (this.options_endpoint).then ((options) =>
 		{
+			//insert blank
+			if (this.blank)
+				options.data.splice (0, 0, this.blank);
+
 			this.setState ({ options: options.data });
 		});
 	}
@@ -45,9 +50,10 @@ export default class Dropdown extends Component
 	{
 		return (
 			<span>
+				{this.state.test}
 				<label style={{fontSize: this.size}}>{this.label}</label>
 				<span className="dropdown">
-					<select style={{fontSize: this.size}}>
+					<select style={{fontSize: this.size}} >
 						{
 							this.state.options.map ((option) =>
 							{

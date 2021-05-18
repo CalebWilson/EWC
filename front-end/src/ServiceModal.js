@@ -3,7 +3,8 @@ import React, { Component } from "react";
 import       Button from "./Button";
 import RemoveButton from "./RemoveButton";
 
-import JobDropdown from "./JobDropdown";
+import    JobDropdown from "./JobDropdown";
+import WorkerDropdown from "./WorkerDropdown";
 
 import Uplink from "./Uplink";
 
@@ -207,7 +208,7 @@ export default class ServiceModal extends Component
 						;
 
 						//stop editing
-						state.editing_day = null;
+						state.editing_day = false;
 						state.out_of_order_error = false;
 
 						return state;
@@ -223,6 +224,25 @@ export default class ServiceModal extends Component
 					}
 				);
 			}
+		});
+	}
+
+	edit_worker = (day_index, worker_index) =>
+	{
+		return ((worker_id, worker_name) =>
+		{
+			this.setState ((state) =>
+			{
+				state.service.Days[day_index].Workers[worker_index] = 
+				{
+					WorkerID: worker_id,
+					WorkerName: worker_name
+				};
+
+				state.editing_worker = false;
+
+				return state;
+			});
 		});
 	}
 
@@ -283,12 +303,22 @@ export default class ServiceModal extends Component
 							this.state.editing_job
 							?
 								<div>
-									{/* edit */}
-									<JobDropdown
-										size="x-large"
-										default={this.state.service.JobID}
-										select_option={this.edit_job}
-									/>
+									{/* edit */
+										(this.state.mode === "Add")
+										?
+											<JobDropdown
+												size="x-large"
+												select_option={this.edit_job}
+											/>
+										:
+											<JobDropdown
+												size="x-large"
+												select_option={this.edit_job}
+												blank={null}
+												default={this.state.service.JobID}
+											/>
+									}
+
 									<br />
 									<br />
 								</div>
@@ -391,7 +421,41 @@ export default class ServiceModal extends Component
 															}
 														/>
 														<span className="remove-spacer"></span>
-														{worker.WorkerName}
+														{
+															this.state.editing_day_workers ===
+																day_index &&
+															this.state.editing_worker ===
+																worker_index
+															?
+																<WorkerDropdown
+																	label=""
+																	default={worker.WorkerID}
+																	blank={null}
+																	select_option={
+																		this.edit_worker (
+																			day_index,
+																			worker_index
+																		)
+																	}
+																/>
+															:
+																<span
+																	style={{cursor: "pointer"}}
+																	onClick={() =>
+																	{
+																		this.setState (
+																		{
+																			editing_day_workers:
+																				day_index,
+
+																			editing_worker:
+																				worker_index
+																		});
+																	}}
+																>
+																	{ worker.WorkerName }
+																</span>
+														}
 													</div>
 												))
 											}

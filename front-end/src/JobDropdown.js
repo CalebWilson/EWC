@@ -9,6 +9,14 @@ export default class JobDropdown extends Dropdown
 		this.label = this.props.label ? this.props.label : "Job: ";
 
 		this.options_endpoint = "jobs";
+
+		this.blank =
+			(this.props.blank !== undefined)
+			?
+				this.props.blank
+			:
+				{ JobID: "", JobName: "" }
+		;
 	}
 
 	get_option_id (job)

@@ -14,13 +14,6 @@ const get_workers = () =>
 				return resolve (results);
 			}
 		);
-	})
-
-	.then ((workers) =>
-	{
-		workers.splice (0, 0, { WorkerID: "", WorkerName: "MASTER" });
-
-		return workers;
 	});
 }
 
