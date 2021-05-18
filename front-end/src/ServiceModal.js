@@ -30,14 +30,14 @@ export default class ServiceModal extends Component
 					}]
 				},
 				editing_day: 0,
-				editing_job_name: true,
+				editing_job: true,
 				mode: this.props.mode
 			}
 		:
 			//else, initialize from props
 			{
 				service: this.props.service,
-				editing_job_name: false,
+				editing_job: false,
 				mode: this.props.mode
 			};
 	}
@@ -47,17 +47,19 @@ export default class ServiceModal extends Component
 		return (this.state.service.JobID && this.state.service.Days[0].Date);
 	}
 
-/*
+
 	sort_days = () =>
 	{
+		console.log ("Unsorted: " + JSON.stringify(this.state.service.Days));
+
 		this.state.service.Days.sort
 		(
 			(day1, day2) => (day2.Date - day1.Date)
 		);
 
-		console.log ("Sorted: " + JSON.stringify(this.state.service.Days));
+		console.log ("  Sorted: " + JSON.stringify(this.state.service.Days));
 	}
-*/
+
 
 	create = () =>
 	{
@@ -73,8 +75,14 @@ export default class ServiceModal extends Component
 		{
 			if (response.error)
 			{
-				this.state.service.Days[0].Date = null;
-				this.setState ({ duplicate_error: true, editing_day: 0 });
+				this.setState ((state) =>
+				{
+					state.service.Days[0].Date = null;
+					state.duplicate_error = true;
+					state.editing_day = 0;
+
+					return state;
+				});
 			}
 
 			else
@@ -106,23 +114,20 @@ export default class ServiceModal extends Component
 		}
 	}
 
-	update_date = (day_index) =>
+	edit_job = (job_id, job_name) =>
 	{
-		return ((update) =>
+		this.setState ((state) =>
 		{
-			//get the new date value
-			//reset timestamp to local
-			this.state.service.Days[day_index].Date =
-				update.target.value + "T00:00:00.000"
-			;
+			state.service.JobName = job_name;
+			state.service.JobID   = job_id;
 
-			this.setState ({ editing_day: null });
+			state.editing_job = false;
+			state.duplicate_error  = false;
 
-			if (day_index === 0)
-			{
-				this.save();
-			}
+			return state;
 		});
+
+		this.save();
 	}
 
 	delete_day = (day_index) =>
@@ -131,6 +136,30 @@ export default class ServiceModal extends Component
 		{
 			this.state.service.Days.splice (day_index, 1);
 			this.forceUpdate();
+		});
+	}
+
+	edit_date = (day_index) =>
+	{
+		return ((update) =>
+		{
+			//get the new date value
+			//reset timestamp to local
+			this.setState ((state) =>
+			{
+				state.service.Days[day_index].Date =
+					update.target.value + "T00:00:00.000"
+				;
+
+				state.editing_day = null;
+
+				return state;
+			});
+
+			if (day_index === 0)
+			{
+				this.save();
+			}
 		});
 	}
 
@@ -176,26 +205,14 @@ export default class ServiceModal extends Component
 
 						{/* job name */}
 						{
-							this.state.editing_job_name
+							this.state.editing_job
 							?
 								<div>
 									{/* edit */}
 									<JobDropdown
 										size="x-large"
 										default={this.state.service.JobID}
-										select_option={(job_id, job_name) =>
-										{
-											this.state.service.JobName = job_name;
-											this.state.service.JobID   = job_id;
-
-											this.setState
-											({
-												editing_job_name: false,
-												duplicate_error:  false
-											});
-
-											this.save();
-										}}
+										select_option={this.edit_job}
 									/>
 									<br />
 									<br />
@@ -209,7 +226,7 @@ export default class ServiceModal extends Component
 										label="Change"
 										action={() =>
 										{
-											this.setState ({ editing_job_name: true });
+											this.setState ({ editing_job: true });
 										}}
 									/>
 									</div>
@@ -252,7 +269,7 @@ export default class ServiceModal extends Component
 																: null
 															}
 															onChange={
-																this.update_date (day_index)
+																this.edit_date (day_index)
 															}
 														/>
 													:
