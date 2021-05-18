@@ -3,7 +3,7 @@
 	padding-right: 1rem;
 }
 
-.button, .delete, .nav-arrow, .nav-arrow:visited {
+.button, .remove, .nav-arrow, .nav-arrow:visited {
 	cursor: pointer;
 	background-color: lightgray;
 	color: black;
@@ -16,13 +16,13 @@
 	padding-right: 1rem;
 }
 
-.delete-row {
+.remove-row {
 	display: flex;
 	flex-direction: row;
 	align-items: center;
 }
 
-.delete {
+.remove {
 	font-size: normal;
 	border: 2px solid black;
 	border-radius: 50%;
@@ -32,6 +32,6 @@
 	padding-right: 0.25rem;
 }
 
-.delete-spacer {
+.remove-spacer {
 	padding-left: 0.75rem;
 }

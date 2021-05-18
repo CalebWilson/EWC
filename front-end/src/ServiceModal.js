@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 
 import       Button from "./Button";
-import DeleteButton from "./DeleteButton";
+import RemoveButton from "./RemoveButton";
 
 import JobDropdown from "./JobDropdown";
 
@@ -130,7 +130,7 @@ export default class ServiceModal extends Component
 		this.save();
 	}
 
-	delete_day = (day_index) =>
+	remove_day = (day_index) =>
 	{
 		return (() =>
 		{
@@ -163,7 +163,7 @@ export default class ServiceModal extends Component
 		});
 	}
 
-	delete_worker = (day_index, worker_index) =>
+	remove_worker = (day_index, worker_index) =>
 	{
 		return (() =>
 		{
@@ -242,19 +242,19 @@ export default class ServiceModal extends Component
 									this.state.service.Days.map ((day, day_index) =>
 									(
 										<div>
-											<div className="delete-row">
+											<div className="remove-row">
 
-												{// delete day
+												{// remove day
 													day_index > 0
 													?
-														<DeleteButton
-															delete={this.delete_day (day_index)}
+														<RemoveButton
+															remove={this.remove_day (day_index)}
 														/>
 													:
-														<button className="delete">=</button>
+														<button className="remove">=</button>
 												}
 
-												<span className="delete-spacer"></span>
+												<span className="remove-spacer"></span>
 
 												{ //edit date
 													day_index === this.state.editing_day
@@ -304,16 +304,16 @@ export default class ServiceModal extends Component
 											{
 												day.Workers.map ((worker, worker_index) =>
 												(
-													<div className="delete-row">
-														<DeleteButton
-															delete=
+													<div className="remove-row">
+														<RemoveButton
+															remove=
 															{
-																this.delete_worker (
+																this.remove_worker (
 																	day_index, worker_index
 																)
 															}
 														/>
-														<span className="delete-spacer"></span>
+														<span className="remove-spacer"></span>
 														{worker.WorkerName}
 													</div>
 												))
