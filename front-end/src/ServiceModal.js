@@ -114,6 +114,7 @@ export default class ServiceModal extends Component
 		}
 	}
 
+	//switch the job of the service to the selected option
 	edit_job = (job_id, job_name) =>
 	{
 		this.setState ((state) =>
@@ -121,8 +122,8 @@ export default class ServiceModal extends Component
 			state.service.JobName = job_name;
 			state.service.JobID   = job_id;
 
-			state.editing_job = false;
-			state.duplicate_error  = false;
+			state.editing_job     = false;
+			state.duplicate_error = false;
 
 			return state;
 		});
@@ -130,32 +131,62 @@ export default class ServiceModal extends Component
 		this.save();
 	}
 
+	//add new day to service
+	add_day = () =>
+	{
+		this.setState ((state) =>
+		{
+			//add a day to the Days array with the same workers as the previous day
+			state.service.Days = state.service.Days.concat (
+			{
+				Date: "",
+				Workers: state.service.Days[state.service.Days.length - 1].Workers
+			});
+
+			console.log (state.service.Days.length);
+
+			//edit last day
+			state.editing_day = state.service.Days.length - 1;
+
+			console.log (state.editing_day);
+
+			return state;
+		});
+	}
+
+	//remove a day from service
 	remove_day = (day_index) =>
 	{
 		return (() =>
 		{
-			this.state.service.Days.splice (day_index, 1);
-			this.forceUpdate();
+			this.setState ((state) =>
+			{
+				state.service.Days.splice (day_index, 1);
+
+				return state;
+			});
 		});
 	}
 
+	//edit the date of a day of a service
 	edit_date = (day_index) =>
 	{
-		return ((update) =>
+		return ((edit) =>
 		{
 			//get the new date value
-			//reset timestamp to local
 			this.setState ((state) =>
 			{
 				state.service.Days[day_index].Date =
-					update.target.value + "T00:00:00.000"
+					edit.target.value + "T00:00:00.000"	//reset timestamp to local
 				;
 
+				//stop editing
 				state.editing_day = null;
 
 				return state;
 			});
 
+			//editing first date updates the rest
 			if (day_index === 0)
 			{
 				this.save();
@@ -163,19 +194,23 @@ export default class ServiceModal extends Component
 		});
 	}
 
+	//remove a worker from a service
 	remove_worker = (day_index, worker_index) =>
 	{
 		return (() =>
 		{
-			this.state.service.Days[day_index].Workers.splice (worker_index, 1);
-			this.forceUpdate();
+			//remove the given worker from the given Day
+			this.setState ((state) =>
+			{
+				state.service.Days[day_index].Workers.splice (worker_index, 1);
+				
+				return state;
+			});
 		});
 	}
 
 	render()
 	{
-		//this.sort_days();
-
 		return (
 
 			<div className="service-modal">
@@ -293,7 +328,6 @@ export default class ServiceModal extends Component
 																	}
 															)
 																.format (new Date (day.Date))
-
 														}
 														</span>
 												}
@@ -326,13 +360,7 @@ export default class ServiceModal extends Component
 
 								<Button
 									label="Continue service to another day"
-									action={() =>
-									{
-										this.setState
-										({
-											editing_day: this.state.service.Days.length - 1
-										});
-									}}
+									action={this.add_day}
 								/><br />
 								<br />
 							</div>
