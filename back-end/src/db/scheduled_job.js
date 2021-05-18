@@ -48,7 +48,8 @@ db_scheduled_job.get = function (scheduled_job_id)
 						FirstDay,
 						ScheduledJobDayID
 					from WeekWork
-					where ScheduledJobID = ?`,
+					where ScheduledJobID = ?
+					order by Date`,
 
 				scheduled_job_id,
 

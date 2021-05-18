@@ -48,6 +48,7 @@ export default class ServiceModal extends Component
 	}
 
 
+/*
 	sort_days = () =>
 	{
 		this.setState ((state) =>
@@ -62,12 +63,11 @@ export default class ServiceModal extends Component
 			console.log ("  Sorted: " + JSON.stringify(state.service.Days));
 		});
 	}
+*/
 
 
 	create = () =>
 	{
-		console.log ("in create");
-
 		let request_body =
 		{
 			JobID: this.state.service.JobID,
@@ -83,7 +83,7 @@ export default class ServiceModal extends Component
 				this.setState ((state) =>
 				{
 					state.service.Days[0].Date = null;
-					state.duplicate_error = true;
+					state.duplicate_service_error = true;
 					state.editing_day = 0;
 
 					return state;
@@ -96,7 +96,7 @@ export default class ServiceModal extends Component
 				({
 					service: response.data,
 					mode: "Edit",
-					duplicate_error: false
+					duplicate_service_error: false
 				});
 			}
 		})
@@ -104,10 +104,8 @@ export default class ServiceModal extends Component
 
 	save = () =>
 	{
-		console.log ("in save");
 		if (this.has_job_and_date())
 		{
-			console.log ("passed job_and_date");
 			if (this.state.mode === "Add")
 			{
 				this.create();
@@ -118,10 +116,6 @@ export default class ServiceModal extends Component
 				
 			}
 
-		}
-		else
-		{
-			console.log ("failed job_and_date");
 		}
 	}
 
@@ -135,8 +129,9 @@ export default class ServiceModal extends Component
 				state.service.JobName = job_name;
 				state.service.JobID   = job_id;
 
-				state.editing_job     = false;
-				state.duplicate_error = false;
+				state.editing_job = false;
+
+				state.duplicate_service_error = false;
 
 				return state;
 			},
@@ -157,12 +152,9 @@ export default class ServiceModal extends Component
 				Workers: state.service.Days[state.service.Days.length - 1].Workers
 			});
 
-			console.log (state.service.Days.length);
-
 			//edit last day
 			state.editing_day = state.service.Days.length - 1;
 
-			console.log (state.editing_day);
 
 			return state;
 		});
@@ -187,31 +179,50 @@ export default class ServiceModal extends Component
 	{
 		return ((edit) =>
 		{
-			//get the new date value
-			this.setState
-			(
-				(state) =>
+			if (
+					day_index !== 0 &&
+					edit.target.value < this.state.service.Days[0].Date
+			)
+			{
+				this.setState ((state) =>
 				{
+					state.out_of_order_error = true;
+
 					state.service.Days[day_index].Date =
-						edit.target.value + "T00:00:00.000"	//reset timestamp to local
+						edit.target.value + "T00:00:00.000"	//reset timestamp local
 					;
 
-					//stop editing
-					state.editing_day = null;
-
 					return state;
-				},
-
-				//editing first date updates the rest
-				() =>
-				{
-					if (day_index === 0)
+				});
+			}
+			else
+			{
+				//get the new date value
+				this.setState
+				(
+					(state) =>
 					{
-						console.log ("about to save");
-						this.save();
+						state.service.Days[day_index].Date =
+							edit.target.value + "T00:00:00.000"	//reset timestamp local
+						;
+
+						//stop editing
+						state.editing_day = null;
+						state.out_of_order_error = false;
+
+						return state;
+					},
+
+					//editing first date updates the rest
+					() =>
+					{
+						if (day_index === 0)
+						{
+							this.save();
+						}
 					}
-				}
-			);
+				);
+			}
 		});
 	}
 
@@ -251,10 +262,18 @@ export default class ServiceModal extends Component
 					<div className="service-modal-inner">
 
 					{
-						this.state.duplicate_error
+						this.state.duplicate_service_error
 						?
 							this.state.service.JobName
 							+ " already has a Service scheduled for this date."
+						:
+							<div></div>
+					}
+
+					{
+						this.state.out_of_order_error
+						?
+							"Subsequent days cannot be scheduled for before the first day."
 						:
 							<div></div>
 					}
@@ -333,9 +352,12 @@ export default class ServiceModal extends Component
 															style={{cursor: "pointer"}}
 															onClick={() =>
 															{
-																this.setState (
-																	{ editing_day: day_index }
-																);
+																if (!this.out_of_order_error)
+																{
+																	this.setState (
+																		{ editing_day: day_index }
+																	);
+																}
 															}}
 														>
 														{ //view date
