@@ -156,7 +156,7 @@ export default class ServiceModal extends Component
 						<div>{this.state.mode} Service</div>
 						<Button
 							label="X"
-							action={this.props.close_service}
+							action={this.props.close_service()}
 							className="close"
 						/>
 					</div>
@@ -328,7 +328,7 @@ export default class ServiceModal extends Component
 					<div className="service-modal-bottom">
 						<Button
 							label="Save"
-							action={() => {this.props.close_service (true)}}
+							action={this.props.close_service (true)}
 						/>
 					</div>
 

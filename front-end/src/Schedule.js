@@ -95,10 +95,13 @@ export default class Schedule extends Component
 	//hide job details; to be passed as a prop to the ServiceModal component
 	close_service = (refresh) =>
 	{
-		this.setState ({ mode: null});
+		return (() =>
+		{
+			this.setState ({ mode: null});
 
-		if (refresh)
-			this.get_schedule();
+			if (refresh)
+				this.get_schedule();
+		});
 	}
 
 	//get worker-specific schedule from the back-end
@@ -140,7 +143,7 @@ export default class Schedule extends Component
 		return (
 			<div>
 				{/* main schedule page */}
-				<div onClickCapture={this.close_service}>
+				<div onClickCapture={this.close_service()}>
 
 					{/* top of the schedule */}
 					<div className="schedule-top">
@@ -151,11 +154,13 @@ export default class Schedule extends Component
 						</div>
 
 						<div className="schedule-top-right">
+
 							<WorkerDropdown select_option={this.select_worker} />
 
 							<Button label="Add Service" action={this.add_service} />
+
 							<span className="button-container">
-								<Button label="Generate"    action={this.generate}    />
+								<Button label="Generate" action={this.generate}    />
 							</span>
 						</div>
 					
