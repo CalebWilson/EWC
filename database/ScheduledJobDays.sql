@@ -9,7 +9,7 @@ create table ScheduledJobDays
 	ScheduledJobID     int NOT NULL,
 	ScheduledJobDay    int NOT NULL, -- 0-indexed
 
-	UNIQUE (ScheduledJobID, ScheduledJobDay)
+	UNIQUE (ScheduledJobID, ScheduledJobDay),
 
 	PRIMARY KEY (ScheduledJobDayID),
 

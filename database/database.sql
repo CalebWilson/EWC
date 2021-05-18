@@ -23,6 +23,9 @@ drop table if exists Statuses;
 drop table if exists InvoiceProcs;
 drop table if exists ServiceTypes;
 
+-- temporary tables
+drop table if exists newScheduledJobs;
+
 
 -- constant tables
 source ServiceTypes.sql;

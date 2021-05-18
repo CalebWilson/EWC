@@ -50,19 +50,24 @@ export default class ServiceModal extends Component
 
 	sort_days = () =>
 	{
-		console.log ("Unsorted: " + JSON.stringify(this.state.service.Days));
+		this.setState ((state) =>
+		{
+			console.log ("Unsorted: " + JSON.stringify(state.service.Days));
 
-		this.state.service.Days.sort
-		(
-			(day1, day2) => (day2.Date - day1.Date)
-		);
+			state.service.Days.sort
+			(
+				(day1, day2) => (day2.Date - day1.Date)
+			);
 
-		console.log ("  Sorted: " + JSON.stringify(this.state.service.Days));
+			console.log ("  Sorted: " + JSON.stringify(state.service.Days));
+		});
 	}
 
 
 	create = () =>
 	{
+		console.log ("in create");
+
 		let request_body =
 		{
 			JobID: this.state.service.JobID,
@@ -99,8 +104,10 @@ export default class ServiceModal extends Component
 
 	save = () =>
 	{
+		console.log ("in save");
 		if (this.has_job_and_date())
 		{
+			console.log ("passed job_and_date");
 			if (this.state.mode === "Add")
 			{
 				this.create();
@@ -112,23 +119,30 @@ export default class ServiceModal extends Component
 			}
 
 		}
+		else
+		{
+			console.log ("failed job_and_date");
+		}
 	}
 
 	//switch the job of the service to the selected option
 	edit_job = (job_id, job_name) =>
 	{
-		this.setState ((state) =>
-		{
-			state.service.JobName = job_name;
-			state.service.JobID   = job_id;
+		this.setState
+		(
+			(state) =>
+			{
+				state.service.JobName = job_name;
+				state.service.JobID   = job_id;
 
-			state.editing_job     = false;
-			state.duplicate_error = false;
+				state.editing_job     = false;
+				state.duplicate_error = false;
 
-			return state;
-		});
+				return state;
+			},
 
-		this.save();
+			() => { this.save(); }
+		);
 	}
 
 	//add new day to service
@@ -174,23 +188,30 @@ export default class ServiceModal extends Component
 		return ((edit) =>
 		{
 			//get the new date value
-			this.setState ((state) =>
-			{
-				state.service.Days[day_index].Date =
-					edit.target.value + "T00:00:00.000"	//reset timestamp to local
-				;
+			this.setState
+			(
+				(state) =>
+				{
+					state.service.Days[day_index].Date =
+						edit.target.value + "T00:00:00.000"	//reset timestamp to local
+					;
 
-				//stop editing
-				state.editing_day = null;
+					//stop editing
+					state.editing_day = null;
 
-				return state;
-			});
+					return state;
+				},
 
-			//editing first date updates the rest
-			if (day_index === 0)
-			{
-				this.save();
-			}
+				//editing first date updates the rest
+				() =>
+				{
+					if (day_index === 0)
+					{
+						console.log ("about to save");
+						this.save();
+					}
+				}
+			);
 		});
 	}
 
