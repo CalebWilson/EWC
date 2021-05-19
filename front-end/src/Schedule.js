@@ -145,7 +145,7 @@ export default class Schedule extends Component
 		return (
 			<div>
 				{/* main schedule page */}
-				<div onClickCapture={this.close_service()}>
+				<div className="schedule" onClickCapture={this.close_service()}>
 
 					{/* top of the schedule */}
 					<div className="schedule-top">
@@ -178,23 +178,21 @@ export default class Schedule extends Component
 					/> 
 
 					{/* schedule table */}
+					<div className="schedule-table-container">
 					<table className="schedule-table">
-						<thead className="schedule-thead">
+						<thead className="schedule-thead"><tr>
+							<th className="schedule-th">Notes</th>
 
-							<tr>
-								<th className="schedule-th">Notes</th>
+							{
+								days.map ((day_name) =>
+								(
+									<th className="schedule-th">{day_name}</th>
+								))
+							}
+						</tr></thead>
 
-								{
-									days.map ((day_name) =>
-									(
-										<th className="schedule-th">{day_name}</th>
-									))
-								}
-							</tr>
-
-						</thead>
-
-						<tbody className="schedule-body"><tr>
+						<tbody className="schedule-body">
+							<tr style={{height: "100%"}}>
 							{/* notes for the week */}
 							<td className="schedule-td"><Day
 								date={this.state.data.week_letter}
@@ -215,7 +213,8 @@ export default class Schedule extends Component
 								))
 							}
 						</tr></tbody>
-					</table><br />
+					</table>
+					</div>
 
 					<div className="schedule-bottom">
 						{/* next week button */}
@@ -224,6 +223,7 @@ export default class Schedule extends Component
 							href={"/schedule/" + (this.week + 1)}
 						/> 
 					</div>
+
 				</div>
 
 				{/* display service, if any */}
