@@ -140,6 +140,8 @@ export default class Schedule extends Component
 			return this.state.error;
 		}
 
+		let days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+		
 		return (
 			<div>
 				{/* main schedule page */}
@@ -176,43 +178,52 @@ export default class Schedule extends Component
 					/> 
 
 					{/* schedule table */}
-					<table>
-						<thead><tr>
-							<th>Notes</th>
-							<th>Monday</th>
-							<th>Tuesday</th>
-							<th>Wednesday</th>
-							<th>Thursday</th>
-							<th>Friday</th>
-						</tr></thead>
-						<tbody><tr>
+					<table className="schedule-table">
+						<thead className="schedule-thead">
+
+							<tr>
+								<th className="schedule-th">Notes</th>
+
+								{
+									days.map ((day_name) =>
+									(
+										<th className="schedule-th">{day_name}</th>
+									))
+								}
+							</tr>
+
+						</thead>
+
+						<tbody className="schedule-body"><tr>
 							{/* notes for the week */}
-							<Day
+							<td className="schedule-td"><Day
 								date={this.state.data.week_letter}
 								work_day="Notes Content"
 								edit_service={this.edit_service}
-							/>
+							/></td>
 							{
 								//work days
 								this.state.data.schedule.map ((schedule_work_day, day) =>
 								(
-									<Day
+									<td className="schedule-td"><Day
 										date={this.get_date(day).getDate()}
 										day={day}
 										key={day}
 										work_day={schedule_work_day}
 										edit_service={this.edit_service}
-									/>
+									/></td>
 								))
 							}
 						</tr></tbody>
 					</table><br />
 
-					{/* next week button */}
-					<NavArrow
-						direction="down"
-						href={"/schedule/" + (this.week + 1)}
-					/> 
+					<div className="schedule-bottom">
+						{/* next week button */}
+						<NavArrow
+							direction="down"
+							href={"/schedule/" + (this.week + 1)}
+						/> 
+					</div>
 				</div>
 
 				{/* display service, if any */}

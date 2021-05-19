@@ -13,15 +13,15 @@ export default class Day extends Component
 
 		return (
 
-			<td>
+			<div className="day-container">
 				<DateNum date={this.props.date} />
 
 				{ (GroupWork === undefined)
 				?
-					<div className="scrollable">{this.props.work_day}</div>
+					<div className="day-content">{this.props.work_day}</div>
 				:
 
-					<div className="scrollable">
+					<div className="day-content">
 					{
 						//GroupWork
 						GroupWork.map ((group_job) =>
@@ -48,7 +48,7 @@ export default class Day extends Component
 					</div>
 				}
 
-			</td>
+			</div>
 		);
 	}
 }
