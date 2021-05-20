@@ -131,6 +131,19 @@ export default class Schedule extends Component
 	componentDidMount()
 	{
 		this.get_schedule();
+
+		document.addEventListener
+		(
+			"keydown",
+
+			(key_down) =>
+			{
+				if (key_down.key === "Escape")
+					this.close_service()();
+			},
+
+			false
+		);
 	}
 
 	render()
@@ -145,7 +158,14 @@ export default class Schedule extends Component
 		return (
 			<div>
 				{/* main schedule page */}
-				<div className="schedule" onClickCapture={this.close_service()}>
+				<div
+					className="schedule"
+					onClickCapture={this.close_service()}
+					onKeyDown={(ev) =>
+					{
+						alert(ev.key);
+					}}
+				>
 
 					{/* top of the schedule */}
 					<div className="schedule-top">

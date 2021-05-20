@@ -45,6 +45,25 @@ export default class ServiceModal extends Component
 			};
 	}
 
+	//add escape listener
+	componentDidMount()
+	{
+		document.addEventListener
+		(
+			"keydown",
+
+			//if the user presses escape, hide service info
+			(key_down) =>
+			{
+				if (key_down.key === "Escape")
+					this.props.close_service()();
+			},
+
+			false
+		);
+	}
+
+
 	has_job_and_date = () =>
 	{
 		return (this.state.service.JobID && this.state.service.Days[0].Date);
