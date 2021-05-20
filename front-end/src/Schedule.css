@@ -15,21 +15,23 @@
 	flex-grow: 0;
 }
 
-	.month {
-		font-size: xxx-large;
-		font-weight: bold;
-		padding-left: 1%;
-	}
+.month {
+	font-size: xxx-large;
+	font-weight: bold;
+	padding-left: 1%;
+}
 
-	.schedule-top-right {
-		font-size: large;
-		padding-top: 1.5%;
-		padding-right: 1%;
-	}
+.schedule-top-right {
+	font-size: large;
+	padding-top: 1.5%;
+	padding-right: 1%;
+}
 
 .schedule-table-container {
 	height: 100%;
-	flex-grow: 1;
+	flex: 1 1 0;
+	min-height: 0;
+	padding-bottom: 75px;
 }
 
 .schedule-table {
@@ -39,34 +41,35 @@
 	right:   2%;
 	width:  96%;
 	height: 100%;
+	min-height: 0;
 
 	table-layout: fixed;
 	border-collapse: collapse;
 }
 
-	.schedule-thead {
-		padding: 1px;
-	}
+.schedule-thead {
+	padding: 1px;
+}
 
-	.schedule-th {
-		font-size: xx-large;
-		width: 12.5%;
-		padding: 5px;
-	}
+.schedule-th {
+	font-size: xx-large;
+	width: 12.5%;
+	padding: 5px;
+}
 
-	.schedule-body {
-		height: auto;
-	}
+.schedule-body {
+	height: 100%;
+}
 
-	.schedule-td {
-		border: 5px solid black;
-		vertical-align: top;
+.schedule-td {
+	border: 5px solid black;
+	vertical-align: top;
 
-		height: auto;
+	height: 100%;
 
-		width: 12.5%;
-		padding: 10px;
-	}
+	width: 12.5%;
+	padding: 10px;
+}
 
 .schedule-bottom {
 	padding-top: 2rem;
