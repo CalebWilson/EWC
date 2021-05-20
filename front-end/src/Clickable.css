@@ -1,0 +1,18 @@
+.clickable-container {
+	border-bottom: 10px solid white;
+}
+
+.clickable {
+	cursor: pointer;
+
+	color: gold;
+	background: navy;
+	font-weight: bold;
+
+	padding-top: 5px;
+	padding-bottom: 5px;
+	padding-left: 10px;
+	padding-right: 10px;
+
+	border-collapse: collapse;
+}

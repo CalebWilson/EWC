@@ -3,6 +3,8 @@ import React, { Component } from "react";
 import       Button from "./Button";
 import RemoveButton from "./RemoveButton";
 
+import Clickable from "./Clickable";
+
 import    JobDropdown from "./JobDropdown";
 import WorkerDropdown from "./WorkerDropdown";
 
@@ -378,9 +380,9 @@ export default class ServiceModal extends Component
 															}
 														/>
 													:
-														<span
-															style={{cursor: "pointer"}}
-															onClick={() =>
+														<span> <Clickable
+
+															action={() =>
 															{
 																if (!this.out_of_order_error)
 																{
@@ -389,20 +391,21 @@ export default class ServiceModal extends Component
 																	);
 																}
 															}}
-														>
-														{ //view date
-															new Intl.DateTimeFormat (
-																	"en-US",
-																	{
-																		weekday: "long",
-																		month: "long",
-																		day: "numeric",
-																		year: "numeric"
-																	}
-															)
-																.format (new Date (day.Date))
-														}
-														</span>
+
+															content=
+															{ //view date
+																new Intl.DateTimeFormat (
+																		"en-US",
+																		{
+																			weekday: "long",
+																			month: "long",
+																			day: "numeric",
+																			year: "numeric"
+																		}
+																)
+																	.format (new Date (day.Date))
+															}
+														/> </span>
 												}
 											</div>
 
@@ -439,9 +442,8 @@ export default class ServiceModal extends Component
 																	}
 																/>
 															:
-																<span
-																	style={{cursor: "pointer"}}
-																	onClick={() =>
+																<span> <Clickable
+																	action={() =>
 																	{
 																		this.setState (
 																		{
@@ -452,9 +454,8 @@ export default class ServiceModal extends Component
 																				worker_index
 																		});
 																	}}
-																>
-																	{ worker.WorkerName }
-																</span>
+																	content={worker.WorkerName}
+																/> </span>
 														}
 													</div>
 												))
