@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 
 import       Button from "./Button";
-import RemoveButton from "./RemoveButton";
+import ListButton from "./ListButton";
 
 import Clickable from "./Clickable";
 
@@ -335,17 +335,29 @@ export default class ServiceModal extends Component
 	render_day = (day, day_index) =>
 	(
 		<div>
-			<div className="remove-row">
+
+			{/*
+			<BulletItem
+				index={worker_index}
+				remove={this.remove_day (day_index)}
+				content=
+			/>
+			*/}
+
+			<div className="list-button-row">
 
 				{	//remove day
-					day_index > 0
+					day_index === 0
 					?
-						<RemoveButton remove={this.remove_day (day_index)} />
+						<ListButton />
 					:
-						<button className="remove">=</button>
+						<ListButton
+							type="remove"
+							action={this.remove_day (day_index)}
+						/>
 				}
 
-				<span className="remove-spacer"></span>
+				<span className="list-button-spacer"></span>
 
 				{	//edit date
 					day_index === this.state.editing_day
@@ -386,11 +398,20 @@ export default class ServiceModal extends Component
 			{
 				day.Workers.map ((worker, worker_index) =>
 				(
-					<div className="remove-row">
-						<RemoveButton
-							remove={this.remove_worker (day_index, worker_index)}
-						/>
-						<span className="remove-spacer"></span>
+					<div className="list-button-row">
+						{
+							worker_index === 0
+							?
+								<ListButton />
+							:
+								<ListButton
+									type="remove"
+									action={this.remove_worker (day_index, worker_index)}
+								/>
+						}
+
+						<span className="list-button-spacer"></span>
+
 						{
 							this.state.editing_day_workers === day_index
 							&& this.state.editing_worker === worker_index
@@ -473,6 +494,8 @@ export default class ServiceModal extends Component
 								{
 									this.state.service.Days.map (this.render_day)
 								}
+
+								<div className="list-button-row"></div>
 
 								<Button
 									label="Continue service to another day"

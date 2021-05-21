@@ -16,13 +16,13 @@
 	padding-right: 1rem;
 }
 
-.remove-row {
+.list-button-row {
 	display: flex;
 	flex-direction: row;
 	align-items: center;
 }
 
-.remove {
+.list-button {
 	font-size: normal;
 	border: 2px solid black;
 	border-radius: 50%;
@@ -32,6 +32,6 @@
 	padding-right: 0.25rem;
 }
 
-.remove-spacer {
+.list-button-spacer {
 	padding-left: 0.75rem;
 }
