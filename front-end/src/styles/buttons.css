@@ -15,23 +15,3 @@
 	padding-left: 1rem;
 	padding-right: 1rem;
 }
-
-.list-button-row {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-}
-
-.list-button {
-	font-size: normal;
-	border: 2px solid black;
-	border-radius: 50%;
-	padding-top: 0rem;
-	padding-bottom: 0.1rem;
-	padding-left: 0.25rem;
-	padding-right: 0.25rem;
-}
-
-.list-button-spacer {
-	padding-left: 0.75rem;
-}

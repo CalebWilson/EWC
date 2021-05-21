@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 
-import       Button from "./Button";
-import ListButton from "./ListButton";
-
-import Clickable from "./Clickable";
+import         Button from "./Button";
+//import     BulletList from "./BulletList";
+import     BulletItem from "./BulletList";
+import      Clickable from "./Clickable";
 
 import    JobDropdown from "./JobDropdown";
 import WorkerDropdown from "./WorkerDropdown";
@@ -162,6 +162,56 @@ export default class ServiceModal extends Component
 		);
 	}
 
+	//show the service job name or a dropdown to select it
+	render_job = () =>
+	(
+		<div>
+		{
+			this.state.editing_job
+			?
+				<div>
+
+					{/* edit job name */
+						(this.state.mode === "Add")
+						?
+							<JobDropdown
+								size="x-large"
+								select_option={this.edit_job}
+							/>
+						:
+							<JobDropdown
+								size="x-large"
+								select_option={this.edit_job}
+								blank={null}
+								default={this.state.service.JobID}
+							/>
+					}
+					<br />
+					<br />
+
+				</div>
+			:
+				<div>
+
+					{/* view job name */}
+					<div>Job: {this.state.service.JobName}</div>
+					<div>
+					<Button
+						label="Change"
+						action={() =>
+						{
+							this.setState ({ editing_job: true });
+						}}
+					/>
+					</div>
+
+				</div>
+		}
+
+		</div>
+	)
+
+
 	//add new day to service
 	add_day = () =>
 	{
@@ -176,7 +226,6 @@ export default class ServiceModal extends Component
 
 			//edit last day
 			state.editing_day = state.service.Days.length - 1;
-
 
 			return state;
 		});
@@ -248,6 +297,31 @@ export default class ServiceModal extends Component
 		});
 	}
 
+	//add new day to service
+	add_worker = (day_index) =>
+	{
+		return (() =>
+		{
+			this.setState ((state) =>
+			{
+				//add a worker to the day
+				state.service.Days[day_index].Workers =
+				state.service.Days[day_index].Workers.concat (
+				{
+					WorkerID: null,
+					WorkerName: ""
+				});
+
+				//edit last worker of the current day
+				state.editing_day_workers = day_index;
+				state.editing_worker
+					= state.service.Days[day_index].Workers.length - 1;
+
+				return state;
+			});
+		});
+	}
+
 	edit_worker = (day_index, worker_index) =>
 	{
 		return ((worker_id, worker_name) =>
@@ -282,165 +356,91 @@ export default class ServiceModal extends Component
 		});
 	}
 
-	//show the service job name or a dropdown to select it
-	render_job = () =>
-	(
-		<div>
-		{
-			this.state.editing_job
-			?
-				<div>
-
-					{/* edit job name */
-						(this.state.mode === "Add")
-						?
-							<JobDropdown
-								size="x-large"
-								select_option={this.edit_job}
-							/>
-						:
-							<JobDropdown
-								size="x-large"
-								select_option={this.edit_job}
-								blank={null}
-								default={this.state.service.JobID}
-							/>
-					}
-					<br />
-					<br />
-
-				</div>
-			:
-				<div>
-
-					{/* view job name */}
-					<div>Job: {this.state.service.JobName}</div>
-					<div>
-					<Button
-						label="Change"
+	//show a worker
+	render_worker = (day_index) =>
+	{
+		return ((worker, worker_index) =>
+		(
+			<div>
+			{
+				this.state.editing_day_workers === day_index &&
+				this.state.editing_worker      === worker_index
+				?
+					<WorkerDropdown
+						label=""
+						default={worker.WorkerID}
+						blank={null}
+						select_option={
+							this.edit_worker (day_index, worker_index)
+						}
+					/>
+				:
+					<span> <Clickable
 						action={() =>
 						{
-							this.setState ({ editing_job: true });
+							this.setState (
+							{
+								editing_day_workers: day_index,
+								editing_worker: worker_index
+							});
 						}}
-					/>
-					</div>
-
-				</div>
-		}
-
-		</div>
-	)
+						content={worker.WorkerName}
+					/> </span>
+			}
+			</div>
+		));
+	}
 
 	//show a day and its workers
 	render_day = (day, day_index) =>
 	(
 		<div>
 
-			{/*
-			<BulletItem
-				index={worker_index}
-				remove={this.remove_day (day_index)}
-				content=
-			/>
-			*/}
+			{	//edit date
+				day_index === this.state.editing_day
+				?
+					<input
+						type="date"
+						style={{fontSize: "large"}}
+						value={ day.Date ? day.Date.toString().substr(0, 10) : null }
+						onChange={this.edit_date (day_index)}
+					/>
+				:
+					<span> <Clickable
 
-			<div className="list-button-row">
-
-				{	//remove day
-					day_index === 0
-					?
-						<ListButton />
-					:
-						<ListButton
-							type="remove"
-							action={this.remove_day (day_index)}
-						/>
-				}
-
-				<span className="list-button-spacer"></span>
-
-				{	//edit date
-					day_index === this.state.editing_day
-					?
-						<input
-							type="date"
-							style={{fontSize: "large"}}
-							value={ day.Date ? day.Date.toString().substr(0, 10) : null }
-							onChange={this.edit_date (day_index)}
-						/>
-					:
-						<span> <Clickable
-
-							action={() =>
+						action={() =>
+						{
+							if (!this.out_of_order_error)
 							{
-								if (!this.out_of_order_error)
-								{
-									this.setState ({ editing_day: day_index });
-								}
-							}}
-
-							content={
-								//view date
-								new Intl.DateTimeFormat ( "en-US",
-								{
-									weekday: "long",
-									month: "long",
-									day: "numeric",
-									year: "numeric"
-								}).format (new Date (day.Date))
+								this.setState ({ editing_day: day_index });
 							}
-						/> </span>
+						}}
+
+						content={
+							//view date
+							new Intl.DateTimeFormat ( "en-US",
+							{
+								weekday: "long",
+								month: "long",
+								day: "numeric",
+								year: "numeric"
+							}).format (new Date (day.Date))
+						}
+					/> </span>
 				}
-			</div>
 
-			{/* workers */}
-			<div className="indent">
-			{
-				day.Workers.map ((worker, worker_index) =>
-				(
-					<div className="list-button-row">
-						{
-							worker_index === 0
-							?
-								<ListButton />
-							:
-								<ListButton
-									type="remove"
-									action={this.remove_worker (day_index, worker_index)}
-								/>
-						}
-
-						<span className="list-button-spacer"></span>
-
-						{
-							this.state.editing_day_workers === day_index
-							&& this.state.editing_worker === worker_index
-							?
-								<WorkerDropdown
-									label=""
-									default={worker.WorkerID}
-									blank={null}
-									select_option={
-										this.edit_worker (day_index, worker_index)
-									}
-								/>
-							:
-								<span> <Clickable
-									action={() =>
-									{
-										this.setState (
-										{
-											editing_day_workers: day_index,
-											editing_worker: worker_index
-										});
-									}}
-									content={worker.WorkerName}
-								/> </span>
-						}
-					</div>
-				))
+			{/*
+			{	//workers
+				<BulletList
+					name_singular="worker"
+					name_plural=""
+					items={day.Workers}
+					map_func={this.render_worker (day_index)}
+					add={this.add_worker}
+					remove={this.remove_worker}
+				/>
 			}
-			</div><br />
+			*/}
 
 		</div>
 	)
@@ -488,22 +488,31 @@ export default class ServiceModal extends Component
 						<br/>
 
 						{/* days and workers */}
-						<div>
-							Days:
-							<div className="indent">
-								{
-									this.state.service.Days.map (this.render_day)
-								}
 
-								<div className="list-button-row"></div>
+						{/*
+						<BulletList
+							name_singular="day"
+							name_plural="Days"
+							items={this.state.service.Days}
+							map_func={this.render_day}
+							add={this.add_day}
+							remove={this.remove_day}
+						/>
+*/}
 
-								<Button
-									label="Continue service to another day"
-									action={this.add_day}
-								/><br />
-								<br />
-							</div>
-						</div>
+						{
+							this.state.service.Days.map ((day, day_index) =>
+							(
+								<BulletItem
+									index={day_index}
+									content={this.render_day (day, day_index)}
+									remove={this.remove_day (day_index)}
+								/>
+							))
+						}
+
+						<br />
+						<br />
 
 						{/* final price */}
 						Final Price: {this.state.service.FinalPrice}
