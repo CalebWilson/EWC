@@ -282,6 +282,148 @@ export default class ServiceModal extends Component
 		});
 	}
 
+	//show the service job name or a dropdown to select it
+	render_job = () =>
+	(
+		<div>
+		{
+			this.state.editing_job
+			?
+				<div>
+
+					{/* edit job name */
+						(this.state.mode === "Add")
+						?
+							<JobDropdown
+								size="x-large"
+								select_option={this.edit_job}
+							/>
+						:
+							<JobDropdown
+								size="x-large"
+								select_option={this.edit_job}
+								blank={null}
+								default={this.state.service.JobID}
+							/>
+					}
+					<br />
+					<br />
+
+				</div>
+			:
+				<div>
+
+					{/* view job name */}
+					<div>Job: {this.state.service.JobName}</div>
+					<div>
+					<Button
+						label="Change"
+						action={() =>
+						{
+							this.setState ({ editing_job: true });
+						}}
+					/>
+					</div>
+
+				</div>
+		}
+
+		</div>
+	)
+
+	//show a day and its workers
+	render_day = (day, day_index) =>
+	(
+		<div>
+			<div className="remove-row">
+
+				{	//remove day
+					day_index > 0
+					?
+						<RemoveButton remove={this.remove_day (day_index)} />
+					:
+						<button className="remove">=</button>
+				}
+
+				<span className="remove-spacer"></span>
+
+				{	//edit date
+					day_index === this.state.editing_day
+					?
+						<input
+							type="date"
+							style={{fontSize: "large"}}
+							value={ day.Date ? day.Date.toString().substr(0, 10) : null }
+							onChange={this.edit_date (day_index)}
+						/>
+					:
+						<span> <Clickable
+
+							action={() =>
+							{
+								if (!this.out_of_order_error)
+								{
+									this.setState ({ editing_day: day_index });
+								}
+							}}
+
+							content={
+								//view date
+								new Intl.DateTimeFormat ( "en-US",
+								{
+									weekday: "long",
+									month: "long",
+									day: "numeric",
+									year: "numeric"
+								}).format (new Date (day.Date))
+							}
+						/> </span>
+				}
+			</div>
+
+			{/* workers */}
+			<div className="indent">
+			{
+				day.Workers.map ((worker, worker_index) =>
+				(
+					<div className="remove-row">
+						<RemoveButton
+							remove={this.remove_worker (day_index, worker_index)}
+						/>
+						<span className="remove-spacer"></span>
+						{
+							this.state.editing_day_workers === day_index
+							&& this.state.editing_worker === worker_index
+							?
+								<WorkerDropdown
+									label=""
+									default={worker.WorkerID}
+									blank={null}
+									select_option={
+										this.edit_worker (day_index, worker_index)
+									}
+								/>
+							:
+								<span> <Clickable
+									action={() =>
+									{
+										this.setState (
+										{
+											editing_day_workers: day_index,
+											editing_worker: worker_index
+										});
+									}}
+									content={worker.WorkerName}
+								/> </span>
+						}
+					</div>
+				))
+			}
+			</div><br />
+
+		</div>
+	)
+
 	render()
 	{
 		return (
@@ -299,65 +441,29 @@ export default class ServiceModal extends Component
 					</div>
 
 
-					{/* scrollable */}
+					{/* main scrollable content */}
 					<div className="service-modal-inner">
 
-					{
-						this.state.duplicate_service_error
-						?
-							this.state.service.JobName
-							+ " already has a Service scheduled for this date."
-						:
-							<div></div>
-					}
-
-					{
-						this.state.out_of_order_error
-						?
-							"Subsequent days cannot be scheduled for before the first day."
-						:
-							<div></div>
-					}
-
-						{/* job name */}
-						{
-							this.state.editing_job
+						{	//duplicate service error
+							this.state.duplicate_service_error
 							?
-								<div>
-									{/* edit */
-										(this.state.mode === "Add")
-										?
-											<JobDropdown
-												size="x-large"
-												select_option={this.edit_job}
-											/>
-										:
-											<JobDropdown
-												size="x-large"
-												select_option={this.edit_job}
-												blank={null}
-												default={this.state.service.JobID}
-											/>
-									}
-
-									<br />
-									<br />
-								</div>
+								this.state.service.JobName
+								+ " already has a Service scheduled for this date."
 							:
-								<div>
-									{/* view */}
-									<div>Job: {this.state.service.JobName}</div>
-									<div>
-									<Button
-										label="Change"
-										action={() =>
-										{
-											this.setState ({ editing_job: true });
-										}}
-									/>
-									</div>
-								</div>
+								<div></div>
 						}
+
+						{	//days out of order error
+							this.state.out_of_order_error
+							?
+								"Subsequent days cannot be scheduled for before the first day."
+							:
+								<div></div>
+						}
+
+						{/* job name or dropdown */}
+						{this.render_job()}
+
 						<br/>
 
 						{/* days and workers */}
@@ -365,124 +471,7 @@ export default class ServiceModal extends Component
 							Days:
 							<div className="indent">
 								{
-									this.state.service.Days.map ((day, day_index) =>
-									(
-										<div>
-											<div className="remove-row">
-
-												{// remove day
-													day_index > 0
-													?
-														<RemoveButton
-															remove={this.remove_day (day_index)}
-														/>
-													:
-														<button className="remove">=</button>
-												}
-
-												<span className="remove-spacer"></span>
-
-												{ //edit date
-													day_index === this.state.editing_day
-													?
-														<input
-															type="date"
-															style={{fontSize: "large"}}
-															value={
-																day.Date ?
-																	day.Date.toString()
-																	.substr(0, 10)
-																: null
-															}
-															onChange={
-																this.edit_date (day_index)
-															}
-														/>
-													:
-														<span> <Clickable
-
-															action={() =>
-															{
-																if (!this.out_of_order_error)
-																{
-																	this.setState (
-																		{ editing_day: day_index }
-																	);
-																}
-															}}
-
-															content=
-															{ //view date
-																new Intl.DateTimeFormat (
-																		"en-US",
-																		{
-																			weekday: "long",
-																			month: "long",
-																			day: "numeric",
-																			year: "numeric"
-																		}
-																)
-																	.format (new Date (day.Date))
-															}
-														/> </span>
-												}
-											</div>
-
-											{/* workers */}
-											<div className="indent">
-											{
-												day.Workers.map ((worker, worker_index) =>
-												(
-													<div className="remove-row">
-														<RemoveButton
-															remove=
-															{
-																this.remove_worker (
-																	day_index, worker_index
-																)
-															}
-														/>
-														<span className="remove-spacer"></span>
-														{
-															this.state.editing_day_workers ===
-																day_index &&
-															this.state.editing_worker ===
-																worker_index
-															?
-																<WorkerDropdown
-																	label=""
-																	default={worker.WorkerID}
-																	blank={null}
-																	select_option={
-																		this.edit_worker (
-																			day_index,
-																			worker_index
-																		)
-																	}
-																/>
-															:
-																<span> <Clickable
-																	action={() =>
-																	{
-																		this.setState (
-																		{
-																			editing_day_workers:
-																				day_index,
-
-																			editing_worker:
-																				worker_index
-																		});
-																	}}
-																	content={worker.WorkerName}
-																/> </span>
-														}
-													</div>
-												))
-											}
-											</div><br />
-
-										</div>
-									))
+									this.state.service.Days.map (this.render_day)
 								}
 
 								<Button
@@ -493,10 +482,12 @@ export default class ServiceModal extends Component
 							</div>
 						</div>
 
+						{/* final price */}
 						Final Price: {this.state.service.FinalPrice}
 
 					</div>
 
+					{/* save or cancel */}
 					<div className="service-modal-bottom">
 						<Button
 							label="Save"
