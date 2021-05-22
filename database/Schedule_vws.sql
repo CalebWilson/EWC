@@ -1,3 +1,5 @@
+select "Schedule_vws.sql";
+
 use ewc;
 
 drop view if exists WeekWork;
@@ -9,24 +11,20 @@ as
 		-- week relative to current week
 		weeks_between (
 			curdate(),
-			ScheduledJobs.ScheduleDate
-			+ interval ScheduledJobDays.ScheduledJobDay day
+			Services.ServiceDate + interval ServiceDays.ServiceDay day
 		)
 			as Week,
 
 		-- numeric day of the week that the work falls on
-		weekday (
-			ScheduledJobs.ScheduleDate
-			+ interval ScheduledJobDays.ScheduledJobDay day
-		)
+		weekday (Services.ServiceDate + interval ServiceDays.ServiceDay day)
 			as Day,
 
 		-- whether the Job Day is the first
-		ScheduledJobDays.ScheduledJobDay = 0
+		ServiceDays.ServiceDay = 0
 			as FirstDay,
 
 		-- date that the work falls on
-		ScheduledJobs.ScheduleDate + interval ScheduledJobDays.ScheduledJobDay day
+		Services.ServiceDate + interval ServiceDays.ServiceDay day
 			as "Date",
 
 		-- Job and Worker info
@@ -36,9 +34,9 @@ as
 			as JobID,
 		ServiceTypes.ServiceType
 			as ServiceType,
-		ScheduledJobs.FinalPrice
+		Services.FinalPrice
 			as FinalPrice,
-		ScheduledJobs.Complete
+		Services.Complete
 			as Complete,
 		Workers.WorkerName
 			as WorkerName,
@@ -46,29 +44,29 @@ as
 			as WorkerStatus,
 
 		-- Primary keys for front-end reference
-		ScheduledJobs.ScheduledJobID
-			as ScheduledJobID,
-		ScheduledJobDays.ScheduledJobDayID
-			as ScheduledJobDayID,
+		Services.ServiceID
+			as ServiceID,
+		ServiceDays.ServiceDayID
+			as ServiceDayID,
 		Workers.WorkerID
 			as WorkerID
 
 	from
 		Jobs,
-		ScheduledJobs,
-		ScheduledJobDays,
+		Services,
+		ServiceDays,
 		Assignments,
 		Workers,
 		ServiceTypes,
 		Statuses as WorkerStatuses
 
 	where
-		Jobs.JobID                         = ScheduledJobs.JobID             and
-		ScheduledJobs.ScheduledJobID       = ScheduledJobDays.ScheduledJobID and
-		ScheduledJobDays.ScheduledJobDayID = Assignments.ScheduledJobDayID   and
-		Assignments.WorkerID               = Workers.WorkerID                and
-		Jobs.ServiceTypeID                 = ServiceTypes.ServiceTypeID      and
-		Workers.StatusID                   = WorkerStatuses.StatusID
+		Jobs.JobID               = Services.JobID             and
+		Services.ServiceID       = ServiceDays.ServiceID      and
+		ServiceDays.ServiceDayID = Assignments.ServiceDayID   and
+		Assignments.WorkerID     = Workers.WorkerID           and
+		Jobs.ServiceTypeID       = ServiceTypes.ServiceTypeID and
+		Workers.StatusID         = WorkerStatuses.StatusID
 	
 	order by Week, Day, JobName
 ;

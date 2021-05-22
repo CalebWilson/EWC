@@ -25,14 +25,14 @@ db_schedule.get_week = function (params)
 
 	//worker specificity for GroupWork
 	group_worker_condition = (worker === undefined) ? `1` :
-		//there is a day of the ScheduledJob to which the Worker is assigned
+		//there is a day of the Service to which the Worker is assigned
 		`(
 			select count(*) > 0
 			from GroupWork as inside
 			where
-				inside.ScheduledJobID = GroupWork.ScheduledJobID and
-				inside.Day            = GroupWork.Day            and
-				WorkerID              = ` + worker +
+				inside.ServiceID = GroupWork.ServiceID and
+				inside.Day       = GroupWork.Day            and
+				WorkerID         = ` + worker +
 		`)`
 	;
 
@@ -104,12 +104,12 @@ db_schedule.get_day = function
 				`select
 					distinct
 						JobName,
-						ScheduledJobID,
+						ServiceID,
 						ServiceType,
 						FinalPrice,
 						Complete,
-						ScheduledJobID,
-						ScheduledJobDayID,
+						ServiceID,
+						ServiceDayID,
 						FirstDay
 					from GroupWork
 					where `
@@ -125,7 +125,7 @@ db_schedule.get_day = function
 		});
 	})
 
-	//make array of Workers for each ScheduledJob
+	//make array of Workers for each Service
 	.then ((group_jobs) =>
 	{
 		//every element will be an array of JSONs like {Worker: "Worker Name"}
@@ -194,7 +194,7 @@ db_schedule.get_day = function
 		});
 	})
 
-	//make array of ScheduledJobs for each Worker
+	//make array of Services for each Worker
 	.then ((indiv_workers) =>
 	{
 		//every element will be an array of JSONS like {Job: "Job Name"}
@@ -209,11 +209,11 @@ db_schedule.get_day = function
 				db.query (
 						`select
 							JobName,
-							ScheduledJobID,
+							ServiceID,
 							ServiceType,
 							FinalPrice,
 							Complete,
-							ScheduledJobDayID,
+							ServiceDayID,
 							FirstDay
 							from IndividualWork
 							where

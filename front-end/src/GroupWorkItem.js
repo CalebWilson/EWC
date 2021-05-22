@@ -13,8 +13,8 @@ export default class GroupWorkItem extends Component
 
 			<div>
 				<Job
-					key={job.ScheduledJobID}
-					scheduled_job_id={job.ScheduledJobID}
+					key={job.ServiceID}
+					service_id={job.ServiceID}
 					job_name={job.JobName}
 					service_type={job.ServiceType}
 					final_price={job.FinalPrice}

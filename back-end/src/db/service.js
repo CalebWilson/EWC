@@ -1,28 +1,28 @@
 const db = require("./db");
 
-let db_scheduled_job = {};
+let db_service = {};
 
 /*
 	Get information about a scheduled job.
 */
-db_scheduled_job.get = function (scheduled_job_id)
+db_service.get = function (service_id)
 {
 	return new Promise ((resolve, reject) =>
 	{
-		//get information about the ScheduledJob
+		//get information about the Service
 		db.query
 		(
 			`select
 				distinct
-					ScheduledJobID,
+					ServiceID,
 					JobName,
 					JobID,
 					FinalPrice,
 					Complete
 				from WeekWork
-				where ScheduledJobID = ?`,
+				where ServiceID = ?`,
 
-			scheduled_job_id,
+			service_id,
 
 			(error, results) =>
 		{
@@ -31,11 +31,11 @@ db_scheduled_job.get = function (scheduled_job_id)
 		})
 	})
 
-	//extract scheduled_job from array
-	.then (scheduled_job_array => scheduled_job_array[0])
+	//extract service from array
+	.then (service_array => service_array[0])
 
 	//make an array of the days of the scheduled job
-	.then ((scheduled_job) =>
+	.then ((service) =>
 	{
 		//get the days
 		return new Promise ((resolve, reject) =>
@@ -46,12 +46,12 @@ db_scheduled_job.get = function (scheduled_job_id)
 					distinct
 						Date,
 						FirstDay,
-						ScheduledJobDayID
+						ServiceDayID
 					from WeekWork
-					where ScheduledJobID = ?
+					where ServiceID = ?
 					order by Date`,
 
-				scheduled_job_id,
+				service_id,
 
 				(error, results) =>
 				{
@@ -77,10 +77,10 @@ db_scheduled_job.get = function (scheduled_job_id)
 						`select WorkerID, WorkerName, WorkerStatus
 							from WeekWork
 							where
-								ScheduledJobID    = ? and
-								ScheduledJobDayID = ?`,
+								ServiceID    = ? and
+								ServiceDayID = ?`,
 
-						[scheduled_job_id, day.ScheduledJobDayID],
+						[service_id, day.ServiceDayID],
 
 						(error, results) =>
 						{
@@ -106,9 +106,9 @@ db_scheduled_job.get = function (scheduled_job_id)
 		//make the days a property of the scheduled job
 		.then ((days) =>
 		{
-			scheduled_job.Days = days;
+			service.Days = days;
 
-			return scheduled_job;
+			return service;
 		})
 	});
 };
@@ -123,7 +123,7 @@ db_scheduled_job.get = function (scheduled_job_id)
 	}
 */
 
-db_scheduled_job.post = function (params)
+db_service.post = function (params)
 {
 	console.log (params);
 	//create new scheduled job in the database
@@ -131,7 +131,7 @@ db_scheduled_job.post = function (params)
 	{
 		db.query
 		(
-			`call CreateScheduledJob (?, ?)`,
+			`call CreateService (?, ?)`,
 
 			[params.JobID, params.ScheduleDate],
 
@@ -149,8 +149,8 @@ db_scheduled_job.post = function (params)
 		{
 			db.query
 			(
-				`select ScheduledJobID
-					from ScheduledJobs
+				`select ServiceID
+					from Services
 					where
 						JobID = ? and
 						ScheduleDate = ?`,
@@ -168,7 +168,7 @@ db_scheduled_job.post = function (params)
 
 	.then ((results) =>
 	{
-		return db_scheduled_job.get (results[0].ScheduledJobID);
+		return db_service.get (results[0].ServiceID);
 	});
 };
 
@@ -187,4 +187,4 @@ db_scheduled_job.post = function (params)
 	}
 */
 
-module.exports = db_scheduled_job;
+module.exports = db_service;

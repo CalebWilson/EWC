@@ -1,3 +1,5 @@
+select "InvoiceProcs.sql";
+
 use ewc;
 
 drop table if exists InvoiceProcs;

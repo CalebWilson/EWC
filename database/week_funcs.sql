@@ -1,3 +1,5 @@
+select "week_funcs.sql";
+
 use ewc;
 
 /*

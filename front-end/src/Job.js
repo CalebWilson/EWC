@@ -8,7 +8,7 @@ export default class Job extends Component
 {
 	edit_service = () =>
 	{
-		Uplink.get_data ("scheduled_job/" + this.props.scheduled_job_id)
+		Uplink.get_data ("service/" + this.props.service_id)
 
 		.then ((data) =>
 		{

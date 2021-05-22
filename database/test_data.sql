@@ -1,3 +1,5 @@
+select "test_data.sql";
+
 use ewc;
 
 insert into
@@ -28,7 +30,7 @@ insert into
 select * from Jobs;
 
 insert into
-	ScheduledJobs (JobID,                                          ScheduleDate, FinalPrice)
+	Services (JobID,                                                ServiceDate, FinalPrice)
 	values        (    1, date(curdate() - interval weekday(curdate()) - 0 day),      30.00),
 	              (    2, date(curdate() - interval weekday(curdate()) - 0 day),      15.00),
                  (    3, date(curdate() - interval weekday(curdate()) - 1 day),      30.00),
@@ -39,25 +41,25 @@ insert into
                  (    8, date(curdate() - interval weekday(curdate()) - 4 day),      20.00),
                  (    9, date(curdate() - interval weekday(curdate()) - 4 day),      20.00)
 ;
-select * from ScheduledJobs;
+select * from Services;
 
 insert into
-	ScheduledJobDays (ScheduledJobID,    ScheduledJobDay)
-	values           (             1,                  0),
-	                 (             2,                  0),
-	                 (             3,                  0),
-	                 (             4,                  0),
-	                 (             4,                  1),
-	                 (             4,                  2),
-	                 (             5,                  0),
-	                 (             6,                  0),
-	                 (             7,                  0),
-	                 (             8,                  0),
-	                 (             8,                  1),
-	                 (             9,                  0),
-						  (             1,                  1)
+	ServiceDays (ServiceID,    ServiceDay)
+	values      (        1,             0),
+	            (        2,             0),
+	            (        3,             0),
+	            (        4,             0),
+	            (        4,             1),
+	            (        4,             2),
+	            (        5,             0),
+	            (        6,             0),
+	            (        7,             0),
+	            (        8,             0),
+	            (        8,             1),
+               (        9,             0),
+               (        1,             1)
 ;
-select * from ScheduledJobDays;
+select * from ServiceDays;
 
 insert into
 	Workers ( Username,    Password,         WorkerName, StatusID)
@@ -69,27 +71,27 @@ insert into
 select * from Workers;
 
 insert into
-	Assignments (ScheduledJobDayID, WorkerID)
-	     values (                1,        1),
-               (                2,        2),
-               (                3,        4),
-               (                4,        1),
-               (                4,        2),
-               (                4,        3),
-               (                5,        1),
-               (                5,        2),
-               (                5,        3),
-               (                6,        1),
-               (                6,        2),
-               (                6,        3),
-               (                7,        1),
-               (                7,        4),
-               (                8,        1),
-               (                8,        4),
-               (                9,        3),
-               (               10,        1),
-               (               11,        1),
-					(               12,        1),
-					(               13,        1)
+	Assignments (ServiceDayID, WorkerID)
+	     values (           1,        1),
+               (           2,        2),
+               (           3,        4),
+               (           4,        1),
+               (           4,        2),
+               (           4,        3),
+               (           5,        1),
+               (           5,        2),
+               (           5,        3),
+               (           6,        1),
+               (           6,        2),
+               (           6,        3),
+               (           7,        1),
+               (           7,        4),
+               (           8,        1),
+               (           8,        4),
+               (           9,        3),
+               (          10,        1),
+               (          11,        1),
+					(          12,        1),
+					(          13,        1)
 ;
 select * from Assignments;

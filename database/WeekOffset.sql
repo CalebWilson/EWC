@@ -1,3 +1,5 @@
+select "WeekOffset.sql";
+
 use ewc;
 
 /*

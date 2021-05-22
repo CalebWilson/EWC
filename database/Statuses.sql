@@ -1,3 +1,5 @@
+select "Statuses.sql";
+
 use ewc;
 
 -- Statuses that Workers and Jobs can have

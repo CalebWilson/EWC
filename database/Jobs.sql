@@ -1,3 +1,5 @@
+select "Jobs.sql";
+
 use ewc;
 
 drop table if exists Jobs;

@@ -27,7 +27,7 @@ export default class Day extends Component
 						GroupWork.map ((group_job) =>
 						(
 							<GroupWorkItem
-								key={group_job.ScheduledJobDayID}
+								key={group_job.ServiceDayID}
 								job={group_job}
 								edit_service={this.props.edit_service}
 							/>

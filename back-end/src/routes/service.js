@@ -4,21 +4,22 @@
 
 //create router
 const express = require("express");
-const scheduled_job_router = express.Router();
+const service_router = express.Router();
 
 //function to access database
 const access_database = require ("./access_database");
 
-//scheduled_job methods
-const db_scheduled_job = require("../db/scheduled_job");
+//service methods
+const db_service = require("../db/service");
 
-scheduled_job_router.route ("/:scheduled_job_id")
+service_router.route ("/:service_id")
 
 	//get
 	.get ((request, response, next) =>
 	{
+		console.log ("request.params.service_id: " + request.params.service_id);
 		let handler =
-			access_database (db_scheduled_job.get, request.params.scheduled_job_id);
+			access_database (db_service.get, request.params.service_id);
 
 		handler (request, response, next);
 	})
@@ -36,11 +37,11 @@ scheduled_job_router.route ("/:scheduled_job_id")
 			}]
 		}
 	*/
-scheduled_job_router.post ("/", (request, response, next) =>
+service_router.post ("/", (request, response, next) =>
 {
-	let handler = access_database (db_scheduled_job.post, request.body);
+	let handler = access_database (db_service.post, request.body);
 
 	handler (request, response, next);
 });
 
-module.exports = scheduled_job_router;
+module.exports = service_router;

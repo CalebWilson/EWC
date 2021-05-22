@@ -1,9 +1,10 @@
+select "Schedule_procs.sql";
+
 use ewc;
 
 /*
-	Given the temporary table newScheduledJobs, copy the ScheduledJobDays and
-	Assignments from the latest prior ScheduledJobs of the Job of the
-	newScheduledJobs.
+	Given the temporary table newServices, copy the ServiceDays and Assignments
+	from the latest prior Services of the Job of the newServices.
 */
 drop procedure if exists RenewServiceData;
 
@@ -12,193 +13,186 @@ delimiter //
 create procedure RenewServiceData()
 begin
 
-	-- the previous services of the new ScheduledJobs
-	drop table if exists lastScheduledJobs;
-	create temporary table lastScheduledJobs
+	-- the previous services of the new Services
+	drop table if exists lastServices;
+	create temporary table lastServices
 	(
-		JobID          int not null,
-		ScheduledJobID int not null
+		JobID     int not null,
+		ServiceID int not null
 	);
 
-	insert into lastScheduledJobs (JobID, ScheduledJobID)
+	insert into lastServices (JobID, ServiceID)
 		select -- distinct
-			ScheduledJobs.JobID,
-			ScheduledJobs.ScheduledJobID
+			Services.JobID,
+			Services.ServiceID
 
-		from ScheduledJobs, newScheduledJobs
+		from Services, newServices
 
 		where
-			ScheduledJobs.JobID = newScheduledJobs.JobID and
+			Services.JobID = newServices.JobID and
 			(
-				-- the ScheduledJob is the latest
-				select ScheduledJobs.ScheduleDate = max(inside.ScheduleDate)
-				from ScheduledJobs as inside
-				where ScheduledJobs.JobID = inside.JobID
+				-- the Service is the latest
+				select Services.ServiceDate = max(inside.ServiceDate)
+				from Services as inside
+				where Services.JobID = inside.JobID
 			)
 	;
 
 	-- schedule the recurrences
-	insert into ScheduledJobs (JobID, ScheduleDate, FinalPrice)
-		select Jobs.JobID, ScheduleDate, Price
-		from newScheduledJobs, Jobs
-		where newScheduledJobs.JobID = Jobs.JobID
+	insert into Services (JobID, ServiceDate, FinalPrice)
+		select Jobs.JobID, ServiceDate, Price
+		from newServices, Jobs
+		where newServices.JobID = Jobs.JobID
 	;
 
-	-- Job Days of the Jobs' previous ScheduledJobs
-	drop table if exists lastScheduledJobDays;
-	create temporary table lastScheduledJobDays
+	-- Job Days of the Jobs' previous Services
+	drop table if exists lastServiceDays;
+	create temporary table lastServiceDays
 	(
-		JobID             int not null,
-		ScheduledJobID    int not null,
-		ScheduledJobDayID int not null
+		JobID        int not null,
+		ServiceID    int not null,
+		ServiceDayID int not null
 	);
 
-	insert into lastScheduledJobDays (JobID, ScheduledJobID, ScheduledJobDayID)
+	insert into lastServiceDays (JobID, ServiceID, ServiceDayID)
 		select
-			lastScheduledJobs.JobID,
-			lastScheduledJobs.ScheduledJobID,
-			ScheduledJobDays.ScheduledJobDayID
-		from ScheduledJobDays, lastScheduledJobs
-		where ScheduledJobDays.ScheduledJobID = lastScheduledJobs.ScheduledJobID
+			lastServices.JobID,
+			lastServices.ServiceID,
+			ServiceDays.ServiceDayID
+		from ServiceDays, lastServices
+		where ServiceDays.ServiceID = lastServices.ServiceID
 	;
 
-	-- the ScheduledJobDays of the newScheduledJobs
-	drop table if exists newScheduledJobDays;
-	create temporary table newScheduledJobDays
+	-- the ServiceDays of the newServices
+	drop table if exists newServiceDays;
+	create temporary table newServiceDays
 	(
-		ScheduledJobID  int not null,
-		ScheduledJobDay int not null
+		ServiceID  int not null,
+		ServiceDay int not null
 	);
 
-	-- broken
-	-- create ScheduledJobDays for the newScheduledJobs
-	insert into newScheduledJobDays (ScheduledJobID, ScheduledJobDay)
-		select ScheduledJobs.ScheduledJobID, ScheduledJobDays.ScheduledJobDay
-		from ScheduledJobs, lastScheduledJobDays, ScheduledJobDays
+	-- create ServiceDays for the newServices
+	insert into newServiceDays (ServiceID, ServiceDay)
+		select Services.ServiceID, ServiceDays.ServiceDay
+		from Services, lastServiceDays, ServiceDays
 		where
-			ScheduledJobs.JobID = lastScheduledJobDays.JobID
-				and
-			lastScheduledJobDays.ScheduledJobID = ScheduledJobDays.ScheduledJobID
-				and
-			lastScheduledJobDays.ScheduledJobDayID = ScheduledJobDays.ScheduledJobDayID
-				and
+			Services.JobID = lastServiceDays.JobID                  and
+			lastServiceDays.ServiceID = ServiceDays.ServiceID       and
+			lastServiceDays.ServiceDayID = ServiceDays.ServiceDayID and
 			(
 				select count(*) = 0
-				from ScheduledJobDays as inside
-				where inside.ScheduledJobID = ScheduledJobs.ScheduledJobID
+				from ServiceDays as inside
+				where inside.ServiceID = Services.ServiceID
 			)
 	;
 
-	-- add the newScheduledJobDays
-	insert into ScheduledJobDays (ScheduledJobID, ScheduledJobDay)
-		select ScheduledJobID, ScheduledJobday
-		from newScheduledJobDays
+	-- add the newServiceDays
+	insert into ServiceDays (ServiceID, ServiceDay)
+		select ServiceID, Serviceday
+		from newServiceDays
 	;
 
 	/*
-		create Assignments for the ScheduledJobs with ScheduledJobDays
+		create Assignments for the Services with ServiceDays
 		that don't have any yet
 	*/
 
-	-- get the assignments for the lastScheduledJobDays
-	insert into Assignments (ScheduledJobDayID, WorkerID)
-		select ScheduledJobDays.ScheduledJobDayID, lastAssignments.WorkerID
+	-- get the assignments for the lastServiceDays
+	insert into Assignments (ServiceDayID, WorkerID)
+		select ServiceDays.ServiceDayID, lastAssignments.WorkerID
 		from
-			ScheduledJobs,
-			ScheduledJobDays,
+			Services,
+			ServiceDays,
 			(
-				-- Assignments for the JobDays of the lastScheduledJobs
+				-- Assignments for the JobDays of the lastServices
 				select 
-					lastScheduledJobDays.JobID
+					lastServiceDays.JobID
 						as JobID,
-					ScheduledJobDays.ScheduledJobDay
-						as ScheduledJobDay,
+					ServiceDays.ServiceDay
+						as ServiceDay,
 					Assignments.WorkerID
 						as WorkerID
 
-				from lastScheduledJobDays, ScheduledJobDays, Assignments
+				from lastServiceDays, ServiceDays, Assignments
 
 				where
-					lastScheduledJobDays.ScheduledJobDayID =
-						ScheduledJobDays.ScheduledJobDayID
-						and
-					ScheduledJobDays.ScheduledJobDayID = Assignments.ScheduledJobDayID
+					lastServiceDays.ServiceDayID = ServiceDays.ServiceDayID and
+					ServiceDays.ServiceDayID = Assignments.ServiceDayID
 
 			) as lastAssignments
 	
 		where
-		 	lastAssignments.JobID = ScheduledJobs.JobID and
-		 	ScheduledJobs.ScheduledJobID = ScheduledJobDays.ScheduledJobID and
-		 	ScheduledJobDays.ScheduledJobDay = lastAssignments.ScheduledJobDay and
+		 	lastAssignments.JobID = Services.JobID              and
+		 	Services.ServiceID = ServiceDays.ServiceID          and
+		 	ServiceDays.ServiceDay = lastAssignments.ServiceDay and
 			(
-				-- there are no Assignments for the ScheduledJobDays
+				-- there are no Assignments for the ServiceDays
 				select count(*) = 0
 				from Assignments
 				where
-					Assignments.ScheduledJobDayID = ScheduledJobDays.ScheduledJobDayID
+					Assignments.ServiceDayID = ServiceDays.ServiceDayID
 			)
 	;
 
 	-- drop temporary tables
-	drop table lastScheduledJobs;
-	drop table lastScheduledJobDays;
-	drop table newScheduledJobDays;
+	drop table lastServices;
+	drop table lastServiceDays;
+	drop table newServiceDays;
 
 end //
 
 delimiter ;
-
 -- end procedure RenewServiceData
 
 
 /*
-	Create a new ScheduledJob.
+	Create a new Service.
 */
-drop procedure if exists CreateScheduledJob;
+drop procedure if exists CreateService;
 
 delimiter //
 
-create procedure CreateScheduledJob (in newJobID int, in newScheduleDate date)
+create procedure CreateService (in newJobID int, in newServiceDate date)
 begin
 
-	declare firstScheduledJob boolean default 0;
+	declare firstService boolean default 0;
 
-	-- whether this will be the first ScheduledJob for the given Job
-	set firstScheduledJob =
+	-- whether this will be the first Service for the given Job
+	set firstService =
 	(
-		-- there are no ScheduledJobs for the given Job
+		-- there are no Services for the given Job
 		select count(*) = 0
-		from ScheduledJobs
+		from Services
 		where JobID = newJobID
 	);
 
-	if firstScheduledJob
+	if firstService
 	then
 		insert into
-			ScheduledJobs (   JobID,    ScheduleDate)
-		   values        (newJobID, newScheduleDate)
+			Services (   JobID,    ServiceDate)
+		   values   (newJobID, newServiceDate)
 		;
 
 		insert into
-			ScheduledJobDays (  ScheduledJobID, ScheduledJobDay)
-			values           (last_insert_id(),               0)
+			ServiceDays (       ServiceID, ServiceDay)
+			values      (last_insert_id(),         0)
 		;
 	
 	else
-		create temporary table newScheduledJobs
+		create temporary table newServices
 		(
-			JobID         int not null,
-			ScheduleDate date not null
+			JobID        int not null,
+			ServiceDate date not null
 		);
 
 		insert into
-			newScheduledJobs (   JobID,    ScheduleDate)
-			values           (newJobID, newScheduleDate)
+			newServices (   JobID,    ServiceDate)
+			values      (newJobID, newServiceDate)
 		;
 
 		call RenewServiceData();
 
-		drop table newScheduledJobs;
+		drop table newServices;
 	
 	end if;
 
@@ -206,7 +200,7 @@ end //
 
 delimiter ;
 
--- end procedure createScheduledJob
+-- end procedure createService
 
 
 /*
@@ -220,16 +214,16 @@ delimiter //
 create procedure GenerateWeek (in Week int)
 begin
 
-	drop table if exists newScheduledJobs;
-	-- ScheduledJobs created during this procedure
-	create temporary table newScheduledJobs
+	drop table if exists newServices;
+	-- Services created during this procedure
+	create temporary table newServices
 	(
-		JobID         int not null,
-		ScheduleDate date not null
+		JobID        int not null,
+		ServiceDate date not null
 	);
 
 	-- generate and save recurrences in the given week for the recurring Jobs
-	insert into newScheduledJobs (JobID, ScheduleDate)
+	insert into newServices (JobID, ServiceDate)
 		select
 			JobID,
 
@@ -241,17 +235,17 @@ begin
 		(
 			-- get the last service and service interval of active recurring Jobs
 			select
-				ScheduledJobs.JobID
+				Services.JobID
 					as JobID,
-				max(ScheduledJobs.ScheduleDate)
+				max(Services.ServiceDate)
 					as LastScheduled,
 				Jobs.ServiceInterval
 					as ServiceInterval
 
-			from ScheduledJobs, Jobs, Statuses
+			from Services, Jobs, Statuses
 
 			where
-				ScheduledJobs.JobID = Jobs.JobID        and
+				Services.JobID      = Jobs.JobID        and
 				Jobs.StatusID       = Statuses.StatusID and
 				Statuses.StatusName = "Active"          and
 				Jobs.ServiceInterval is not null
@@ -265,20 +259,20 @@ begin
 			weeks_between (LastScheduled, curdate() + interval Week week)
 				% ServiceInterval = 0 and
 
-			-- prevent duplicate ScheduledJobs
+			-- prevent duplicate Services
 			(
 				select count(*) = 0
-				from Jobs, ScheduledJobs
+				from Jobs, Services
 				where
-					ScheduledJobs.JobID = Jobs.JobID  and
+					Services.JobID = Jobs.JobID      and
 					Jobs.JobID = serviceHistory.JobID and
-					weeks_between (ScheduledJobs.ScheduleDate, curdate() + interval Week week) = 0
+					weeks_between (Services.ServiceDate, curdate() + interval Week week) = 0
 			)
 	;
 
 	call renewServiceData();
 
-	drop table newScheduledJobs;
+	drop table newServices;
 
 end //
 

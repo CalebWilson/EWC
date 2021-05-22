@@ -15,8 +15,8 @@ const schedule_router = require ("./schedule");
 router.use ("/schedule", schedule_router);
 
 //scheduled job
-const scheduled_job_router = require ("./scheduled_job");
-router.use ("/scheduled_job", scheduled_job_router);
+const service_router = require ("./service");
+router.use ("/service", service_router);
 
 //generate
 const generate_router = require ("./generate");

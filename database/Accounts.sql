@@ -1,3 +1,5 @@
+select "Accounts.sql";
+
 use ewc;
 
 drop table if exists Accounts;

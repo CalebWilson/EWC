@@ -1,3 +1,5 @@
+select "WorkerStatuses.sql";
+
 use ewc;
 
 drop view if exists WorkerStatuses;

@@ -1,3 +1,5 @@
+select "ServiceTypes.sql";
+
 use ewc;
 
 drop table if exists ServiceTypes;
