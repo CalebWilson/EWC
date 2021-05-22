@@ -25,31 +25,47 @@ class BulletButton extends Component
 	}
 }
 
-export default class BulletItem extends Component
+//export default class BulletItem extends Component
+class BulletItem extends Component
 {
 	render()
 	{
+		const {
+			list_length,
+			action,
+			content
+		}
+			= this.props;
+
 		return (
 			<div className="bullet-item">
 
 				{
-					(this.props.index === 0)
+					//if a list length is provided
+					(list_length !== undefined)
 					?
-						<BulletButton />
+						//don't allow removal of the last item
+						(list_length === 1)
+						?
+							<BulletButton />
+						: 
+							<BulletButton remove={action} />
 					:
-						<BulletButton remove={this.props.remove} />
+						//no list length means add button
+						<BulletButton add={action} />
 				}
 
-				<span className="list-button-spacer"></span>
+				<span className="bullet-button-spacer"></span>
 
-				{this.content}
+				{content}
 
 			</div>
 		);
 	}
 }
 
-class BulletList extends Component
+//class BulletList extends Component
+export default class BulletList extends Component
 {
 	render()
 	{
@@ -60,33 +76,41 @@ class BulletList extends Component
 			map_func,
 			add,
 			remove
-
-		} = this.props;
+		}
+			= this.props;
 
 		return (
 			<div>
 
-				{name_plural + ":"}
+				{name_plural ? name_plural + ":" : ""}
 
 				<div className="indent">
 					{
 						items.map ((item_value, item_index) =>
 						(
 							<BulletItem
-								index={item_index}
+								list_length={items.length}
 								content={map_func (item_value, item_index)}
-								remove={remove (item_index)}
+								action={remove (item_index)}
 							/>
 						))
 					}
 
+					<br/>
 					<BulletItem
-						index="-1"
-						content={"Add another " + name_singular}
-						add={add}
+						content={
+							<span style={{paddingTop: "0.2rem"}}>
+								{"Add another " + name_singular}
+							</span>
+						}
+						action={add}
 					/>
 
+
 				</div>
+
+			<br/>
+
 
 			</div>
 		);

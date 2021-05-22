@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 
 import         Button from "./Button";
-//import     BulletList from "./BulletList";
-import     BulletItem from "./BulletList";
+import     BulletList from "./BulletList";
+//import     BulletItem from "./BulletList";
 import      Clickable from "./Clickable";
 
 import    JobDropdown from "./JobDropdown";
@@ -342,16 +342,19 @@ export default class ServiceModal extends Component
 	}
 
 	//remove a worker from a service
-	remove_worker = (day_index, worker_index) =>
+	remove_worker = (day_index) =>
 	{
-		return (() =>
+		return ((worker_index) =>
 		{
-			//remove the given worker from the given Day
-			this.setState ((state) =>
+			return (() =>
 			{
-				state.service.Days[day_index].Workers.splice (worker_index, 1);
-				
-				return state;
+				//remove the given worker from the given Day
+				this.setState ((state) =>
+				{
+					state.service.Days[day_index].Workers.splice (worker_index, 1);
+					
+					return state;
+				});
 			});
 		});
 	}
@@ -429,18 +432,15 @@ export default class ServiceModal extends Component
 					/> </span>
 				}
 
-			{/*
 			{	//workers
 				<BulletList
 					name_singular="worker"
-					name_plural=""
 					items={day.Workers}
 					map_func={this.render_worker (day_index)}
-					add={this.add_worker}
-					remove={this.remove_worker}
+					add={this.add_worker (day_index)}
+					remove={this.remove_worker (day_index)}
 				/>
 			}
-			*/}
 
 		</div>
 	)
@@ -489,7 +489,6 @@ export default class ServiceModal extends Component
 
 						{/* days and workers */}
 
-						{/*
 						<BulletList
 							name_singular="day"
 							name_plural="Days"
@@ -498,20 +497,7 @@ export default class ServiceModal extends Component
 							add={this.add_day}
 							remove={this.remove_day}
 						/>
-*/}
 
-						{
-							this.state.service.Days.map ((day, day_index) =>
-							(
-								<BulletItem
-									index={day_index}
-									content={this.render_day (day, day_index)}
-									remove={this.remove_day (day_index)}
-								/>
-							))
-						}
-
-						<br />
 						<br />
 
 						{/* final price */}
