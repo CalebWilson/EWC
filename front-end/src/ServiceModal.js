@@ -77,7 +77,7 @@ export default class ServiceModal extends Component
 		{
 			console.log ("Unsorted: " + JSON.stringify(state.service.Days));
 
-			state.service.Days.sort
+			state.service.Days = state.service.Days.sort
 			(
 				(day1, day2) => (day2.Date - day1.Date)
 			);
@@ -93,10 +93,10 @@ export default class ServiceModal extends Component
 		let request_body =
 		{
 			JobID: this.state.service.JobID,
-			ScheduleDate: this.state.service.Days[0].Date
+			ServiceDate: this.state.service.Days[0].Date
 		};
 
-		Uplink.send_data ("scheduled_job", request_body)
+		Uplink.send_data ("service", "post", request_body)
 
 		.then ((response) =>
 		{
@@ -250,6 +250,7 @@ export default class ServiceModal extends Component
 	{
 		return ((edit) =>
 		{
+			/*
 			if (
 					day_index !== 0 &&
 					edit.target.value < this.state.service.Days[0].Date
@@ -268,32 +269,33 @@ export default class ServiceModal extends Component
 			}
 			else
 			{
-				//get the new date value
-				this.setState
-				(
-					(state) =>
+			*/
+
+			//get the new date value
+			this.setState
+			(
+				(state) =>
+				{
+					state.service.Days[day_index].Date =
+						edit.target.value + "T00:00:00.000"	//reset timestamp to local
+					;
+
+					//stop editing
+					state.editing_day = false;
+					state.out_of_order_error = false;
+
+					return state;
+				},
+
+				//editing first date updates the rest
+				() =>
+				{
+					if (day_index === 0)
 					{
-						state.service.Days[day_index].Date =
-							edit.target.value + "T00:00:00.000"	//reset timestamp local
-						;
-
-						//stop editing
-						state.editing_day = false;
-						state.out_of_order_error = false;
-
-						return state;
-					},
-
-					//editing first date updates the rest
-					() =>
-					{
-						if (day_index === 0)
-						{
-							this.save();
-						}
+						this.save();
 					}
-				);
-			}
+				}
+			);
 		});
 	}
 
@@ -507,10 +509,17 @@ export default class ServiceModal extends Component
 
 					{/* save or cancel */}
 					<div className="service-modal-bottom">
+
+						<Button
+							label="Cancel Service"
+							action={this.props.close_service()}
+						/>
+
 						<Button
 							label="Save"
 							action={this.props.close_service (true)}
 						/>
+
 					</div>
 
 				</div>

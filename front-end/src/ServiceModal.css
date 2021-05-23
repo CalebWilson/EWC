@@ -50,7 +50,12 @@
 }
 
 .service-modal-bottom {
-	flex: 0;
 	padding-top: 2%;
 	border-top: 3px solid black;
+	
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+
+	flex: 0;
 }

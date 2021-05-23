@@ -17,13 +17,11 @@ service_router.route ("/:service_id")
 	//get
 	.get ((request, response, next) =>
 	{
-		console.log ("request.params.service_id: " + request.params.service_id);
 		let handler =
 			access_database (db_service.get, request.params.service_id);
 
 		handler (request, response, next);
 	})
-;
 
 	/*
 		request.body will be a JSON of the form:
@@ -37,6 +35,15 @@ service_router.route ("/:service_id")
 			}]
 		}
 	*/
+	.patch ((request, response, next) =>
+	{
+		let handler = 
+			access_database (db_service.patch, request.params.service_id);
+
+		handler (request, response, next);
+	})
+;
+
 service_router.post ("/", (request, response, next) =>
 {
 	let handler = access_database (db_service.post, request.body);

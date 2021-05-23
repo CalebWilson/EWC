@@ -119,13 +119,12 @@ db_service.get = function (service_id)
 	params will be a JSON of the form:
 	{
 		JobID: int,
-		ScheduleDate: date
+		ServiceDate: date
 	}
 */
 
 db_service.post = function (params)
 {
-	console.log (params);
 	//create new scheduled job in the database
 	return new Promise ((resolve, reject) =>
 	{
@@ -133,7 +132,7 @@ db_service.post = function (params)
 		(
 			`call CreateService (?, ?)`,
 
-			[params.JobID, params.ScheduleDate],
+			[params.JobID, params.ServiceDate],
 
 			(error, results) =>
 			{
@@ -153,9 +152,9 @@ db_service.post = function (params)
 					from Services
 					where
 						JobID = ? and
-						ScheduleDate = ?`,
+						ServiceDate = ?`,
 
-				[params.JobID, params.ScheduleDate],
+				[params.JobID, params.ServiceDate],
 
 				(error, results) =>
 				{
@@ -173,18 +172,79 @@ db_service.post = function (params)
 };
 
 /*
-	Edit a scheduled job.
+	Edit a service.
 
 	params will be a JSON of the form:
 	{
+		ServiceID: int,
 		JobID: int,
-		ScheduleDate: date,
 		Days:
 		[{
 			Day: int,
-			WorkersIDs: int[]
+			Date: Date,
+			Workers: int[],
+			ServiceDayID: int //undefined if new ServiceDay
 		}]
 	}
+*/
+
+/*
+db_service.patch = function (params)
+{
+	//update JobID and ServiceDate
+	new Promise ((resolve, reject) =>
+	{
+		db.query
+		(
+			`update Services
+				set
+					JobID = ?,
+					ServiceDate = ?
+				where ServiceID = ?`,
+
+			[params.JobID, params.Days[0].Date, params.ServiceID],
+
+			(error, results) =>
+			{
+				if (error) return reject (error);
+				return resolve (results);
+			}
+		);
+	});
+
+	//update Days
+	new Promise ((resolve, reject) =>
+	{
+		db.query
+		(
+			`select ServiceDayID, ServiceDay
+				from Services
+				where ServiceID = ?`,
+
+			params.ServiceID,
+
+			(error, results) =>
+			{
+				if (error) return reject (error);
+				return resolve (results);
+			}
+		);
+	})
+
+	.then ((db_days) =>
+	{
+		//days that are not new or deleted
+		const edited_days = params.Days.filter (
+			(day) => (day.ServiceDayID !== undefined)
+		);
+
+		//the numbers of days that are not new or deleted
+		const edited_day_nums = edited_days.map ((edited_day) => (edited_day.Day));
+
+		//delete the days in the database that aren't in params
+		const to_delete = db_days.filter (
+			(db_day) => (!edited_day_nums.includes (db_day.ServiceDay
+};
 */
 
 module.exports = db_service;

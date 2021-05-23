@@ -40,7 +40,6 @@ var catch_errors = (error) =>
 //retrieve data from server
 Uplink.get_data = function (endpoint)
 {
-	console.log ("getting data");
 	return fetch (back_end + endpoint)
 		.then  (check_status)
 		.then  (package_data)
@@ -49,12 +48,11 @@ Uplink.get_data = function (endpoint)
 };
 
 //send data to server and receive response
-Uplink.send_data = function (endpoint, body)
+Uplink.send_data = function (endpoint, method, body)
 {
-	console.log ("sending data");
 	const request_options =
 	{
-		method: "POST",
+		method: method.toUpperCase(),
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify (body)
 	};
