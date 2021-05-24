@@ -1,20 +1,8 @@
-const db = require ("./db");
+const db_query = require ("./db_query");
 
 const get_jobs = () =>
 {
-	return new Promise ((resolve, reject) =>
-	{
-		db.query
-		(
-			`select JobID, JobName from Jobs`,
-
-			(error, results) =>
-			{
-				if (error) return reject (error);
-				return resolve (results);
-			}
-		);
-	});
+	return db_query (`select JobID, JobName from Jobs`);
 }
 
 module.exports = get_jobs;

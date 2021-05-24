@@ -1,23 +1,9 @@
-const db          = require ("./db");
+const db_query    = require ("./db_query");
 const db_schedule = require ("./schedule");
 
 const generate = (week) =>
 {
-	return new Promise ((resolve, reject) =>
-	{
-		db.query
-		(
-			`call GenerateWeek (?)`,
-
-			week,
-
-			(error, results) =>
-			{
-				if (error) return reject (error);
-				return resolve (results);
-			}
-		);
-	})
+	return db.query (`call GenerateWeek (?)`, week)
 
 	.then ((results) =>
 	{

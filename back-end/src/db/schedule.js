@@ -1,4 +1,4 @@
-const db = require ("./db");
+const db_query = require ("./db_query");
 
 let db_schedule = {};
 
@@ -57,20 +57,8 @@ db_schedule.get_week = function (params)
 
 	let final_schedule = Promise.all (schedule);
 
-	let week_letter = new Promise ((resolve, reject) =>
-	{
-		db.query
-		(
-			`select week_letter(?) as week_letter`,
-			week,
+	let week_letter = db_query (`select week_letter(?) as week_letter`, week)
 
-			(error, results) =>
-			{
-				if (error) return reject (error);
-				return resolve (results);
-			}
-		);
-	})
 	.then ((results) =>
 	{
 		return results[0].week_letter;
@@ -97,33 +85,23 @@ db_schedule.get_day = function
 	let day_condition = `(Day % 5 = ` + day + `)`;
 
 	//get GroupWork
-	var group = new Promise ((resolve, reject) =>
-	{
-		db.query
-		(
-				`select
-					distinct
-						JobName,
-						ServiceID,
-						ServiceType,
-						FinalPrice,
-						Complete,
-						ServiceID,
-						ServiceDayID,
-						FirstDay
-					from GroupWork
-					where `
-						+  day_condition + ` and `
-						+ week_condition + ` and `
-						+ group_worker_condition
-				,
-
-				(error, results) =>
-		{
-			if (error) return reject (error);
-			return resolve (results);
-		});
-	})
+	var group = db_query
+	(
+		`select distinct
+			JobName,
+			ServiceID,
+			ServiceType,
+			FinalPrice,
+			Complete,
+			ServiceID,
+			ServiceDayID,
+			FirstDay
+		from GroupWork
+		where `
+			+  day_condition + ` and `
+			+ week_condition + ` and `
+			+ group_worker_condition
+	)
 
 	//make array of Workers for each Service
 	.then ((group_jobs) =>
@@ -135,27 +113,19 @@ db_schedule.get_day = function
 		group_jobs.forEach ((group_job) =>
 		{
 			//add the team that will work on that job to teams array
-			teams.push (new Promise ((resolve, reject) =>
-			{
-				db.query
+			teams.push (
+				db_query
 				(
 					`select WorkerID, WorkerName, WorkerStatus
 						from GroupWork
 						where
 							JobName = ?         and `
 							+ day_condition + ` and `
-							+ week_condition
-					,
+							+ week_condition,
 
-					group_job.JobName,
-
-					(error, results) =>
-					{
-						if (error) return reject (error);
-						return resolve (results);
-					}
-				);
-			}));
+					group_job.JobName
+				)
+			);
 		});
 
 		//match each worker team with its job
@@ -173,26 +143,17 @@ db_schedule.get_day = function
 	});
 
 	//get IndividualWork
-	var indiv = new Promise ((resolve, reject) =>
-	{
-		db.query
-		(
-				`select
-					distinct
-						WorkerID,
-						WorkerName
-					from IndividualWork
-					where `
-						+  day_condition + ` and `
-						+ week_condition + ` and `
-						+ indiv_worker_condition
-				,
-				(error, results) =>
-		{
-			if (error) return reject (error);
-			return resolve (results);
-		});
-	})
+	var indiv = db_query
+	(
+		`select distinct
+			WorkerID,
+			WorkerName
+		from IndividualWork
+		where `
+			+  day_condition + ` and `
+			+ week_condition + ` and `
+			+ indiv_worker_condition
+	)
 
 	//make array of Services for each Worker
 	.then ((indiv_workers) =>
@@ -204,32 +165,26 @@ db_schedule.get_day = function
 		indiv_workers.forEach ((worker) =>
 		{
 			//add the jobs that the worker does to the jobs array
-			job_sets.push (new Promise ((resolve, reject) =>
-			{
-				db.query (
-						`select
-							JobName,
-							ServiceID,
-							ServiceType,
-							FinalPrice,
-							Complete,
-							ServiceDayID,
-							FirstDay
-							from IndividualWork
-							where
-								WorkerID = ?         and `
-								+  day_condition + ` and `
-								+ week_condition
-						,
+			job_sets.push (
+				db_query
+				(
+					`select
+						JobName,
+						ServiceID,
+						ServiceType,
+						FinalPrice,
+						Complete,
+						ServiceDayID,
+						FirstDay
+						from IndividualWork
+						where
+							WorkerID = ?         and `
+							+  day_condition + ` and `
+							+ week_condition,
 
-						worker.WorkerID,
-
-						(error, results) =>
-				{
-					if (error) return reject (error);
-					return resolve (results);
-				});
-			}));
+					worker.WorkerID
+				)
+			);
 		});
 
 		//match each set of jobs with its worker

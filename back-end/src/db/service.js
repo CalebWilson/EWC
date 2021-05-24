@@ -1,35 +1,27 @@
-const db = require("./db");
+const db_query = require("./db_query");
 
 let db_service = {};
 
 /*
-	Get information about a scheduled job.
+	Get information about a service.
 */
 db_service.get = function (service_id)
 {
-	return new Promise ((resolve, reject) =>
-	{
-		//get information about the Service
-		db.query
-		(
-			`select
-				distinct
-					ServiceID,
-					JobName,
-					JobID,
-					FinalPrice,
-					Complete
-				from WeekWork
-				where ServiceID = ?`,
+	//get information about the Service
+	return db_query
+	(
+		`select
+			distinct
+				ServiceID,
+				JobName,
+				JobID,
+				FinalPrice,
+				Complete
+			from WeekWork
+			where ServiceID = ?`,
 
-			service_id,
-
-			(error, results) =>
-		{
-			if (error) return reject (error);
-			return resolve (results);
-		})
-	})
+		service_id
+	)
 
 	//extract service from array
 	.then ((service_array) =>
@@ -44,28 +36,19 @@ db_service.get = function (service_id)
 	.then ((service) =>
 	{
 		//get the days
-		return new Promise ((resolve, reject) =>
-		{
-			db.query
-			(
-				`select
-					distinct
-						Date,
-						FirstDay,
-						ServiceDayID
-					from WeekWork
-					where ServiceID = ?
-					order by Date`,
+		return db_query
+		(
+			`select
+				distinct
+					Date,
+					FirstDay,
+					ServiceDayID
+				from WeekWork
+				where ServiceID = ?
+				order by Date`,
 
-				service_id,
-
-				(error, results) =>
-				{
-					if (error) return reject (error);
-					return resolve (results);
-				}
-			);
-		})
+			service_id
+		)
 
 		//get the workers for each day
 		.then ((days) =>
@@ -76,9 +59,9 @@ db_service.get = function (service_id)
 			days.forEach ((day) =>
 			{
 				//push an array of Worker JSONs onto teams
-				teams.push (new Promise ((resolve, reject) =>
-				{
-					db.query
+				teams.push
+				(
+					db_query
 					(
 						`select WorkerID, WorkerName, WorkerStatus
 							from WeekWork
@@ -86,15 +69,9 @@ db_service.get = function (service_id)
 								ServiceID    = ? and
 								ServiceDayID = ?`,
 
-						[service_id, day.ServiceDayID],
-
-						(error, results) =>
-						{
-							if (error) return reject (error);
-							return resolve (results);
-						}
-					);
-				}));
+						[service_id, day.ServiceDayID]
+					)
+				)
 			});
 
 			//match each worker team with its day
@@ -132,44 +109,26 @@ db_service.get = function (service_id)
 db_service.post = function (params)
 {
 	//create new service in the database
-	return new Promise ((resolve, reject) =>
-	{
-		db.query
-		(
-			`call CreateService (?, ?)`,
+	return db_query
+	(
+		`call CreateService (?, ?)`,
 
-			[params.JobID, params.ServiceDate],
-
-			(error, results) =>
-			{
-				if (error) return reject (error);
-				return resolve (results);
-			}
-		);
-	})
+		[params.JobID, params.ServiceDate]
+	)
 
 	//get the ID of the new service
 	.then ((results) =>
 	{
-		return new Promise ((resolve, reject) =>
-		{
-			db.query
-			(
-				`select ServiceID
-					from Services
-					where
-						JobID = ? and
-						ServiceDate = ?`,
+		return db_query
+		(
+			`select ServiceID
+				from Services
+				where
+					JobID = ? and
+					ServiceDate = ?`,
 
-				[params.JobID, params.ServiceDate],
-
-				(error, results) =>
-				{
-					if (error) return reject (error);
-					return resolve (results);
-				}
-			);
-		})
+			[params.JobID, params.ServiceDate]
+		);
 	})
 
 	//get the new service
@@ -202,101 +161,62 @@ db_service.patch = function (params)
 	//function to remove timestamp from dates
 	const date = (datetime) => (JSON.stringify(datetime).substr(1, 10));
 
+	//convert each day's date to a day number to match database
 	params.Date = params.Days[0].Date;
-
 	Days = params.Days.map ((day) =>
 	{
 		day.Day = Math.round((new Date(day.Date) - new Date(params.Date))
 			/ (1000 * 60 * 60 * 24));
 
-		console.log ("\nday: ", day);
-
 		return day;
 	});
 
 	//update JobID and ServiceDate
-	let attributes = new Promise ((resolve, reject) =>
-	{
-		db.query
-		(
-			`update Services
-				set
-					JobID = ?,
-					ServiceDate = ?
-				where ServiceID = ?`,
+	let attributes = db_query
+	(
+		`update Services
+			set
+				JobID = ?,
+				ServiceDate = ?
+			where ServiceID = ?`,
 
-			[params.JobID, date(params.Days[0].Date), params.ServiceID],
-
-			(error, results) =>
-			{
-				if (error) return reject (error);
-				return resolve (results);
-			}
-		);
-	});
+		[params.JobID, date(params.Days[0].Date), params.ServiceID]
+	);
 
 	//update Days
-	let service_days = new Promise ((resolve, reject) =>
-	{
-		db.query
-		(
-			`select
-					ServiceDayID, ServiceDay
-				from ServiceDays
-				where ServiceID = ?`,
-
-			params.ServiceID,
-
-			(error, results) =>
-			{
-				if (error) return reject (error);
-				return resolve (results);
-			}
-		);
-	})
+	let service_days = db_query
+	(
+		`select ServiceDayID, ServiceDay
+		from ServiceDays
+		where ServiceID = ?`, params.ServiceID
+	)
 
 	.then ((db_days) =>
 	{
-		console.log (db_days);
-
 		//days that are not new or deleted will have a ServiceDayID
 		const edited_days = params.Days.filter (
 			(day) => (day.ServiceDayID !== undefined)
 		);
-		console.log ("edited_days: ", edited_days);
 
 		//the numbers of days that are not new or deleted
 		const edited_day_nums = edited_days.map ((edited_day) => (edited_day.Day));
-		console.log ("edited_day_nums: ", edited_day_nums);
 
 		//days in the database that aren't in params should be deleted
 		const to_delete = db_days.filter (
 			(db_day) => (!edited_day_nums.includes (db_day.ServiceDay))
 		);
-		console.log ("to_delete: ", to_delete);
 
 		//delete days
 		return Promise.all
 		(
 			to_delete.map ((delete_day) =>
 			(
-				new Promise ((resolve, reject) =>
-				{
-					db.query
-					(
-						`delete
-							from ServiceDays
-							where ServiceDayID = ?`,
-
-						delete_day.ServiceDayID,
-
-						(error, results) =>
-						{
-							if (error) return reject (error);
-							return resolve (results);
-						}
-					);
-				})
+				db_query
+				(
+					`delete
+					from ServiceDays
+					where ServiceDayID = ?`, delete_day.ServiceDayID
+				)
 			))
 		);
 	});
