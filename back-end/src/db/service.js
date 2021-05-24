@@ -32,7 +32,13 @@ db_service.get = function (service_id)
 	})
 
 	//extract service from array
-	.then (service_array => service_array[0])
+	.then ((service_array) =>
+	{
+		if (service_array.length === 0)
+			throw "No results.";
+
+		return service_array[0];
+	})
 
 	//make an array of the days of the scheduled job
 	.then ((service) =>
@@ -125,7 +131,7 @@ db_service.get = function (service_id)
 
 db_service.post = function (params)
 {
-	//create new scheduled job in the database
+	//create new service in the database
 	return new Promise ((resolve, reject) =>
 	{
 		db.query
@@ -142,6 +148,7 @@ db_service.post = function (params)
 		);
 	})
 
+	//get the ID of the new service
 	.then ((results) =>
 	{
 		return new Promise ((resolve, reject) =>
@@ -165,6 +172,7 @@ db_service.post = function (params)
 		})
 	})
 
+	//get the new service
 	.then ((results) =>
 	{
 		return db_service.get (results[0].ServiceID);
@@ -180,7 +188,6 @@ db_service.post = function (params)
 		JobID: int,
 		Days:
 		[{
-			Day: int,
 			Date: Date,
 			Workers: int[],
 			ServiceDayID: int //undefined if new ServiceDay
@@ -188,11 +195,27 @@ db_service.post = function (params)
 	}
 */
 
-/*
 db_service.patch = function (params)
 {
+	console.log ("params: ", JSON.stringify (params));
+
+	//function to remove timestamp from dates
+	const date = (datetime) => (JSON.stringify(datetime).substr(1, 10));
+
+	params.Date = params.Days[0].Date;
+
+	Days = params.Days.map ((day) =>
+	{
+		day.Day = Math.round((new Date(day.Date) - new Date(params.Date))
+			/ (1000 * 60 * 60 * 24));
+
+		console.log ("\nday: ", day);
+
+		return day;
+	});
+
 	//update JobID and ServiceDate
-	new Promise ((resolve, reject) =>
+	let attributes = new Promise ((resolve, reject) =>
 	{
 		db.query
 		(
@@ -202,7 +225,7 @@ db_service.patch = function (params)
 					ServiceDate = ?
 				where ServiceID = ?`,
 
-			[params.JobID, params.Days[0].Date, params.ServiceID],
+			[params.JobID, date(params.Days[0].Date), params.ServiceID],
 
 			(error, results) =>
 			{
@@ -213,12 +236,13 @@ db_service.patch = function (params)
 	});
 
 	//update Days
-	new Promise ((resolve, reject) =>
+	let service_days = new Promise ((resolve, reject) =>
 	{
 		db.query
 		(
-			`select ServiceDayID, ServiceDay
-				from Services
+			`select
+					ServiceDayID, ServiceDay
+				from ServiceDays
 				where ServiceID = ?`,
 
 			params.ServiceID,
@@ -233,18 +257,55 @@ db_service.patch = function (params)
 
 	.then ((db_days) =>
 	{
-		//days that are not new or deleted
+		console.log (db_days);
+
+		//days that are not new or deleted will have a ServiceDayID
 		const edited_days = params.Days.filter (
 			(day) => (day.ServiceDayID !== undefined)
 		);
+		console.log ("edited_days: ", edited_days);
 
 		//the numbers of days that are not new or deleted
 		const edited_day_nums = edited_days.map ((edited_day) => (edited_day.Day));
+		console.log ("edited_day_nums: ", edited_day_nums);
 
-		//delete the days in the database that aren't in params
+		//days in the database that aren't in params should be deleted
 		const to_delete = db_days.filter (
-			(db_day) => (!edited_day_nums.includes (db_day.ServiceDay
+			(db_day) => (!edited_day_nums.includes (db_day.ServiceDay))
+		);
+		console.log ("to_delete: ", to_delete);
+
+		//delete days
+		return Promise.all
+		(
+			to_delete.map ((delete_day) =>
+			(
+				new Promise ((resolve, reject) =>
+				{
+					db.query
+					(
+						`delete
+							from ServiceDays
+							where ServiceDayID = ?`,
+
+						delete_day.ServiceDayID,
+
+						(error, results) =>
+						{
+							if (error) return reject (error);
+							return resolve (results);
+						}
+					);
+				})
+			))
+		);
+	});
+
+	//get the modified service
+	return Promise.all ([attributes, service_days]).then (() =>
+	{
+		return db_service.get (params.ServiceID);
+	});
 };
-*/
 
 module.exports = db_service;

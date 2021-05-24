@@ -14,8 +14,11 @@ create table Assignments
 
 	PRIMARY KEY (AssignmentID),
 
-	FOREIGN KEY (ServiceDayID) REFERENCES ServiceDays (ServiceDayID),
-	FOREIGN KEY (    WorkerID) REFERENCES  Workers    (    WorkerID)
+	FOREIGN KEY (ServiceDayID)
+		REFERENCES ServiceDays (ServiceDayID)
+		ON DELETE CASCADE,
+
+	FOREIGN KEY (WorkerID) REFERENCES Workers (WorkerID)
 );
 
 /*

@@ -37,8 +37,9 @@ service_router.route ("/:service_id")
 	*/
 	.patch ((request, response, next) =>
 	{
-		let handler = 
-			access_database (db_service.patch, request.params.service_id);
+		request.body.ServiceID = request.params.service_id;
+
+		let handler = access_database (db_service.patch, request.body);
 
 		handler (request, response, next);
 	})

@@ -18,7 +18,9 @@ create table Services
 
 	PRIMARY KEY (ServiceID),
 
-	FOREIGN KEY (JobID) REFERENCES Jobs (JobID)
+	FOREIGN KEY (JobID)
+		REFERENCES Jobs (JobID)
+		ON DELETE CASCADE
 );
 
 /*

@@ -121,10 +121,68 @@ export default class ServiceModal extends Component
 					duplicate_service_error: false
 				});
 			}
-		})
+		});
 	}
 
-	save = () =>
+	update = (close) =>
+	{
+		const service = this.state.service;
+
+		//alert (JSON.stringify (this.state));
+
+		let request_body = 
+		{
+			ServiceID: service.ServiceID,
+			JobID: service.JobID,
+			FinalPrice: service.FinalPrice,
+			Complete: service.Complete,
+			Days: service.Days.map
+			(
+				(day) =>
+				{
+					day.Workers = day.Workers.map ((worker) => (worker.WorkerID));
+
+					return day;
+				}
+			)
+		};
+
+		Uplink.send_data (
+			"service/" + this.state.service.ServiceID, "patch", request_body
+		)
+
+		.then ((response) =>
+		{
+			if (response.error)
+			{
+				//alert (JSON.stringify(response.error));
+			}
+
+			else
+			{
+				//alert ("Response: " + JSON.stringify(response.data));
+
+				this.setState
+				(
+					{
+						service: response.data,
+						mode: "Edit",
+						duplicate_service_error: false
+					},
+
+					() =>
+					{
+						if (close)
+						{
+							this.props.close_service(true)();
+						}
+					}
+				);
+			}
+		});
+	}
+
+	save = (close) =>
 	{
 		if (this.has_job_and_date())
 		{
@@ -135,9 +193,8 @@ export default class ServiceModal extends Component
 
 			else
 			{
-				
+				this.update(close);
 			}
-
 		}
 	}
 
@@ -517,7 +574,10 @@ export default class ServiceModal extends Component
 
 						<Button
 							label="Save"
-							action={this.props.close_service (true)}
+							action={() =>
+							{
+								this.save(true);
+							}}
 						/>
 
 					</div>

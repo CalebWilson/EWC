@@ -15,7 +15,9 @@ create table ServiceDays
 
 	PRIMARY KEY (ServiceDayID),
 
-	FOREIGN KEY (ServiceID) REFERENCES Services (ServiceID)
+	FOREIGN KEY (ServiceID)
+		REFERENCES Services (ServiceID)
+		ON DELETE CASCADE
 );
 
 /*
