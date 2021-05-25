@@ -50,7 +50,6 @@ export default class Dropdown extends Component
 	{
 		return (
 			<span>
-				{this.state.test}
 				<label style={{fontSize: this.size}}>{this.label}</label>
 				<span className="dropdown">
 					<select style={{fontSize: this.size}} >

@@ -1,5 +1,7 @@
 .clickable-container {
 	border-bottom: 10px solid white;
+	width: auto;
+	flex: 0 1 0;
 }
 
 .clickable {

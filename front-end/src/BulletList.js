@@ -96,7 +96,6 @@ export default class BulletList extends Component
 						))
 					}
 
-					<br/>
 					<BulletItem
 						content={
 							<span style={{paddingTop: "0.2rem"}}>

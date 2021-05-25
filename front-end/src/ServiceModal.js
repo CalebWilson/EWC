@@ -413,6 +413,7 @@ export default class ServiceModal extends Component
 				this.state.editing_day_workers === day_index &&
 				this.state.editing_worker      === worker_index
 				?
+					<div style={{height: "3rem", paddingTop: "0.25rem"}}>
 					<WorkerDropdown
 						label=""
 						default={worker.WorkerID}
@@ -420,7 +421,9 @@ export default class ServiceModal extends Component
 						select_option={
 							this.edit_worker (day_index, worker_index)
 						}
+						size="x-large"
 					/>
+					</div>
 				:
 					<span> <Clickable
 						action={() =>
@@ -446,12 +449,14 @@ export default class ServiceModal extends Component
 			{	//edit date
 				day_index === this.state.editing_day
 				?
-					<input
-						type="date"
-						style={{fontSize: "large"}}
-						value={ day.Date ? day.Date.toString().substr(0, 10) : null }
-						onChange={this.edit_date (day_index)}
-					/>
+					<div style={{height: "3rem", paddingBottom: "0.25rem"}}>
+						<input
+							type="date"
+							style={{fontSize: "x-large"}}
+							value={ day.Date ? day.Date.toString().substr(0, 10) : null }
+							onChange={this.edit_date (day_index)}
+						/>
+					</div>
 				:
 					<span> <Clickable
 
