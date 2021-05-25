@@ -156,8 +156,6 @@ db_service.post = function (params)
 
 db_service.patch = function (params)
 {
-	console.log ("params: ", JSON.stringify (params));
-
 	//function to remove timestamp from dates
 	const date = (datetime) => (JSON.stringify(datetime).substr(1, 10));
 
@@ -170,6 +168,8 @@ db_service.patch = function (params)
 
 		return day;
 	});
+
+	console.log ("params: ", JSON.stringify (params));
 
 	//update JobID and ServiceDate
 	let attributes = db_query

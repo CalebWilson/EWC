@@ -70,7 +70,6 @@ export default class ServiceModal extends Component
 	}
 
 
-/*
 	sort_days = () =>
 	{
 		this.setState ((state) =>
@@ -85,8 +84,6 @@ export default class ServiceModal extends Component
 			console.log ("  Sorted: " + JSON.stringify(state.service.Days));
 		});
 	}
-*/
-
 
 	create = () =>
 	{
@@ -307,27 +304,6 @@ export default class ServiceModal extends Component
 	{
 		return ((edit) =>
 		{
-			/*
-			if (
-					day_index !== 0 &&
-					edit.target.value < this.state.service.Days[0].Date
-			)
-			{
-				this.setState ((state) =>
-				{
-					state.out_of_order_error = true;
-
-					state.service.Days[day_index].Date =
-						edit.target.value + "T00:00:00.000"	//reset timestamp local
-					;
-
-					return state;
-				});
-			}
-			else
-			{
-			*/
-
 			//get the new date value
 			this.setState
 			(
