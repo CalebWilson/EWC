@@ -42,7 +42,15 @@ export default class ServiceModal extends Component
 				service: this.props.service,
 				editing_job: false,
 				mode: this.props.mode
-			};
+			}
+		;
+
+		this.setState ((state) =>
+		{
+			state.service.Days = this.sort_days (state.service.Days);
+
+			return state;
+		});
 	}
 
 	//add escape listener
@@ -70,19 +78,18 @@ export default class ServiceModal extends Component
 	}
 
 
-	sort_days = () =>
+	sort_days = (days) =>
 	{
-		this.setState ((state) =>
-		{
-			console.log ("Unsorted: " + JSON.stringify(state.service.Days));
+		days.sort
+		(
+			(day1, day2) =>
+			{
+				console.log (new Date (day1.Date) - new Date (day2.Date));
+				return (new Date (day1.Date) - new Date (day2.Date));
+			}
+		);
 
-			state.service.Days = state.service.Days.sort
-			(
-				(day1, day2) => (day2.Date - day1.Date)
-			);
-
-			console.log ("  Sorted: " + JSON.stringify(state.service.Days));
-		});
+		return days;
 	}
 
 	create = () =>
@@ -315,7 +322,9 @@ export default class ServiceModal extends Component
 
 					//stop editing
 					state.editing_day = false;
-					state.out_of_order_error = false;
+
+					//sort days
+					state.service.Days = this.sort_days (state.service.Days);
 
 					return state;
 				},
