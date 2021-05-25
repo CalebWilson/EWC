@@ -27,7 +27,7 @@ db_service.get = function (service_id)
 	.then ((service_array) =>
 	{
 		if (service_array.length === 0)
-			throw "No results.";
+			throw "There were no Services with the provided ID.";
 
 		return service_array[0];
 	})

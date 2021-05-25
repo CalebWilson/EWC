@@ -1,4 +1,5 @@
 const db_query = require ("./db_query");
+const promise_all_obj = require ("./promise_all_obj");
 
 let db_schedule = {};
 
@@ -64,11 +65,7 @@ db_schedule.get_week = function (params)
 		return results[0].week_letter;
 	});
 
-
-	return Promise.all ([week_letter, final_schedule]).then ((week_arr) =>
-	{
-		return { week_letter: week_arr[0], schedule: week_arr[1]};
-	});
+	return promise_all_obj ({week_letter: week_letter, schedule: final_schedule});
 };
 
 /*
@@ -201,10 +198,7 @@ db_schedule.get_day = function
 
 	});
 
-	return Promise.all ([group, indiv]).then ((work_arr) =>
-	{
-		return {"GroupWork": work_arr[0], "IndividualWork": work_arr[1]};
-	})
+	return promise_all_obj ({GroupWork: group, IndividualWork: indiv});
 };
 
 module.exports = db_schedule;
