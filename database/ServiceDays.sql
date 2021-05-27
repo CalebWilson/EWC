@@ -9,7 +9,7 @@ create table ServiceDays
 (
 	ServiceDayID  int NOT NULL AUTO_INCREMENT,
 	ServiceID     int NOT NULL,
-	ServiceDay    int NOT NULL, -- 0-indexed
+	ServiceDay    int, -- 0-indexed, only nullable to allow intermediate NULLs
 
 	UNIQUE (ServiceID, ServiceDay),
 
