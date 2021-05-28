@@ -22,8 +22,27 @@ end //
 
 delimiter ;
 
+
 /*
-	Returns the letter of the given week.
+	The number of work days between two work days. Same sign as weeks_between.
+*/
+
+drop function if exists work_days_between;
+
+delimiter //
+
+create function work_days_between (date1 date, date2 date) returns int deterministic
+begin
+
+	return datediff (date2, date1) - (2 * weeks_between (date1, date2));
+
+end //
+
+delimiter ;
+
+
+/*
+	The letter of the given week: A, B, C, or D.
 */
 
 drop function if exists week_letter; 

@@ -45,8 +45,8 @@ begin
 	);
 
 	insert into
-		ServiceDays (ServiceID,                                ServiceDay)
-		values      (service_id, datediff (service_day_date, service_date))
+		ServiceDays (ServiceID,                                          ServiceDay)
+		values      (service_id, work_days_between (service_date, service_day_date))
 	;
 
 end //
@@ -76,7 +76,7 @@ begin
 	);
 
 	update ServiceDays 
-		set ServiceDay = datediff (service_day_date, service_date)
+		set ServiceDay = work_days_between (service_date, service_day_date)
 		where ServiceDayID = service_day_id
 	;
 
