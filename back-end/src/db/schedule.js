@@ -1,4 +1,4 @@
-const db_query = require ("./db_query");
+const db = require ("./db");
 const promise_all_obj = require ("./promise_all_obj");
 
 let db_schedule = {};
@@ -58,7 +58,7 @@ db_schedule.get_week = function (params)
 
 	let final_schedule = Promise.all (schedule);
 
-	let week_letter = db_query (`select week_letter(?) as week_letter`, week)
+	let week_letter = db.query (`select week_letter(?) as week_letter`, week)
 
 	.then ((results) =>
 	{
@@ -82,7 +82,7 @@ db_schedule.get_day = function
 	let day_condition = `(Day % 5 = ` + day + `)`;
 
 	//get GroupWork
-	var group = db_query
+	var group = db.query
 	(
 		`select distinct
 			JobName,
@@ -111,7 +111,7 @@ db_schedule.get_day = function
 		{
 			//add the team that will work on that job to teams array
 			teams.push (
-				db_query
+				db.query
 				(
 					`select WorkerID, WorkerName, WorkerStatus
 						from GroupWork
@@ -140,7 +140,7 @@ db_schedule.get_day = function
 	});
 
 	//get IndividualWork
-	var indiv = db_query
+	var indiv = db.query
 	(
 		`select distinct
 			WorkerID,
@@ -163,7 +163,7 @@ db_schedule.get_day = function
 		{
 			//add the jobs that the worker does to the jobs array
 			job_sets.push (
-				db_query
+				db.query
 				(
 					`select
 						JobName,

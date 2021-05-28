@@ -1,8 +1,8 @@
-const db_query = require ("./db_query");
+const db = require ("./db");
 
 const get_workers = () =>
 {
-	return db_query (`select WorkerID, WorkerName, Status from WorkerStatuses`);
+	return db.query (`select WorkerID, WorkerName, Status from WorkerStatuses`);
 }
 
 module.exports = get_workers;

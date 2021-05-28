@@ -1,4 +1,4 @@
-const db_query    = require ("./db_query");
+const db = require ("./db");
 const db_schedule = require ("./schedule");
 
 const generate = (week) =>

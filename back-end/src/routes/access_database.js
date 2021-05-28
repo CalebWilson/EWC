@@ -14,6 +14,8 @@ function access_database (db_method, params)
 		{
 			let results = await db_method (params);
 			response.json(results);
+
+			console.log ("Sent response");
 		}
 
 		//error handling

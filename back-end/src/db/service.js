@@ -1,4 +1,4 @@
-const db_query = require("./db_query");
+const db = require("./db");
 
 let db_service = {};
 
@@ -7,8 +7,10 @@ let db_service = {};
 */
 db_service.get = function (service_id)
 {
+	console.log ("getting service_id: " + service_id);
+
 	//get information about the Service
-	return db_query
+	return db.query
 	(
 		`select
 			distinct
@@ -26,8 +28,13 @@ db_service.get = function (service_id)
 	//extract service from array
 	.then ((service_array) =>
 	{
+		console.log ("service array: ", service_array);
+
 		if (service_array.length === 0)
+		{
+			console.log ("no service results");
 			throw "There were no Services with the provided ID.";
+		}
 
 		return service_array[0];
 	})
@@ -35,8 +42,10 @@ db_service.get = function (service_id)
 	//make an array of the days of the scheduled job
 	.then ((service) =>
 	{
+		console.log ("service: ", service);
+
 		//get the days
-		return db_query
+		return db.query
 		(
 			`select
 				distinct
@@ -53,6 +62,8 @@ db_service.get = function (service_id)
 		//get the workers for each day
 		.then ((days) =>
 		{
+			console.log ("days: ", days);
+
 			//every element will be an array of JSONs like {Worker: "Worker Name"}
 			teams = [];
 
@@ -61,7 +72,7 @@ db_service.get = function (service_id)
 				//push an array of Worker JSONs onto teams
 				teams.push
 				(
-					db_query
+					db.query
 					(
 						`select WorkerID, WorkerName, WorkerStatus
 							from WeekWork
@@ -77,6 +88,8 @@ db_service.get = function (service_id)
 			//match each worker team with its day
 			return Promise.all (teams).then ((teams) =>
 			{
+				console.log ("teams: ", teams);
+
 				days.forEach ((day, index) =>
 				{
 					day.Workers = teams[index];
@@ -89,6 +102,8 @@ db_service.get = function (service_id)
 		//make the days a property of the scheduled job
 		.then ((days) =>
 		{
+			console.log ("final days", days);
+
 			service.Days = days;
 
 			return service;
@@ -109,7 +124,7 @@ db_service.get = function (service_id)
 db_service.post = function (params)
 {
 	//create new service in the database
-	return db_query
+	return db.query
 	(
 		`call CreateService (?, ?)`,
 
@@ -119,7 +134,7 @@ db_service.post = function (params)
 	//get the ID of the new service
 	.then ((results) =>
 	{
-		return db_query
+		return db.query
 		(
 			`select ServiceID
 				from Services
@@ -156,6 +171,8 @@ db_service.post = function (params)
 
 db_service.patch = function (params)
 {
+	params.ServiceID = parseInt (params.ServiceID);
+
 	//function to remove timestamp from dates
 	const date = (datetime) => (JSON.stringify(datetime).substr(1, 10));
 
@@ -172,7 +189,7 @@ db_service.patch = function (params)
 	console.log ("params: ", JSON.stringify (params, null, "\t"));
 
 	//update JobID and ServiceDate
-	let attributes = db_query
+	let attributes = db.query
 	(
 		`update Services
 			set
@@ -184,7 +201,7 @@ db_service.patch = function (params)
 	);
 
 	//get current Service Days from database
-	let service_days = db_query
+	let service_days = db.query
 	(
 		`select ServiceDayID, ServiceDay
 		from ServiceDays
@@ -201,6 +218,8 @@ db_service.patch = function (params)
 		(day) => (day.ServiceDayID !== undefined)
 	);
 
+	console.log ("edited_days: ", edited_days);
+
 	//the numbers of days that are not new or deleted
 	//const edited_day_nums = edited_days.map ((edited_day) => (edited_day.Day));
 	const edited_day_IDs = edited_days.map ((edited_day) => (edited_day.ServiceDayID));
@@ -208,8 +227,8 @@ db_service.patch = function (params)
 	//delete days from the database that aren't incoming
 	let delete_days = service_days.then ((db_days) =>
 	{
-/*
 		//days in the database that aren't in params should be deleted
+/*
 		const deleted_days = db_days.filter (
 			(db_day) => (!edited_day_nums.includes (db_day.ServiceDay))
 		);
@@ -230,7 +249,7 @@ db_service.patch = function (params)
 		(
 			deleted_days.map ((delete_day) =>
 			(
-				db_query
+				db.query
 				(
 					`delete
 					from ServiceDays
@@ -243,7 +262,7 @@ db_service.patch = function (params)
 
 	.then ((del_days) =>
 	{
-		db_query
+		db.query
 		(
 			`select ServiceDayID, ServiceDay
 					from ServiceDays
@@ -259,51 +278,43 @@ db_service.patch = function (params)
 	let edit_day_nums = delete_days.then (() =>
 	(
 		//protect against uniqueness conflicts
-		db_query (`start transaction`)
-
-		//set the service's days to null to avoid temporary unique conflicts
-		.then (() =>
+		db.transaction ((query) =>
 		(
-			db_query
+			//null the service's days to avoid temporary unique conflicts
+			query
 			(
 				`update ServiceDays
 				set ServiceDay = null
 				where ServiceID = ?`, params.ServiceID
 			)
-		))
 
-		//set all the service's days
-		.then (() =>
-		(
-			Promise.all
+			//set all the service's days
+			.then (() =>
 			(
-				edited_days.map ((edited_day) =>
+				Promise.all
 				(
-					db_query
+					edited_days.map ((edited_day) =>
 					(
-						`update ServiceDays
-						set ServiceDay = ?
-						where ServiceDayID = ?`,
+						query
+						(
+							`update ServiceDays
+							set ServiceDay = ?
+							where ServiceDayID = ?`,
 
-						[edited_day.Day, edited_day.ServiceDayID]
-					)
-				))
-			)
+							[edited_day.Day, edited_day.ServiceDayID]
+						)
+					))
+				)
+			))
 		))
+	))
 
-		//if no conflicts, commit
-		.then (() => (db_query (`commit`)))
+	.then ((results) =>
+	{
+		console.log ("finished edit_day_nums");
 
-		//if conflicts, rollback and throw error
-		.catch (() =>
-		{
-			db_query (`rollback`).then (() =>
-			{
-				throw "Duplicate Service Days";
-			});
-		})
-
-	));
+		return results;
+	});
 
 	//incoming days that are new will have no ServiceDayID
 	const added_days = params.Days.filter (
@@ -322,7 +333,7 @@ db_service.patch = function (params)
 			added_days.map ((new_day) =>
 			{
 				//add the service day
-				return db_query
+				return db.query
 				(
 					`insert into
 						ServiceDays (ServiceID, ServiceDay)
@@ -335,7 +346,7 @@ db_service.patch = function (params)
 				.then (() =>
 				{
 					//get the id of the new service day
-					return db_query
+					return db.query
 					(
 						`select ServiceDayID
 							from ServiceDays
@@ -355,11 +366,13 @@ db_service.patch = function (params)
 							//insert each worker
 							new_day.Workers.map ((worker_id) =>
 							{
-								return db_query
+								console.log ("adding worker " + worker_id);
+
+								return db.query
 								(
 									`insert into
 										Assignments (ServiceDayID, WorkerID)
-										values      (        ?,        ?)`,
+										values      (           ?,        ?)`,
 
 									[service_day_id, worker_id]
 								);
@@ -369,6 +382,13 @@ db_service.patch = function (params)
 				});
 			})
 		);
+	})
+
+	.then ((results) =>
+	{
+		console.log ("finished add_days");
+
+		return results;
 	});
 
 	//add and remove workers from each day
@@ -377,7 +397,7 @@ db_service.patch = function (params)
 		edited_days.map ((edited_day) =>
 		{
 			//get all the workers assigned to the day
-			let db_workers = db_query
+			let db_workers = db.query
 			(
 				`select WorkerID
 				from Assignments
@@ -397,7 +417,7 @@ db_service.patch = function (params)
 				(
 					deleted_workers.map ((deleted_worker) =>
 					(
-						db_query
+						db.query
 						(
 							`delete
 								from Assignments
@@ -428,7 +448,7 @@ db_service.patch = function (params)
 				(
 					added_workers.map ((added_worker) =>
 					(
-						db_query
+						db.query
 						(
 							`insert into
 								Assignments (ServiceDayID, WorkerID)
@@ -445,7 +465,15 @@ db_service.patch = function (params)
 
 		}) //end edited_days.map
 
-	); //end add_delete_day_workers
+	)
+
+	.then ((results) =>
+	{
+		console.log ("finished add_delete_day_workers");
+
+		return results;
+
+	}); //end add_delete_day_workers
 
 	return Promise.all
 	([
@@ -457,7 +485,12 @@ db_service.patch = function (params)
 	])
 
 	//get the modified service
-	.then (() => (db_service.get (params.ServiceID)));
+	.then (() => 
+	{
+		console.log ("reached get");
+		
+		return db_service.get (params.ServiceID);
+	});
 };
 
 module.exports = db_service;
