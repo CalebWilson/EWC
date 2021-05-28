@@ -221,7 +221,6 @@ db_service.patch = function (params)
 	console.log ("edited_days: ", edited_days);
 
 	//the numbers of days that are not new or deleted
-	//const edited_day_nums = edited_days.map ((edited_day) => (edited_day.Day));
 	const edited_day_IDs = edited_days.map ((edited_day) => (edited_day.ServiceDayID));
 
 	//delete days from the database that aren't incoming
