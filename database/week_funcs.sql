@@ -22,6 +22,27 @@ end //
 
 delimiter ;
 
+/*
+	Throw error if the given date is not a work day.
+*/
+drop function if exists assert_is_work_day;
+
+delimiter //
+
+create function assert_is_work_day (my_date date) returns int deterministic
+begin
+	
+	if (weekday (my_date) > 4)
+	then
+		signal sqlstate "45000";
+	end if;
+
+	return 1;
+		
+end //
+
+delimiter ;
+
 
 /*
 	The number of work days between two work days. Same sign as weeks_between.

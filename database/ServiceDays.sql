@@ -37,6 +37,8 @@ begin
 
 	declare service_date date;
 
+	select assert_is_work_day (service_day_date);
+
 	set service_date =
 	(
 		select ServiceDate
@@ -65,6 +67,8 @@ create procedure UpdateServiceDay
 begin
 
 	declare service_date date;
+
+	select assert_is_work_day (service_day_date);
 
 	set service_date =
 	(

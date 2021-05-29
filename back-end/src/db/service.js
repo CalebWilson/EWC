@@ -174,7 +174,7 @@ db_service.patch = function (params)
 	params.ServiceID = parseInt (params.ServiceID);
 
 	//function to remove timestamp from dates
-	const date = (datetime) => (JSON.stringify(datetime).substr(1, 10));
+	const sql_date = (datetime) => (datetime.toString().substr(0, 10))
 
 	//convert each day's date to a day number to match database
 	params.Date = params.Days[0].Date;
@@ -197,7 +197,7 @@ db_service.patch = function (params)
 				ServiceDate = ?
 			where ServiceID = ?`,
 
-		[params.JobID, date(params.Days[0].Date), params.ServiceID]
+		[params.JobID, sql_date(params.Days[0].Date), params.ServiceID]
 	);
 
 	//get current Service Days from database
@@ -227,11 +227,6 @@ db_service.patch = function (params)
 	let delete_days = service_days.then ((db_days) =>
 	{
 		//days in the database that aren't in params should be deleted
-/*
-		const deleted_days = db_days.filter (
-			(db_day) => (!edited_day_nums.includes (db_day.ServiceDay))
-		);
-*/
 
 		const deleted_days = db_days.filter (
 			(db_day) => (!edited_day_IDs.includes (db_day.ServiceDayID))
@@ -259,6 +254,7 @@ db_service.patch = function (params)
 
 	}) //end delete_days
 
+	//TODO remove after debug
 	.then ((del_days) =>
 	{
 		db.query
@@ -296,11 +292,18 @@ db_service.patch = function (params)
 					(
 						query
 						(
-							`update ServiceDays
-							set ServiceDay = ?
-							where ServiceDayID = ?`,
+							`call UpdateServiceDay (?, ?)`,
 
-							[edited_day.Day, edited_day.ServiceDayID]
+							[edited_day.ServiceDayID, sql_date (edited_day.Date)]
+
+							//TODO remove after debug
+							/*
+								`update ServiceDays
+								set ServiceDay = ?
+								where ServiceDayID = ?`,
+
+								[edited_day.Day, edited_day.ServiceDayID]
+							*/
 						)
 					))
 				)
@@ -334,11 +337,17 @@ db_service.patch = function (params)
 				//add the service day
 				return db.query
 				(
-					`insert into
-						ServiceDays (ServiceID, ServiceDay)
-						values      (        ?,          ?)`,
+					//TODO remove after debug
+					/*
+						`insert into
+							ServiceDays (ServiceID, ServiceDay)
+							values      (        ?,          ?)`,
 
-					[params.ServiceID, new_day.Day]
+						[params.ServiceID, new_day.Day]
+					*/
+
+					`call CreateServiceDay (?, ?)`,
+					[params.ServiceID, sql_date (new_day.Date)]
 				)
 
 				//add workers to the day
