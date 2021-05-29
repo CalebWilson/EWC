@@ -10,8 +10,9 @@ drop      view if exists GroupWork;
 drop      view if exists IndividualWork;
 drop      view if exists WeekWork;
 drop      view if exists WorkerStatuses;
-drop  function if exists assert_is_work_day;
 drop  function if exists week_letter;
+drop  function if exists plus_work_days;
+drop  function if exists assert_is_work_day;
 drop  function if exists work_days_between;
 drop  function if exists weeks_between;
 

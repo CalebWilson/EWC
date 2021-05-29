@@ -11,12 +11,12 @@ as
 		-- week relative to current week
 		weeks_between (
 			curdate(),
-			Services.ServiceDate + interval ServiceDays.ServiceDay day
+			plus_work_days (Services.ServiceDate, ServiceDays.ServiceDay)
 		)
 			as Week,
 
 		-- numeric day of the week that the work falls on
-		weekday (Services.ServiceDate + interval ServiceDays.ServiceDay day)
+		weekday (plus_work_days (Services.ServiceDate, ServiceDays.ServiceDay))
 			as Day,
 
 		-- whether the Job Day is the first
@@ -24,7 +24,7 @@ as
 			as FirstDay,
 
 		-- date that the work falls on
-		Services.ServiceDate + interval ServiceDays.ServiceDay day
+		plus_work_days (Services.ServiceDate, ServiceDays.ServiceDay)
 			as "Date",
 
 		-- Job and Worker info

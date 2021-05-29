@@ -52,10 +52,31 @@ drop function if exists work_days_between;
 
 delimiter //
 
-create function work_days_between (date1 date, date2 date) returns int deterministic
+create function work_days_between (date1 date, date2 date)
+		returns int deterministic
 begin
 
 	return datediff (date2, date1) - (2 * weeks_between (date1, date2));
+
+end //
+
+delimiter ;
+
+drop function if exists plus_work_days;
+
+delimiter //
+
+create function plus_work_days (first_date date, day_num int)
+		returns date deterministic
+begin
+
+	set day_num = day_num + weekday (first_date);
+
+	return first_date
+		- interval weekday (first_date) day
+		+ interval      (day_num div 5) week
+		+ interval      (day_num   % 5) day
+	;
 
 end //
 
