@@ -178,7 +178,7 @@ export default class ServiceModal extends Component
 					{
 						if (close)
 						{
-							this.props.close_service(true)();
+							this.props.close_service (true)();
 						}
 					}
 				);
@@ -197,7 +197,7 @@ export default class ServiceModal extends Component
 
 			else
 			{
-				this.update(close);
+				this.update (close);
 			}
 		}
 	}
@@ -332,7 +332,8 @@ export default class ServiceModal extends Component
 				//editing first date updates the rest
 				() =>
 				{
-					if (day_index === 0)
+					//if (day_index === 0)
+					if (this.mode === "Add")
 					{
 						this.save();
 					}
@@ -523,10 +524,13 @@ export default class ServiceModal extends Component
 								<div></div>
 						}
 
-						{	//days out of order error
-							this.state.out_of_order_error
+						{	//errors
+							this.state.service.errors
 							?
-								"Subsequent days cannot be scheduled for before the first day."
+								this.state.service.errors.map ((error) =>
+								(
+									<div style="error">{error}</div>
+								))
 							:
 								<div></div>
 						}

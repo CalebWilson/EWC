@@ -112,7 +112,7 @@ db_service.get = function (service_id)
 };
 
 /*
-	Create a new scheduled job.
+	Create a new service.
 
 	params will be a JSON of the form:
 	{
@@ -174,8 +174,17 @@ db_service.patch = function (params)
 	params.ServiceID = parseInt (params.ServiceID);
 
 	//function to remove timestamp from dates
-	const sql_date = (datetime) => (datetime.toString().substr(0, 10))
+	const sql_date = (datetime) => (datetime.toString().substr(0, 10));
 
+	//errors
+	let errors = [];
+	let error_types =
+	{
+		duplicate_service_day: "Duplicate days of the same service.",
+		duplicate_service_day_worker: "Duplicate worker on the same day of the same service."
+	};
+
+	//TODO: remove after debug
 	//convert each day's date to a day number to match database
 	params.Date = params.Days[0].Date;
 	Days = params.Days.map ((day) =>
@@ -227,7 +236,6 @@ db_service.patch = function (params)
 	let delete_days = service_days.then ((db_days) =>
 	{
 		//days in the database that aren't in params should be deleted
-
 		const deleted_days = db_days.filter (
 			(db_day) => (!edited_day_IDs.includes (db_day.ServiceDayID))
 		);
@@ -305,6 +313,13 @@ db_service.patch = function (params)
 								[edited_day.Day, edited_day.ServiceDayID]
 							*/
 						)
+
+						.catch ((error) =>
+						{
+							errors.push (error_types.duplicate_service_day);
+
+							return true;
+						})
 					))
 				)
 			))
@@ -316,7 +331,10 @@ db_service.patch = function (params)
 		console.log ("finished edit_day_nums");
 
 		return results;
-	});
+	})
+
+	
+	;
 
 	//incoming days that are new will have no ServiceDayID
 	const added_days = params.Days.filter (
@@ -362,6 +380,7 @@ db_service.patch = function (params)
 								ServiceID  = ? and 
 								ServiceDay = ?`,
 
+						//TODO: convert from Day to Date
 						[params.ServiceID, new_day.Day]
 					)
 
@@ -497,7 +516,10 @@ db_service.patch = function (params)
 	{
 		console.log ("reached get");
 		
-		return db_service.get (params.ServiceID);
+		let service = db_service.get (params.ServiceID);
+		service.errors = errors;
+
+		return service;
 	});
 };
 
