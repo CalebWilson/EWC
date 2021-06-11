@@ -198,7 +198,7 @@ db_service.patch = function (params)
 	console.log ("params: ", JSON.stringify (params, null, "\t"));
 
 	//update JobID and ServiceDate
-	let attributes = db.query
+	let attributes = old_date.then (() =>
 	(
 		`update Services
 			set
@@ -207,7 +207,7 @@ db_service.patch = function (params)
 			where ServiceID = ?`,
 
 		[params.JobID, sql_date(params.Days[0].Date), params.ServiceID]
-	);
+	));
 
 	//get current Service Days from database
 	let service_days = db.query
@@ -231,6 +231,14 @@ db_service.patch = function (params)
 
 	//the numbers of days that are not new or deleted
 	const edited_day_IDs = edited_days.map ((edited_day) => (edited_day.ServiceDayID));
+
+	//incoming days that are new will have no ServiceDayID
+	const added_days = params.Days.filter (
+		(day) => (day.ServiceDayID === undefined)
+	);
+
+	console.log ("\nadded_days: " + JSON.stringify (added_days, null, "\t"));
+	console.log();
 
 	//delete days from the database that aren't incoming
 	let delete_days = service_days.then ((db_days) =>
@@ -278,7 +286,7 @@ db_service.patch = function (params)
 	});
 
 	//edit days
-	let edit_day_nums = delete_days.then (() =>
+	let add_edit_days = delete_days.then (() =>
 	(
 		//protect against uniqueness conflicts
 		db.transaction ((query) =>
@@ -313,185 +321,190 @@ db_service.patch = function (params)
 								[edited_day.Day, edited_day.ServiceDayID]
 							*/
 						)
-
-						.catch ((error) =>
-						{
-							errors.push (error_types.duplicate_service_day);
-
-							return true;
-						})
 					))
 				)
 			))
-		))
-	))
 
-	.then ((results) =>
-	{
-		console.log ("finished edit_day_nums");
-
-		return results;
-	})
-
-	
-	;
-
-	//incoming days that are new will have no ServiceDayID
-	const added_days = params.Days.filter (
-		(day) => (day.ServiceDayID === undefined)
-	);
-
-	console.log ("\nadded_days: " + JSON.stringify (added_days, null, "\t"));
-	console.log();
-
-	//add days
-	let add_days = edit_day_nums.then (() =>
-	{
-		return Promise.all
-		(
-			//for each day
-			added_days.map ((new_day) =>
+			//TODO remove after debug
+			.then ((results) =>
 			{
-				//add the service day
-				return db.query
+				console.log ("finished edit_day_nums");
+				return results;
+			})
+
+			//add days
+			.then (() =>
+			(
+				Promise.all
 				(
-					//TODO remove after debug
-					/*
-						`insert into
-							ServiceDays (ServiceID, ServiceDay)
-							values      (        ?,          ?)`,
+					//for each day
+					added_days.map ((new_day) =>
+					(
+						//add the service day
+						query
+						(
+							//TODO remove after debug
+							/*
+								`insert into
+									ServiceDays (ServiceID, ServiceDay)
+									values      (        ?,          ?)`,
 
-						[params.ServiceID, new_day.Day]
-					*/
+								[params.ServiceID, new_day.Day]
+							*/
 
-					`call CreateServiceDay (?, ?)`,
-					[params.ServiceID, sql_date (new_day.Date)]
+							`call CreateServiceDay (?, ?)`,
+							[params.ServiceID, sql_date (new_day.Date)]
+						)
+					))
+				)
+			))
+		)
+
+		//if there was a duplicate day
+		.catch ((error) =>
+		{
+			console.log ("error caught");
+
+			//add to logged errors
+			errors.push (error_types.duplicate_service_day);
+
+			throw error;
+		})
+
+		.then ((results) =>
+		{
+			console.log ("finished add_days");
+
+			return results;
+		})
+
+	)); //end add_edit_days
+
+	//add workers to each new day
+	let added_day_workers = add_edit_days.then (() =>
+	(
+		added_days.map ((new_day) =>
+		(
+			//protect against duplicate Workers on the same Service Day
+			db.transaction ((query) =>
+			(
+				//get the id of the new service day
+				query
+				(
+					`select ServiceDayID
+						from ServiceDays
+						where
+							ServiceID  = ? and 
+							ServiceDay = ?`,
+
+					//TODO: convert from Day to Date
+					[params.ServiceID, new_day.Day]
 				)
 
-				//add workers to the day
-				.then (() =>
+				//add Workers to new days
+				.then ((service_day_id) =>
 				{
-					//get the id of the new service day
-					return db.query
+					service_day_id = service_day_id[0].ServiceDayID;
+
+					return Promise.all
 					(
-						`select ServiceDayID
-							from ServiceDays
-							where
-								ServiceID  = ? and 
-								ServiceDay = ?`,
+						//insert each worker
+						new_day.Workers.map ((worker_id) =>
+						{
+							console.log ("adding worker " + worker_id);
 
-						//TODO: convert from Day to Date
-						[params.ServiceID, new_day.Day]
-					)
+							return query
+							(
+								`insert into
+									Assignments (ServiceDayID, WorkerID)
+									values      (           ?,        ?)`,
 
-					.then ((service_day_id) =>
-					{
-						service_day_id = service_day_id[0].ServiceDayID;
+								[service_day_id, worker_id]
+							);
+						})
+					);
+				})
+			))
+		))
 
-						return Promise.all
-						(
-							//insert each worker
-							new_day.Workers.map ((worker_id) =>
-							{
-								console.log ("adding worker " + worker_id);
+	)); //end added_day_workers
 
-								return db.query
-								(
-									`insert into
-										Assignments (ServiceDayID, WorkerID)
-										values      (           ?,        ?)`,
-
-									[service_day_id, worker_id]
-								);
-							})
-						);
-					});
-				});
-			})
-		);
-	})
-
-	.then ((results) =>
-	{
-		console.log ("finished add_days");
-
-		return results;
-	});
-
-	//add and remove workers from each day
-	let add_delete_day_workers = Promise.all
+	//add and remove workers for each edited day
+	let edited_day_workers = add_edit_days.then (() =>
 	(
-		edited_days.map ((edited_day) =>
-		{
-			//get all the workers assigned to the day
-			let db_workers = db.query
-			(
-				`select WorkerID
-				from Assignments
-				where ServiceDayID = ?`, edited_day.ServiceDayID
-			)
-			.then ((workers) => (workers.map ((worker) => (worker.WorkerID))));
-
-			//delete workers
-			let delete_workers = db_workers.then ((old_workers) =>
+		Promise.all
+		(
+			edited_days.map ((edited_day) =>
 			{
-				//deleted workers are in the database but not the edited day
-				let deleted_workers = old_workers.filter (
-					(db_worker) => (!edited_day.Workers.includes (db_worker))
-				);
-
-				return Promise.all
+				//get all the workers assigned to the day
+				let db_workers = db.query
 				(
-					deleted_workers.map ((deleted_worker) =>
+					`select WorkerID
+					from Assignments
+					where ServiceDayID = ?`, edited_day.ServiceDayID
+				)
+				.then ((workers) => (workers.map ((worker) => (worker.WorkerID))));
+
+				//delete workers
+				let delete_workers = db_workers.then ((old_workers) =>
+				{
+					//deleted workers are in the database but not the edited day
+					let deleted_workers = old_workers.filter (
+						(db_worker) => (!edited_day.Workers.includes (db_worker))
+					);
+
+					return Promise.all
 					(
-						db.query
+						deleted_workers.map ((deleted_worker) =>
 						(
-							`delete
-								from Assignments
-								where
-									ServiceDayID = ? and
-									WorkerID = ?`,
+							db.query
+							(
+								`delete
+									from Assignments
+									where
+										ServiceDayID = ? and
+										WorkerID = ?`,
 
-							[edited_day.ServiceDayID, deleted_worker]
-						)
-					))
-				);
+								[edited_day.ServiceDayID, deleted_worker]
+							)
+						))
+					);
 
-			}); //end delete_workers
+				}); //end delete_workers
 
-			//add workers
-			let add_workers = db_workers.then ((old_workers) =>
-			{
-				//added workers are in the edited day but not the database
-				let added_workers = edited_day.Workers.filter
-				(
-					(edited_day_worker) =>
+				//add workers
+				let add_workers = db_workers.then ((old_workers) =>
+				{
+					//added workers are in the edited day but not the database
+					let added_workers = edited_day.Workers.filter
 					(
-						!old_workers.includes (edited_day_worker)
-					)
-				);
-
-				return Promise.all
-				(
-					added_workers.map ((added_worker) =>
-					(
-						db.query
+						(edited_day_worker) =>
 						(
-							`insert into
-								Assignments (ServiceDayID, WorkerID)
-								values      (           ?,        ?)`,
-
-							[edited_day.ServiceDayID, added_worker]
+							!old_workers.includes (edited_day_worker)
 						)
-					))
-				);
+					);
 
-			}); //end add_workers
+					return Promise.all
+					(
+						added_workers.map ((added_worker) =>
+						(
+							db.query
+							(
+								`insert into
+									Assignments (ServiceDayID, WorkerID)
+									values      (           ?,        ?)`,
 
-			return Promise.all ([add_workers, delete_workers]);
+								[edited_day.ServiceDayID, added_worker]
+							)
+						))
+					);
 
-		}) //end edited_days.map
+				}); //end add_workers
 
+				return Promise.all ([add_workers, delete_workers]);
+
+			}) //end edited_days.map
+		)
 	)
 
 	.then ((results) =>
