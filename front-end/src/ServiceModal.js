@@ -176,7 +176,7 @@ export default class ServiceModal extends Component
 
 					() =>
 					{
-						if (close)
+						if (close && response.data.errors.length === 0)
 						{
 							this.props.close_service (true)();
 						}
