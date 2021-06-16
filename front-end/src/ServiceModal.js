@@ -63,8 +63,16 @@ export default class ServiceModal extends Component
 			//if the user presses escape, hide service info
 			(key_down) =>
 			{
-				if (key_down.key === "Escape")
-					this.props.close_service()();
+				switch (key_down.key)
+				{
+					case "Escape":
+						this.props.close_service()();
+						break;
+
+					case " ":
+						this.save (true);
+						break;
+				}
 			},
 
 			false
@@ -132,8 +140,6 @@ export default class ServiceModal extends Component
 	{
 		const service = this.state.service;
 
-		//alert (JSON.stringify (this.state));
-
 		let request_body = 
 		{
 			ServiceID: service.ServiceID,
@@ -143,11 +149,12 @@ export default class ServiceModal extends Component
 			Days: service.Days.map
 			(
 				(day) =>
-				{
-					day.Workers = day.Workers.map ((worker) => (worker.WorkerID));
-
-					return day;
-				}
+				(
+					{
+						...day,
+						Workers: day.Workers.map ((worker) => (worker.WorkerID))
+					}
+				)
 			)
 		};
 
@@ -164,25 +171,32 @@ export default class ServiceModal extends Component
 
 			else
 			{
-				//alert ("Response: " + JSON.stringify(response.data));
+				//alert ("Response: " + JSON.stringify (Object.keys (response.data)));
 
-				this.setState
-				(
-					{
-						service: response.data,
-						mode: "Edit",
-						duplicate_service_error: false
-					},
-
-					() =>
-					{
-						if (close && response.data.errors.length === 0)
+				//display errors, if any
+				if (response.data.errors.length > 0)
+				{
+					this.setState
+					(
 						{
-							this.props.close_service (true)();
-						}
-					}
-				);
+							errors: response.data.errors,
+							Workers: service.Workers
+						},
+					
+						() => { /* alert (JSON.stringify (this.state)); */}
+					);
+					
+				}
+
+				//if no errors, close
+				else
+				{
+					this.props.close_service (true)();
+				}
+
+
 			}
+
 		});
 	}
 
@@ -524,21 +538,28 @@ export default class ServiceModal extends Component
 								<div></div>
 						}
 
-						{	//errors
-							this.state.service.errors
-							?
-								this.state.service.errors.map ((error) =>
-								(
-									<div style="error">{error}</div>
-								))
-							:
-								<div></div>
-						}
-
 						{/* job name or dropdown */}
 						{this.render_job()}
 
 						<br/>
+
+						{	//errors
+							this.state.errors
+							?
+								<div>
+									{
+										this.state.errors.map ((error) =>
+										(
+											<div className="error">{"Error: " + error}</div>
+										))
+									}
+									<br/>
+
+								</div>
+
+							:
+								<div></div>
+						}
 
 						{/* days and workers */}
 
@@ -558,7 +579,7 @@ export default class ServiceModal extends Component
 
 					</div>
 
-					{/* save or cancel */}
+					{/* save and cancel */}
 					<div className="service-modal-bottom">
 
 						<Button

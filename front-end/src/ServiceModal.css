@@ -45,6 +45,11 @@
 	flex: 1 1 0;
 }
 
+.error {
+	font-weight: bold;
+	color: red;
+}
+
 .close {
 	align-self: start;
 }

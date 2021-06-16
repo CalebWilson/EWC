@@ -198,7 +198,7 @@ db_service.patch = function (params)
 	console.log ("params: ", JSON.stringify (params, null, "\t"));
 
 	//update JobID and ServiceDate
-	let attributes = old_date.then (() =>
+	let attributes = db.query
 	(
 		`update Services
 			set
@@ -207,7 +207,7 @@ db_service.patch = function (params)
 			where ServiceID = ?`,
 
 		[params.JobID, sql_date(params.Days[0].Date), params.ServiceID]
-	));
+	);
 
 	//incoming days that are not new will have a ServiceDayID
 	const edited_days = params.Days.filter (
@@ -523,7 +523,19 @@ db_service.patch = function (params)
 			return results;
 		})
 
-	)); //end service days
+	))
+
+	.catch ((error) =>
+	{
+		console.log (error, `
+
+		HANDLED
+
+		`);
+
+		return true;
+
+	}); //end service days
 
 	return Promise.all
 	([
@@ -536,10 +548,14 @@ db_service.patch = function (params)
 	{
 		console.log ("reached get");
 		
-		let service = db_service.get (params.ServiceID);
-		service.errors = errors;
+		return db_service.get (params.ServiceID)
 
-		return service;
+		.then ((service) =>
+		{
+			service.errors = errors;
+
+			return service;
+		});
 	});
 };
 
