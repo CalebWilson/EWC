@@ -102,7 +102,7 @@ db_service.get = function (service_id)
 		//make the days a property of the scheduled job
 		.then ((days) =>
 		{
-			console.log ("final days", days);
+			console.log ("final days", JSON.stringify(days));
 
 			service.Days = days;
 
@@ -476,10 +476,14 @@ db_service.patch = function (params)
 							//added workers are in the edited day but not the database
 							let added_workers = edited_day.Workers.filter
 							(
-								(edited_day_worker) =>
-								(
-									!old_workers.includes (edited_day_worker)
-								)
+								(edited_day_worker, index) =>
+								{
+									//if duplicate workers, throw error
+									if (edited_day.Workers.indexOf (edited_day_worker) !== index)
+										throw "duplicate workers";
+
+									return !old_workers.includes (edited_day_worker);
+								}
 							);
 
 							return Promise.all

@@ -114,10 +114,15 @@ export default class ServiceModal extends Component
 		{
 			if (response.error)
 			{
+				alert (response.error);
+			}
+
+			else if (response.data.errors.length > 0)
+			{
 				this.setState ((state) =>
 				{
+					state.errors = response.data.errors;
 					state.service.Days[0].Date = null;
-					state.duplicate_service_error = true;
 					state.editing_day = 0;
 
 					return state;
@@ -130,7 +135,7 @@ export default class ServiceModal extends Component
 				({
 					service: response.data,
 					mode: "Edit",
-					duplicate_service_error: false
+					errors: []
 				});
 			}
 		});
@@ -166,24 +171,18 @@ export default class ServiceModal extends Component
 		{
 			if (response.error)
 			{
-				//alert (JSON.stringify(response.error));
+				alert (JSON.stringify(response.error));
 			}
 
 			else
 			{
-				//alert ("Response: " + JSON.stringify (Object.keys (response.data)));
+				alert ("Response: " + JSON.stringify (response.data));
 
 				//display errors, if any
 				if (response.data.errors.length > 0)
 				{
-					this.setState
-					(
-						{
-							errors: response.data.errors,
-							Workers: service.Workers
-						},
-					
-						() => { /* alert (JSON.stringify (this.state)); */}
+					this.setState ({ errors: response.data.errors } 
+						//, () => {  alert (JSON.stringify (this.state)); }
 					);
 					
 				}
@@ -525,6 +524,21 @@ export default class ServiceModal extends Component
 						/>
 					</div>
 
+					{	//errors
+						this.state.errors
+						?
+							<div>
+							{
+								this.state.errors.map ((error) =>
+								(
+									<div className="error">{"Error: " + error}</div>
+								))
+							}
+							</div>
+
+						:
+							<div></div>
+					}
 
 					{/* main scrollable content */}
 					<div className="service-modal-inner">
@@ -542,24 +556,6 @@ export default class ServiceModal extends Component
 						{this.render_job()}
 
 						<br/>
-
-						{	//errors
-							this.state.errors
-							?
-								<div>
-									{
-										this.state.errors.map ((error) =>
-										(
-											<div className="error">{"Error: " + error}</div>
-										))
-									}
-									<br/>
-
-								</div>
-
-							:
-								<div></div>
-						}
 
 						{/* days and workers */}
 
