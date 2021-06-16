@@ -179,20 +179,24 @@ begin
 		;
 	
 	else
-		create temporary table newServices
-		(
-			JobID        int not null,
-			ServiceDate date not null
-		);
+		start transaction;
 
-		insert into
-			newServices (   JobID,    ServiceDate)
-			values      (newJobID, newServiceDate)
-		;
+			create temporary table newServices
+			(
+				JobID        int not null,
+				ServiceDate date not null
+			);
 
-		call RenewServiceData();
+			insert into
+				newServices (   JobID,    ServiceDate)
+				values      (newJobID, newServiceDate)
+			;
 
-		drop table newServices;
+			call RenewServiceData();
+
+			drop table newServices;
+
+		commit;
 	
 	end if;
 

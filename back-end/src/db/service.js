@@ -148,8 +148,13 @@ db_service.post = function (params)
 
 	//get the new service
 	.then ((results) =>
+	(
+		db_service.get (results[0].ServiceID)
+	))
+
+	.catch ((error) =>
 	{
-		return db_service.get (results[0].ServiceID);
+		return { errors: ["Duplicate service for the same Job"] };
 	});
 };
 
@@ -556,7 +561,8 @@ db_service.patch = function (params)
 
 		.then ((service) =>
 		{
-			service.errors = errors;
+			if (errors.length > 0)
+				service.errors = errors;
 
 			return service;
 		});

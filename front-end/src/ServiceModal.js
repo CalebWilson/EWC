@@ -112,12 +112,13 @@ export default class ServiceModal extends Component
 
 		.then ((response) =>
 		{
+			alert ("RESPONSE" + JSON.stringify(response));
 			if (response.error)
 			{
 				alert (response.error);
 			}
 
-			else if (response.data.errors.length > 0)
+			else if (response.data.errors && response.data.errors.length > 0)
 			{
 				this.setState ((state) =>
 				{
@@ -179,7 +180,7 @@ export default class ServiceModal extends Component
 				alert ("Response: " + JSON.stringify (response.data));
 
 				//display errors, if any
-				if (response.data.errors.length > 0)
+				if (response.data.errors && response.data.errors.length > 0)
 				{
 					this.setState ({ errors: response.data.errors } 
 						//, () => {  alert (JSON.stringify (this.state)); }
@@ -346,7 +347,7 @@ export default class ServiceModal extends Component
 				() =>
 				{
 					//if (day_index === 0)
-					if (this.mode === "Add")
+					if (this.state.mode === "Add")
 					{
 						this.save();
 					}
