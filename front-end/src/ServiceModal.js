@@ -325,34 +325,37 @@ export default class ServiceModal extends Component
 	{
 		return ((edit) =>
 		{
-			//get the new date value
-			this.setState
-			(
-				(state) =>
-				{
-					state.service.Days[day_index].Date =
-						edit.target.value + "T00:00:00.000"	//reset timestamp to local
-					;
-
-					//stop editing
-					state.editing_day = false;
-
-					//sort days
-					state.service.Days = this.sort_days (state.service.Days);
-
-					return state;
-				},
-
-				//editing first date updates the rest
-				() =>
-				{
-					//if (day_index === 0)
-					if (this.state.mode === "Add")
+			if (edit.target.value)
+			{
+				//get the new date value
+				this.setState
+				(
+					(state) =>
 					{
-						this.save();
+						state.service.Days[day_index].Date =
+							edit.target.value + "T00:00:00.000"	//reset timestamp to local
+						;
+
+						//stop editing
+						state.editing_day = false;
+
+						//sort days
+						state.service.Days = this.sort_days (state.service.Days);
+
+						return state;
+					},
+
+					//editing first date updates the rest
+					() =>
+					{
+						//if (day_index === 0)
+						if (this.state.mode === "Add")
+						{
+							this.save();
+						}
 					}
-				}
-			);
+				);
+			}
 		});
 	}
 
