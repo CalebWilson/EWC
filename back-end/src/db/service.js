@@ -359,6 +359,15 @@ db_service.patch = function (params)
 							`call CreateServiceDay (?, ?)`,
 							[params.ServiceID, sql_date (new_day.Date)]
 						)
+
+						.then (() => (query (`select last_insert_id() as ID`)))
+
+						.then ((id) =>
+						{
+							new_day.ServiceDayID = id[0].ID;
+
+							return id;
+						})
 					))
 				)
 			))
@@ -380,6 +389,19 @@ db_service.patch = function (params)
 			return results;
 		})
 
+		.then (() =>
+		(
+			query (
+				`select * from ServiceDays where ServiceID = ?`,
+				params.ServiceID
+			)
+
+			.then ((results) =>
+			{
+				console.log (JSON.stringify (results, null, "\t") + "\n");
+			})
+		))
+
 		//workers
 		.then (() =>
 		(
@@ -387,44 +409,48 @@ db_service.patch = function (params)
 			Promise.all
 			(
 				added_days.map ((new_day) =>
-				(
+				{
+/* TODO: remove after debug
 					//get the id of the new service day
 					query
 					(
 						`select ServiceDayID
-							from ServiceDays
+							from Services, ServiceDays
 							where
-								ServiceID  = ? and 
-								ServiceDay = ?`,
+								ServiceDays.ServiceID = Services.ServiceID and
+								ServiceDays.ServiceID = ?                  and 
+								plus_work_days (ServiceDate, ServiceDay) = ?`,
 
 						//TODO: convert from Day to Date
-						[params.ServiceID, new_day.Day]
+						[params.ServiceID, new_day.Date]
 					)
-
 					//add Workers to new days
 					.then ((service_day_id) =>
 					{
-						service_day_id = service_day_id[0].ServiceDayID;
+*/
 
-						return Promise.all
-						(
-							//insert each worker
-							new_day.Workers.map ((worker_id) =>
-							{
-								console.log ("adding worker " + worker_id);
+					console.log ("Service Day ID: ", new_day.ServiceDayID);
 
-								return query
-								(
-									`insert into
-										Assignments (ServiceDayID, WorkerID)
-										values      (           ?,        ?)`,
+					return Promise.all
+					(
+						//insert each worker
+						new_day.Workers.map ((worker_id) =>
+						{
+							console.log ("adding worker " + worker_id);
 
-									[service_day_id, worker_id]
-								);
-							})
-						);
-					})
-				))
+							return query
+							(
+								`insert into
+									Assignments (ServiceDayID, WorkerID)
+									values      (           ?,        ?)`,
+
+								[new_day.ServiceDayID, worker_id]
+							);
+						})
+					);
+				})
+
+			//))
 
 			) //end new day workers
 
