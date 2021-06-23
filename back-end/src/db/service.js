@@ -44,7 +44,6 @@ db_service.get = function (service_id)
 			`select
 				distinct
 					Date,
-					FirstDay,
 					ServiceDayID
 				from WeekWork
 				where ServiceID = ?

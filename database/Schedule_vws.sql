@@ -19,10 +19,6 @@ as
 		weekday (plus_work_days (Services.ServiceDate, ServiceDays.ServiceDay))
 			as Day,
 
-		-- whether the Job Day is the first
-		ServiceDays.ServiceDay = 0
-			as FirstDay,
-
 		-- date that the work falls on
 		plus_work_days (Services.ServiceDate, ServiceDays.ServiceDay)
 			as "Date",

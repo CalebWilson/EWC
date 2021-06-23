@@ -91,8 +91,7 @@ db_schedule.get_day = function
 			FinalPrice,
 			Complete,
 			ServiceID,
-			ServiceDayID,
-			FirstDay
+			ServiceDayID
 		from GroupWork
 		where `
 			+  day_condition + ` and `
@@ -171,8 +170,7 @@ db_schedule.get_day = function
 						ServiceType,
 						FinalPrice,
 						Complete,
-						ServiceDayID,
-						FirstDay
+						ServiceDayID
 						from IndividualWork
 						where
 							WorkerID = ?         and `
