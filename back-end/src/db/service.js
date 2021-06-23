@@ -3,7 +3,7 @@ const db = require("./db");
 let db_service = {};
 
 /*
-	Get information about a service.
+	Get service details
 */
 db_service.get = function (service_id)
 {
@@ -124,38 +124,114 @@ db_service.get = function (service_id)
 db_service.post = function (params)
 {
 	//create new service in the database
-	return db.query
+	return db.transaction ((query) =>
 	(
-		`call CreateService (?, ?)`,
-
-		[params.JobID, params.ServiceDate]
-	)
-
-	//get the ID of the new service
-	.then ((results) =>
-	{
-		return db.query
+		/*
+		query
 		(
-			`select ServiceID
-				from Services
-				where
-					JobID = ? and
-					ServiceDate = ?`,
+			`delete from Services
+			where
+				JobID       = ? and
+				ServiceDate = ?`,
 
 			[params.JobID, params.ServiceDate]
-		);
-	})
+		)
 
-	//get the new service
-	.then ((results) =>
-	(
-		db_service.get (results[0].ServiceID)
-	))
+		.catch ((error) => {})
 
-	.catch ((error) =>
-	{
-		return { errors: ["Duplicate service for the same Job"] };
-	});
+		.then (() =>
+		(
+		*/
+			query
+			(
+				`call CreateService (?, ?)`,
+
+				[params.JobID, params.ServiceDate]
+			)
+		//))
+		.catch ((error) =>
+		{
+			console.log (error);
+
+			throw error;
+		})
+
+		.then (() =>
+		(
+
+			//TODO: this only works with new services, but deletes sometimes don't work so idfk
+			query (`select last_insert_id() as id`)
+
+			.then ((results) =>
+			{
+				console.log ("ID: " + results[0].id);
+			})
+		))
+
+		//get the ID of the new service
+		.then (() =>
+		(
+			query
+			(
+				`select ServiceID
+				from ServiceDays
+				where ServiceDayID = last_insert_id()`
+			)
+		))
+
+		//get the new service
+		.then ((id_result) =>
+		{
+			console.log (id_result[0]);
+			const service_id = id_result[0].ServiceID;
+
+			return db_service.get (service_id)
+
+			//if get fails, it means this is a new service
+			.catch ((error) =>
+			(
+				query
+				(
+					`select
+						Jobs.JobName,
+						Services.FinalPrice,
+						Services.Complete,
+						ServiceDays.ServiceDayID
+					from Jobs, Services, ServiceDays
+					where
+						ServiceDays.ServiceID = Services.ServiceID and
+						Services.JobID        = Jobs.JobID         and
+						Services.JobID = ?`, params.JobID
+				)
+
+				.then ((results) =>
+				{
+					results = results[0];
+
+					return (
+					{
+						ServiceID: service_id,
+						JobName: results.JobName,
+						JobID: params.JobID,
+						FinalPrice: results.FinalPrice,
+						Complete: results.Complete,
+						Days: [
+							{
+								Date: params.ServiceDate,
+								ServiceDayID: results.ServiceDayID,
+								Workers: []
+							}
+						]
+					});
+				})
+			))
+		})
+
+		.catch ((error) =>
+		{
+			return { errors: ["Duplicate service for the same Job."] };
+		})
+	));
 };
 
 /*
@@ -612,6 +688,15 @@ db_service.patch = function (params)
 			return service;
 		});
 	});
+
+}; //end patch
+
+/*
+	Delete a service
+*/
+db_service.delete = function (service_id)
+{
+	return db.query (`delete from Services where ServiceID = ?`, service_id)
 };
 
 module.exports = db_service;

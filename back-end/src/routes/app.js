@@ -14,7 +14,7 @@ router.get ("/", (request, response) =>
 const schedule_router = require ("./schedule");
 router.use ("/schedule", schedule_router);
 
-//scheduled job
+//service
 const service_router = require ("./service");
 router.use ("/service", service_router);
 

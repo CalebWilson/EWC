@@ -60,17 +60,22 @@ export default class ServiceModal extends Component
 		(
 			"keydown",
 
-			//if the user presses escape, hide service info
 			(key_down) =>
 			{
 				switch (key_down.key)
 				{
+					//if the user presses escape, hide service info
 					case "Escape":
-						this.props.close_service()();
+						this.props.close_service();
 						break;
 
+					//if the user presses space, submit data
 					case " ":
 						this.save (true);
+						break;
+
+					//get rid of compiler warning
+					default:
 						break;
 				}
 			},
@@ -112,10 +117,9 @@ export default class ServiceModal extends Component
 
 		.then ((response) =>
 		{
-			alert ("RESPONSE" + JSON.stringify(response));
 			if (response.error)
 			{
-				alert (response.error);
+				alert (JSON.stringify(response.error));
 			}
 
 			else if (response.data.errors && response.data.errors.length > 0)
@@ -141,6 +145,29 @@ export default class ServiceModal extends Component
 			}
 		});
 	}
+
+	confirm_close = (response) =>
+	{
+		if (response.error)
+		{
+			alert (JSON.stringify(response.error));
+		}
+
+		else
+		{
+			//display errors, if any
+			if (response.data.errors && response.data.errors.length > 0)
+			{
+				this.setState ({ errors: response.data.errors });
+			}
+
+			//if no errors, close
+			else
+			{
+				this.props.close_service ();
+			}
+		}
+	};
 
 	update = (close) =>
 	{
@@ -168,37 +195,15 @@ export default class ServiceModal extends Component
 			"service/" + this.state.service.ServiceID, "patch", request_body
 		)
 
-		.then ((response) =>
-		{
-			if (response.error)
-			{
-				alert (JSON.stringify(response.error));
-			}
-
-			else
-			{
-				alert ("Response: " + JSON.stringify (response.data));
-
-				//display errors, if any
-				if (response.data.errors && response.data.errors.length > 0)
-				{
-					this.setState ({ errors: response.data.errors } 
-						//, () => {  alert (JSON.stringify (this.state)); }
-					);
-					
-				}
-
-				//if no errors, close
-				else
-				{
-					this.props.close_service (true)();
-				}
-
-
-			}
-
-		});
+		.then (this.confirm_close);
 	}
+
+	remove = () =>
+	{
+		Uplink.send_data ("service/" + this.state.service.ServiceID, "delete")
+
+		.then (this.confirm_close);
+	};
 
 	save = (close) =>
 	{
@@ -523,7 +528,7 @@ export default class ServiceModal extends Component
 						<div>{this.state.mode} Service</div>
 						<Button
 							label="X"
-							action={this.props.close_service()}
+							action={this.props.close_service}
 							className="close"
 						/>
 					</div>
@@ -584,7 +589,7 @@ export default class ServiceModal extends Component
 
 						<Button
 							label="Cancel Service"
-							action={this.props.close_service()}
+							action={this.remove}
 						/>
 
 						<Button

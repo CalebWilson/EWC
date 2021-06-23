@@ -12,9 +12,17 @@ const access_database = require ("./access_database");
 //service methods
 const db_service = require("../db/service");
 
+//create
+service_router.post ("/", (request, response, next) =>
+{
+	let handler = access_database (db_service.post, request.body);
+
+	handler (request, response, next);
+});
+
 service_router.route ("/:service_id")
 
-	//get
+	//read
 	.get ((request, response, next) =>
 	{
 		let handler =
@@ -23,18 +31,7 @@ service_router.route ("/:service_id")
 		handler (request, response, next);
 	})
 
-	/*
-		request.body will be a JSON of the form:
-		{
-			JobID: int,
-			ScheduleDate: date,
-			DayAssignments:
-			[{
-					Day: int,
-					WorkersIDs: int[]
-			}]
-		}
-	*/
+	//update
 	.patch ((request, response, next) =>
 	{
 		request.body.ServiceID = request.params.service_id;
@@ -43,13 +40,15 @@ service_router.route ("/:service_id")
 
 		handler (request, response, next);
 	})
+
+	//delete
+	.delete ((request, response, next) =>
+	{
+		let handler =
+			access_database (db_service.delete, request.params.service_id);
+
+		handler (request, response, next);
+	})
 ;
-
-service_router.post ("/", (request, response, next) =>
-{
-	let handler = access_database (db_service.post, request.body);
-
-	handler (request, response, next);
-});
 
 module.exports = service_router;

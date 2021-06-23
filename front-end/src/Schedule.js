@@ -93,15 +93,11 @@ export default class Schedule extends Component
 	}
 
 	//hide job details; to be passed as a prop to the ServiceModal component
-	close_service = (refresh) =>
+	close_service = () =>
 	{
-		return (() =>
-		{
-			this.setState ({ mode: null});
+		this.setState ({ mode: null});
 
-			if (refresh)
-				this.get_schedule();
-		});
+		this.get_schedule();
 	}
 
 	//get worker-specific schedule from the back-end
@@ -139,7 +135,7 @@ export default class Schedule extends Component
 			(key_down) =>
 			{
 				if (key_down.key === "Escape")
-					this.close_service()();
+					this.close_service();
 			},
 
 			false
@@ -160,7 +156,7 @@ export default class Schedule extends Component
 				{/* main schedule page */}
 				<div
 					className="schedule"
-					onClickCapture={this.close_service()}
+					onClickCapture={this.close_service}
 					onKeyDown={(ev) =>
 					{
 						alert(ev.key);

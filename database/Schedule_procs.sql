@@ -155,9 +155,8 @@ delimiter //
 create procedure CreateService (in newJobID int, in newServiceDate date)
 begin
 
-	declare firstService boolean default 0;
-
 	-- whether this will be the first Service for the given Job
+	declare firstService boolean default 0;
 	set firstService =
 	(
 		-- there are no Services for the given Job
@@ -168,6 +167,8 @@ begin
 
 	if firstService
 	then
+		select "first service";
+
 		insert into
 			Services (   JobID,    ServiceDate)
 		   values   (newJobID, newServiceDate)
