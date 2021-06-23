@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import "./Clickable.css";
+import "./styles/Clickable.css";
 
 export default class Clickable extends Component
 {

@@ -11,7 +11,7 @@ import WorkerDropdown from "./WorkerDropdown";
 import Uplink from "./Uplink";
 
 import "./styles/indent.css";
-import "./ServiceModal.css";
+import "./styles/ServiceModal.css";
 
 export default class ServiceModal extends Component
 {
@@ -293,20 +293,23 @@ export default class ServiceModal extends Component
 	//add new day to service
 	add_day = () =>
 	{
-		this.setState ((state) =>
+		if (!Number.isInteger (this.state.editing_day))
 		{
-			//add a day to the Days array with the same workers as the previous day
-			state.service.Days = state.service.Days.concat (
+			this.setState ((state) =>
 			{
-				Date: "",
-				Workers: state.service.Days[state.service.Days.length - 1].Workers
+				//add a day to the Days array with the same workers as the previous day
+				state.service.Days = state.service.Days.concat (
+				{
+					Date: "",
+					Workers: state.service.Days[state.service.Days.length - 1].Workers
+				});
+
+				//edit last day
+				state.editing_day = state.service.Days.length - 1;
+
+				return state;
 			});
-
-			//edit last day
-			state.editing_day = state.service.Days.length - 1;
-
-			return state;
-		});
+		}
 	}
 
 	//remove a day from service
@@ -317,6 +320,11 @@ export default class ServiceModal extends Component
 			this.setState ((state) =>
 			{
 				state.service.Days.splice (day_index, 1);
+
+				if (day_index === state.editing_day)
+				{
+					state.editing_day = false;
+				}
 
 				return state;
 			});
@@ -374,7 +382,7 @@ export default class ServiceModal extends Component
 		});
 	}
 
-	//add new day to service
+	//add new worker to service day
 	add_worker = (day_index) =>
 	{
 		return (() =>
@@ -496,7 +504,7 @@ export default class ServiceModal extends Component
 						action={() =>
 						{
 							//set editing_day to day_index unless already set
-							if (!this.state.editing_day && this.state.editing_day !== 0)
+							if (!Number.isInteger (this.state.editing_day))
 							{
 								this.setState ({ editing_day: day_index });
 							}

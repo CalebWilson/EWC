@@ -10,7 +10,7 @@ import {
 import { Redirect } from "react-router";
 
 //styling
-import "./index.css";
+import "./styles/index.css";
 
 //components
 import Schedule from "./Schedule";

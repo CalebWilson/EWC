@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import "./Job.css";
+import "./styles/Job.css";
 
 import Uplink from "./Uplink";
 import Clickable from "./Clickable";

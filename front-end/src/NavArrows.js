@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import "./NavArrows.css";
+import "./styles/NavArrows.css";
 
 export default class NavArrow extends Component
 {

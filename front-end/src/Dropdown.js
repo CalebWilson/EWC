@@ -2,7 +2,7 @@ import React, { Component } from "react";
 
 import Uplink from "./Uplink";
 
-import "./Dropdown.css";
+import "./styles/Dropdown.css";
 
 export default class Dropdown extends Component
 {

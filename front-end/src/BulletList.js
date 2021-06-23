@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-import "./BulletList.css";
+import "./styles/BulletList.css";
 import "./styles/indent.css";
 
 class BulletButton extends Component

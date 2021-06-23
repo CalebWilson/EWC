@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import "./WorkItem.css";
+import "./styles/WorkItem.css";
 
 import Job from "./Job";
 

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import "./DateNum.css";
+import "./styles/DateNum.css";
 
 export default class Day extends Component
 {

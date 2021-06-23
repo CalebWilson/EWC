@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import "./Day.css";
+import "./styles/Day.css";
 
 import            DateNum from            "./DateNum";
 import      GroupWorkItem from      "./GroupWorkItem";

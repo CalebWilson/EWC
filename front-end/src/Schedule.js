@@ -8,7 +8,7 @@ import ServiceModal   from "./ServiceModal";
 
 import Uplink from "./Uplink";
 
-import "./Schedule.css";
+import "./styles/Schedule.css";
 import "./styles/buttons.css";
 
 export default class Schedule extends Component
