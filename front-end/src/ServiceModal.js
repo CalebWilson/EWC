@@ -84,12 +84,10 @@ export default class ServiceModal extends Component
 		);
 	}
 
-
 	has_job_and_date = () =>
 	{
 		return (this.state.service.JobID && this.state.service.Days[0].Date);
 	}
-
 
 	sort_days = (days) =>
 	{
@@ -330,9 +328,10 @@ export default class ServiceModal extends Component
 	{
 		return ((edit) =>
 		{
+			//if date value is good
 			if (edit.target.value)
 			{
-				//get the new date value
+				//set the new date value
 				this.setState
 				(
 					(state) =>
@@ -350,7 +349,7 @@ export default class ServiceModal extends Component
 						return state;
 					},
 
-					//editing first date updates the rest
+					//editing date in Add mode sav
 					() =>
 					{
 						//if (day_index === 0)
@@ -360,6 +359,17 @@ export default class ServiceModal extends Component
 						}
 					}
 				);
+			}
+
+			//bad date value, set null
+			else
+			{
+				this.setState ((state) =>
+				{
+					state.service.Days[day_index].Date = null;
+
+					return state;
+				});
 			}
 		});
 	}
@@ -485,7 +495,8 @@ export default class ServiceModal extends Component
 
 						action={() =>
 						{
-							if (!this.out_of_order_error)
+							//set editing_day to day_index unless already set
+							if (!this.state.editing_day && this.state.editing_day !== 0)
 							{
 								this.setState ({ editing_day: day_index });
 							}
