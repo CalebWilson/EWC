@@ -73,7 +73,15 @@ db_service.get = function (service_id)
 
 						[service_id, day.ServiceDayID]
 					)
-				)
+
+					//remove null workers
+					.then ((workers) =>
+					(
+						//only keep workers with truthy IDs
+						//works because MySQL PKs are nonzero
+						workers.filter ((worker) => (worker.WorkerID))
+					))
+				);
 			});
 
 			//match each worker team with its day

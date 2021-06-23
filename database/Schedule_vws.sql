@@ -48,21 +48,14 @@ as
 			as WorkerID
 
 	from
-		Jobs,
-		Services,
-		ServiceDays,
-		Assignments,
-		Workers,
-		ServiceTypes,
+		Jobs                                                                  inner join 
+		Services     on Jobs.JobID               = Services.JobID             inner join
+		ServiceDays  on Services.ServiceID       = ServiceDays.ServiceID      left  join
+		Assignments  on ServiceDays.ServiceDayID = Assignments.ServiceDayID   left  join
+		Workers      on Assignments.WorkerID     = Workers.WorkerID           left  join
+		ServiceTypes on Jobs.ServiceTypeID       = ServiceTypes.ServiceTypeID left  join
 		Statuses as WorkerStatuses
-
-	where
-		Jobs.JobID               = Services.JobID             and
-		Services.ServiceID       = ServiceDays.ServiceID      and
-		ServiceDays.ServiceDayID = Assignments.ServiceDayID   and
-		Assignments.WorkerID     = Workers.WorkerID           and
-		Jobs.ServiceTypeID       = ServiceTypes.ServiceTypeID and
-		Workers.StatusID         = WorkerStatuses.StatusID
+		             on Workers.StatusID         = WorkerStatuses.StatusID
 	
 	order by Week, Day, JobName
 ;
@@ -75,14 +68,15 @@ as
 	select *
 	from WeekWork as outside
 	where
-	(
-		-- there are no jobs assigned to multiple different workers
-		select count(*) = 0
-		from WeekWork as inside
-		where
-			outside.JobName     = inside.JobName and
-			outside.WorkerName != inside.WorkerName
-	)
+		(
+			-- there are no jobs assigned to multiple different workers
+			select count(*) = 0
+			from WeekWork as inside
+			where
+				outside.JobName     = inside.JobName and
+				outside.WorkerName != inside.WorkerName
+		)
+		and WorkerID is not null
 ;
 
 drop view if exists GroupWork;
@@ -93,12 +87,13 @@ as
 	select *
 	from WeekWork as outside
 	where
-	(
-		-- there are some jobs assigned to multiple different workers
-		select count(*) > 0
-		from WeekWork as inside
-		where
-			outside.JobName     = inside.JobName and
-			outside.WorkerName != inside.WorkerName
-	)
+		(
+			-- there are some jobs assigned to multiple different workers
+			select count(*) > 0
+			from WeekWork as inside
+			where
+				outside.JobName     = inside.JobName and
+				outside.WorkerName != inside.WorkerName
+		)
+		or WorkerID is null
 ;

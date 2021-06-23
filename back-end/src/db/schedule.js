@@ -109,7 +109,8 @@ db_schedule.get_day = function
 		group_jobs.forEach ((group_job) =>
 		{
 			//add the team that will work on that job to teams array
-			teams.push (
+			teams.push
+			(
 				db.query
 				(
 					`select WorkerID, WorkerName, WorkerStatus
@@ -121,6 +122,14 @@ db_schedule.get_day = function
 
 					group_job.JobName
 				)
+
+				//remove null workers
+				.then ((workers) =>
+				(
+					//only keep workers with truthy IDs
+					//works because MySQL PKs are nonzero
+					workers.filter ((worker) => (worker.WorkerID))
+				))
 			);
 		});
 
