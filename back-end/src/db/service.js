@@ -242,10 +242,16 @@ db_service.patch = function (params)
 		`update Services
 			set
 				JobID = ?,
-				ServiceDate = ?
+				ServiceDate = ?,
+				FinalPrice = ?
 			where ServiceID = ?`,
 
-		[params.JobID, sql_date(params.Days[0].Date), params.ServiceID]
+		[
+			params.JobID,
+			sql_date(params.Days[0].Date),
+			params.FinalPrice,
+			params.ServiceID
+		]
 	);
 
 	//incoming days that are not new will have a ServiceDayID

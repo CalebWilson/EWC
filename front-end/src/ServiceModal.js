@@ -274,13 +274,13 @@ export default class ServiceModal extends Component
 					{/* view job name */}
 					<div>Job: {this.state.service.JobName}</div>
 					<div>
-					<Button
-						label="Change"
-						action={() =>
-						{
-							this.setState ({ editing_job: true });
-						}}
-					/>
+						<Button
+							label="Change"
+							action={() =>
+							{
+								this.setState ({ editing_job: true });
+							}}
+						/>
 					</div>
 
 				</div>
@@ -536,6 +536,84 @@ export default class ServiceModal extends Component
 		</div>
 	)
 
+	//display and edit the final price
+	render_price = () =>
+	{
+		let save_price = () =>
+		{
+			this.setState ({ editing_price: false });
+		};
+
+		return (
+
+			<div>
+			{
+				this.state.mode === "Edit"
+				?
+					<div>
+					{
+						//if editing price
+						this.state.editing_price
+						?
+							<div>
+
+								{/* input */}
+								<div>
+									Final Price: <input
+										type="number"
+										style={{fontSize: "x-large"}}
+										value={this.state.service.FinalPrice}
+										onChange={(edit) =>
+										{
+											this.setState ((state) =>
+											{
+												state.service.FinalPrice = edit.target.value;
+
+												return state;
+											});
+										}}
+										onKeyDown={(key_down) =>
+										{
+											//pressing Enter saves input
+											if (key_down.key === "Enter")
+												save_price();
+										}}
+									/>
+								</div>
+
+								{/* save button */}
+								<Button
+									label="Save"
+									action={save_price}
+								/>
+
+							</div>
+						:
+							<div>
+								{/* not edting price */}
+								<div>
+									Final Price: {this.state.service.FinalPrice}
+								</div>
+
+								{/* change button */}
+								<Button
+									label="Change"
+									action={() =>
+									{
+										this.setState ({ editing_price: true });
+									}}
+								/>
+							</div>
+					}
+					</div>
+				:
+					<div></div>
+			} 
+			</div>
+
+		);
+	}
+
 	render()
 	{
 		return (
@@ -597,11 +675,11 @@ export default class ServiceModal extends Component
 						/>
 
 						<br />
-
+						
 						{/* final price */}
-						Final Price: {this.state.service.FinalPrice}
+						{this.render_price()}
 
-					</div>
+					</div> {/* end service-modal-inner */}
 
 					{/* save and cancel */}
 					<div className="service-modal-bottom">
