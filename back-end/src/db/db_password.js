@@ -1,1 +1,1 @@
-module.exports = ""; //insert your database password here
+module.exports = ""; //insert        your database password here
