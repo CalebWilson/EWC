@@ -2,7 +2,7 @@ TO RUN LOCALLY:
 
 	$ cd database/
 	$ sudo service mysql start
-	$ sudo -h localhost -p
+	$ sudo mysql -h localhost -p
 		[enter password]
 		mysql> source database.sql
 		mysql> exit
