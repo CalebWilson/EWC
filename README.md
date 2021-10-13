@@ -1,5 +1,8 @@
 TO RUN LOCALLY:
 
+	$ touch back-end/src/db/db_password.js
+	$ echo "module.exports = \"{your database password}\";" >> back-end/src/db/db_password.js
+
 	$ cd database/
 	$ sudo service mysql start
 	$ sudo mysql -h localhost -p
