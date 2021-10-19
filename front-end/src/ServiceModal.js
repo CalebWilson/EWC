@@ -162,7 +162,7 @@ export default class ServiceModal extends Component
 			//if no errors, close
 			else
 			{
-				this.props.close_service ();
+				this.props.close_service();
 			}
 		}
 	};
@@ -198,6 +198,12 @@ export default class ServiceModal extends Component
 
 	remove = () =>
 	{
+		if (this.state.service.ServiceID === undefined)
+		{
+			this.props.close_service();
+			return;
+		}
+
 		Uplink.send_data ("service/" + this.state.service.ServiceID, "delete")
 
 		.then (this.confirm_close);
