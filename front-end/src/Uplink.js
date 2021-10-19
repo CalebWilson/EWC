@@ -24,7 +24,6 @@ var catch_errors = (error) =>
 {
 	if (error.toString() === ("TypeError: NetworkError when attempting to fetch resource."))
 	{
-		console.log ("GOTCHA");
 		return;
 	}
 
