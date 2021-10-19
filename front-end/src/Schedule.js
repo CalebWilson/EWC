@@ -202,7 +202,9 @@ export default class Schedule extends Component
 							{
 								days.map ((day_name) =>
 								(
-									<th className="schedule-th">{day_name}</th>
+									<th key={day_name} className="schedule-th">
+										{day_name}
+									</th>
 								))
 							}
 						</tr></thead>
@@ -219,13 +221,14 @@ export default class Schedule extends Component
 								//work days
 								this.state.data.schedule.map ((schedule_work_day, day) =>
 								(
-									<td className="schedule-td"><Day
-										date={this.get_date(day).getDate()}
-										day={day}
-										key={day}
-										work_day={schedule_work_day}
-										edit_service={this.edit_service}
-									/></td>
+									<td className="schedule-td" key={day}>
+										<Day
+											date={this.get_date(day).getDate()}
+											day={day}
+											work_day={schedule_work_day}
+											edit_service={this.edit_service}
+										/>
+									</td>
 								))
 							}
 						</tr></tbody>

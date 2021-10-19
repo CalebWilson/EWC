@@ -8,7 +8,7 @@ export default class NavArrow extends Component
 		return (
 			<div className="nav-container">
 				<a className="nav-arrow" href={this.props.href}>
-					<i class={"fa fa-angle-" + this.props.direction}></i>
+					<i className={"fa fa-angle-" + this.props.direction}></i>
 				</a>
 			</div>
 		);
