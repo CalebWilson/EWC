@@ -56,16 +56,32 @@ db_schedule.get_week = function (params)
 		);
 	}
 
+	//final schedule
 	let final_schedule = Promise.all (schedule);
 
+	//week letter
 	let week_letter = db.query (`select week_letter(?) as week_letter`, week)
-
 	.then ((results) =>
 	{
 		return results[0].week_letter;
 	});
 
-	return promise_all_obj ({week_letter: week_letter, schedule: final_schedule});
+	//week notes
+	let week_notes = db.query
+	(
+		`select Content from NumberedWeekNotes where Week = ?`, week
+	)
+	.then ((results) =>
+	{
+		return results[0].Content;
+	});
+
+	return promise_all_obj
+	({
+		week_letter: week_letter,
+		week_notes: week_notes,
+		schedule: final_schedule
+	});
 };
 
 /*

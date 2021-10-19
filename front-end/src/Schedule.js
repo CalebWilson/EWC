@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 
+import WeekNotes      from "./WeekNotes";
 import Day            from "./Day";
 import NavArrow       from "./NavArrows";
 import WorkerDropdown from "./WorkerDropdown";
@@ -18,7 +19,7 @@ export default class Schedule extends Component
 		super (props);
 		this.state =
 		{
-			data: { week_letter: null, schedule: []},
+			data: { week_letter: null, week_notes: "", schedule: []},
 			mode: null
 		};
 
@@ -150,7 +151,7 @@ export default class Schedule extends Component
 		}
 
 		let days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
-		
+
 		return (
 			<div>
 				{/* main schedule page */}
@@ -212,10 +213,9 @@ export default class Schedule extends Component
 						<tbody className="schedule-body">
 							<tr style={{height: "100%"}}>
 							{/* notes for the week */}
-							<td className="schedule-td"><Day
-								date={this.state.data.week_letter}
-								work_day="Notes Content"
-								edit_service={this.edit_service}
+							<td className="schedule-td"><WeekNotes
+								week_letter={this.state.data.week_letter}
+								week_notes={this.state.data.week_notes}
 							/></td>
 							{
 								//work days
