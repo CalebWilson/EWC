@@ -22,7 +22,12 @@ var package_data = (data) =>
 //error handling
 var catch_errors = (error) =>
 {
-	console.log ("error");
+	if (error.toString() == ("TypeError: NetworkError when attempting to fetch resource."))
+	{
+		console.log ("GOTCHA");
+		return;
+	}
+
 	return (
 	{
 		error:
@@ -34,13 +39,20 @@ var catch_errors = (error) =>
 					Please contact the System Administrator.
 				</h1>
 			</div>
-	})
+	});
 };
 
 //retrieve data from server
 Uplink.get_data = function (endpoint)
 {
 	return fetch (back_end + endpoint)
+		.then ((so_far) =>
+		{
+			console.log ("so far:");
+			console.log (so_far);
+			
+			return so_far;
+		})
 		.then  (check_status)
 		.then  (package_data)
 		.catch (catch_errors)
