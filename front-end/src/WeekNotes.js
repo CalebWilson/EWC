@@ -12,7 +12,13 @@ export default class WeekNotes extends Component
 				<DateNum date={this.props.week_letter} />
 
 				<div className="day-content">
-					{this.props.week_notes}
+				{
+					this.props.week_notes
+					?
+						this.props.week_notes
+					:
+						"Add notes for this week..."
+				}
 				</div>
 
 			</div>

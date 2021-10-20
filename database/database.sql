@@ -51,10 +51,11 @@ source Assignments.sql;
 source   WeekNotes.sql;
 
 -- functions, procedures, and views
-source        week_funcs.sql;
-source      Schedule_vws.sql;
-source WorkerStatuses_vw.sql;
-source    Schedule_procs.sql;
+source           week_funcs.sql;
+source         Schedule_vws.sql;
+source    WorkerStatuses_vw.sql;
+source NumberedWeekNotes_vw.sql;
+source       Schedule_procs.sql;
 
 -- test data
 source test_data.sql;

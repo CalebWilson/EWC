@@ -21,8 +21,8 @@ show warnings;
 
 -- test
 insert into
-	WeekNotes (                                           WeekOf,         Content)
-	values    (date(curdate() - interval weekday(curdate()) day), 'Dynamic Notes')
+	WeekNotes (                                           WeekOf,                    Content)
+	values    (date(curdate() - interval weekday(curdate()) day), 'Test notes from database')
 ;
 
 select * from WeekNotes;

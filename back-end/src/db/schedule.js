@@ -73,7 +73,7 @@ db_schedule.get_week = function (params)
 	)
 	.then ((results) =>
 	{
-		return results[0].Content;
+		return results[0] ? results[0].Content : null;
 	});
 
 	return promise_all_obj
