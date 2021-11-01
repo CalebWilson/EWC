@@ -19,6 +19,7 @@ export default class Schedule extends Component
 		super (props);
 		this.state =
 		{
+			worker_id: "",
 			data: { week_letter: null, week_notes: "", schedule: []},
 			mode: null
 		};
@@ -29,7 +30,11 @@ export default class Schedule extends Component
 
 	get_schedule = () =>
 	{
-		Uplink.get_data ("schedule/" + this.props.match.params.week)
+		Uplink.get_data (
+			"schedule/" + this.props.match.params.week +
+			"/"         + this.state.worker_id
+		)
+
 		.then ((data) =>
 		{
 			this.setState (data);
@@ -96,21 +101,27 @@ export default class Schedule extends Component
 	//hide job details; to be passed as a prop to the ServiceModal component
 	close_service = () =>
 	{
-		this.setState ({ mode: null});
-
-		this.get_schedule();
+		this.setState
+		(
+			{mode: null},
+			() => { this.get_schedule(); }
+		);
 	}
 
 	//get worker-specific schedule from the back-end
 	select_worker = (worker_id) =>
 	{
-		Uplink.get_data (
-			"schedule/" + this.props.match.params.week + "/" + worker_id
-		)
-		.then ((data) =>
-		{
-			this.setState (data);
-		});
+		this.setState
+		(
+			(state) =>
+			{
+				state.worker_id = worker_id;
+
+				return state;
+			},
+
+			() => { this.get_schedule() }
+		);
 	}
 
 	//tell the back-end to generate the current week's recurring jobs
