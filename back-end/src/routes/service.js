@@ -22,7 +22,7 @@ service_router.post ("/", (request, response, next) =>
 
 service_router.route ("/:service_id")
 
-	//read
+//read
 	.get ((request, response, next) =>
 	{
 		let handler =
@@ -31,7 +31,7 @@ service_router.route ("/:service_id")
 		handler (request, response, next);
 	})
 
-	//update
+//update
 	.patch ((request, response, next) =>
 	{
 		request.body.ServiceID = request.params.service_id;
@@ -41,7 +41,7 @@ service_router.route ("/:service_id")
 		handler (request, response, next);
 	})
 
-	//delete
+//delete
 	.delete ((request, response, next) =>
 	{
 		let handler =

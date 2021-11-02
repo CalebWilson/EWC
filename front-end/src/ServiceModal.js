@@ -1,12 +1,13 @@
 import React, { Component } from "react";
 
-import         Button from "./Button";
-import     BulletList from "./BulletList";
-//import     BulletItem from "./BulletList";
-import      Clickable from "./Clickable";
+import     Button from "./Button";
+import BulletList from "./BulletList";
+import  Clickable from "./Clickable";
 
 import    JobDropdown from "./JobDropdown";
 import WorkerDropdown from "./WorkerDropdown";
+
+import Checkbox from "./Checkbox";
 
 import Uplink from "./Uplink";
 
@@ -26,6 +27,7 @@ export default class ServiceModal extends Component
 				service:
 				{
 					JobID: null,
+					Complete: false,
 					Days:
 					[{
 						Date: "",
@@ -680,10 +682,26 @@ export default class ServiceModal extends Component
 							remove={this.remove_day}
 						/>
 
-						<br />
+						<br/>
 						
 						{/* final price */}
 						{this.render_price()}
+
+						<br/>
+
+						{/* complete checkbox */}
+						<Checkbox
+							label="Complete"
+							checked={this.state.service.Complete}
+							onChange={(checked) =>
+							{
+								this.setState ((state) =>
+								{
+									state.service.Complete = !state.service.Complete;
+									return state;
+								});
+							}}
+						/>
 
 					</div> {/* end service-modal-inner */}
 

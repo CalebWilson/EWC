@@ -216,12 +216,15 @@ db_service.post = function (params)
 			Date: Date,
 			Workers: int[],
 			ServiceDayID: int //undefined if new ServiceDay
-		}]
+		}],
+		Complete: boolean
 	}
 */
 
 db_service.patch = function (params)
 {
+	console.log (params);
+
 	params.ServiceID = parseInt (params.ServiceID);
 
 	//function to remove timestamp from dates
@@ -241,15 +244,17 @@ db_service.patch = function (params)
 	(
 		`update Services
 			set
-				JobID = ?,
+				JobID       = ?,
 				ServiceDate = ?,
-				FinalPrice = ?
+				FinalPrice  = ?,
+				Complete    = ?
 			where ServiceID = ?`,
 
 		[
 			params.JobID,
 			sql_date(params.Days[0].Date),
 			params.FinalPrice,
+			params.Complete,
 			params.ServiceID
 		]
 	);
