@@ -55,8 +55,6 @@ class BulletItem extends Component
 						<BulletButton add={action} />
 				}
 
-				<span className="bullet-button-spacer"></span>
-
 				{content}
 
 			</div>
