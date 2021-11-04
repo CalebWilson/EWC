@@ -45,13 +45,6 @@ var catch_errors = (error) =>
 Uplink.get_data = function (endpoint)
 {
 	return fetch (back_end + endpoint)
-		.then ((so_far) =>
-		{
-			console.log ("so far:");
-			console.log (so_far);
-			
-			return so_far;
-		})
 		.then  (check_status)
 		.then  (package_data)
 		.catch (catch_errors)

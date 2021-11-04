@@ -87,6 +87,7 @@ export default class BulletList extends Component
 						items.map ((item_value, item_index) =>
 						(
 							<BulletItem
+								key={item_index}
 								list_length={items.length}
 								content={map_func (item_value, item_index)}
 								action={remove (item_index)}
