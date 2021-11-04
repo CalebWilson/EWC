@@ -25,6 +25,7 @@ export default class Day extends Component
 							key={group_job.ServiceDayID}
 							job={group_job}
 							edit_service={this.props.edit_service}
+							sync_complete={this.props.sync_complete}
 						/>
 					))
 				}
@@ -37,6 +38,7 @@ export default class Day extends Component
 							key={day + " " + indiv_worker_day.WorkerID}
 							worker_day={indiv_worker_day}
 							edit_service={this.props.edit_service}
+							sync_complete={this.props.sync_complete}
 						/>
 					))
 				}

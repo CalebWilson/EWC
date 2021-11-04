@@ -101,11 +101,14 @@ export default class Schedule extends Component
 	//hide job details; to be passed as a prop to the ServiceModal component
 	close_service = () =>
 	{
-		this.setState
-		(
-			{mode: null},
-			() => { this.get_schedule(); }
-		);
+		if (this.state.mode)
+		{
+			this.setState
+			(
+				{mode: null},
+				() => { this.get_schedule(); }
+			);
+		}
 	}
 
 	//get worker-specific schedule from the back-end
@@ -132,6 +135,44 @@ export default class Schedule extends Component
 		.then ((data) =>
 		{
 			this.setState (data);
+		});
+	}
+
+	//called when a service is marked complete. updates all days of same service
+	sync_complete = (service_id, is_complete) =>
+	{
+		this.setState ((state) =>
+		{
+			//for every day
+			state.data.schedule = state.data.schedule.map ((work_day) =>
+			{
+				//update group work
+				work_day.GroupWork = work_day.GroupWork.map ((group_job) =>
+				{
+					if (group_job.ServiceID === service_id)
+						group_job.Complete = is_complete;
+
+					return group_job;
+				});
+
+				//update individual work
+				work_day.IndividualWork = work_day.IndividualWork.map ((worker) =>
+				{
+					worker.Jobs = worker.Jobs.map ((indiv_job) =>
+					{
+						if (indiv_job.ServiceID === service_id)
+							indiv_job.Complete = is_complete;
+
+						return indiv_job;
+					});
+
+					return worker;
+				});
+
+				return work_day;
+			});
+
+			return state;
 		});
 	}
 
@@ -169,10 +210,6 @@ export default class Schedule extends Component
 				<div
 					className="schedule"
 					onClickCapture={this.close_service}
-					onKeyDown={(ev) =>
-					{
-						alert(ev.key);
-					}}
 				>
 
 					{/* top of the schedule */}
@@ -238,6 +275,7 @@ export default class Schedule extends Component
 											day={day}
 											work_day={schedule_work_day}
 											edit_service={this.edit_service}
+											sync_complete={this.sync_complete}
 										/>
 									</td>
 								))

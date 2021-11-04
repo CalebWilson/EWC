@@ -3,7 +3,7 @@ const db = require("./db");
 let db_service = {};
 
 /*
-	Get service details
+	Get service details.
 */
 db_service.get = function (service_id)
 {
@@ -121,13 +121,12 @@ db_service.post = function (params)
 	//create new service in the database
 	return db.transaction ((query) =>
 	(
-			query
-			(
-				`call CreateService (?, ?)`,
+		query
+		(
+			`call CreateService (?, ?)`,
 
-				[params.JobID, params.ServiceDate]
-			)
-		//))
+			[params.JobID, params.ServiceDate]
+		)
 		.catch ((error) =>
 		{
 			console.log (error);
@@ -207,7 +206,7 @@ db_service.post = function (params)
 /*
 	Edit a service.
 
-	params will be a JSON of the form:
+	params will be an object of the form:
 	{
 		ServiceID: int,
 		JobID: int,
@@ -223,8 +222,6 @@ db_service.post = function (params)
 
 db_service.patch = function (params)
 {
-	console.log (params);
-
 	params.ServiceID = parseInt (params.ServiceID);
 
 	//function to remove timestamp from dates
@@ -551,11 +548,49 @@ db_service.patch = function (params)
 }; //end patch
 
 /*
-	Delete a service
+	Delete a service.
 */
-db_service.delete = function (service_id)
+db_service.delete = function (params)
 {
 	return db.query (`delete from Services where ServiceID = ?`, service_id)
 };
+
+/*
+	Find whether a service is complete or incomplete.
+*/
+db_service.get_complete = function (service_id)
+{
+	return db.query (
+		`select Complete from Services where ServiceID = ?`, service_id
+	)
+
+	.then ((results) => (results[0]));
+}
+
+/*
+	Mark a service as complete or incomplete.
+
+	params will be an object of the form:
+	{
+		service_id: int,
+		is_complete: boolean
+	}
+*/
+
+db_service.set_complete = function (params)
+{
+	return db.query
+	(
+		`update Services
+			set Complete = ?
+			where ServiceID = ?`,
+
+		[params.is_complete, params.service_id]
+	)
+
+	.then (() => (db_service.get (params.service_id)));
+
+};
+	
 
 module.exports = db_service;

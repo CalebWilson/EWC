@@ -1,14 +1,18 @@
+.job-container {
+	position: relative;
+}
+
+.job-container .clickable {
+	min-height: 2.6rem;
+}
 .job {
 	display: flex;
 	flex-direction: row-reverse;
 	justify-content: space-between;
 }
 
-.type-price {
+.job-info {
 	padding-left: 10px;
 	text-align: right;
 	white-space: nowrap;
-}
-
-.job-name {
 }

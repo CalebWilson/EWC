@@ -21,7 +21,7 @@ export default class ServiceModal extends Component
 		super (props);
 
 		//if new service, start in edit mode with empty service
-		this.state = (this.props.mode === "Add")
+		let state = (this.props.mode === "Add")
 		?
 			{
 				service:
@@ -47,12 +47,10 @@ export default class ServiceModal extends Component
 			}
 		;
 
-		this.setState ((state) =>
-		{
-			state.service.Days = this.sort_days (state.service.Days);
+		state.service.Days = this.sort_days (state.service.Days);
 
-			return state;
-		});
+		this.state = state;
+
 	}
 
 	//add escape listener
@@ -502,7 +500,7 @@ export default class ServiceModal extends Component
 						<input
 							type="date"
 							style={{fontSize: "x-large"}}
-							value={ day.Date ? day.Date.toString().substr(0, 10) : null }
+							value={ day.Date ? day.Date.toString().substr(0, 10) : ""}
 							onChange={this.edit_date (day_index)}
 						/>
 					</div>

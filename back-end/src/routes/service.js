@@ -1,5 +1,5 @@
 /*
-	Scheduled Job
+	Service
 */
 
 //create router
@@ -50,5 +50,30 @@ service_router.route ("/:service_id")
 		handler (request, response, next);
 	})
 ;
+
+//complete
+service_router.route ("/complete/:service_id")
+
+	.get ((request, response, next) =>
+	{
+		let handler = access_database (
+			db_service.get_complete, request.params.service_id
+		);
+
+		handler (request, response, next);
+	})
+
+	.patch ((request, response, next) =>
+	{
+		const params =
+		{
+			service_id: request.params.service_id,
+			is_complete: request.body.is_complete
+		};
+
+		let handler = access_database (db_service.set_complete, params);
+
+		handler (request, response, next);
+	});
 
 module.exports = service_router;
