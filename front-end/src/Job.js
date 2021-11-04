@@ -4,7 +4,6 @@ import "./styles/Job.css";
 import Uplink from "./Uplink";
 import Clickable from "./Clickable";
 
-import Checkbox from "./Checkbox";
 import ServiceCompleteCheckbox from "./ServiceCompleteCheckbox";
 
 export default class Job extends Component
