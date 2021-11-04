@@ -186,7 +186,7 @@ export default class Schedule extends Component
 
 		.then ((data) =>
 		{
-			this.setState (data);
+			this.setState (data, this.mark_cont);
 		});
 	}
 
