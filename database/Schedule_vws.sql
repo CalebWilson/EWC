@@ -34,6 +34,8 @@ as
 			as FinalPrice,
 		Services.Complete
 			as Complete,
+		ServiceDays.ServiceDay
+			as ServiceDay,
 		Workers.WorkerName
 			as WorkerName,
 		WorkerStatuses.StatusName

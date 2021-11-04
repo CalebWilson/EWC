@@ -37,7 +37,59 @@ export default class Schedule extends Component
 
 		.then ((data) =>
 		{
-			this.setState (data);
+			this.setState (data, this.mark_cont);
+		});
+	}
+
+	//mark all service continuations as such
+	mark_cont = () =>
+	{
+		this.modify_services ((job) =>
+		{
+			if (job.ServiceDay !== 0)
+				job.JobName += " (cont.)";
+
+			return job;
+		});
+	}
+
+	/*
+		Modify every job on the schedule with the callback modify_func.
+
+		modify_func should take in a service object of the form
+		{
+			JobName: string,
+			ServiceID: int,
+			ServiceType: "IN", "OUT", or "IN/OUT",
+			FinalPrice: int,
+			Complete: boolean int,
+			ServiceDayID: int
+		}
+
+		and return an object with the same structure.
+	*/
+	modify_services = (modify_func) =>
+	{
+		this.setState ((state) =>
+		{
+			//for every day
+			state.data.schedule = state.data.schedule.map ((work_day) =>
+			{
+				//update group work
+				work_day.GroupWork = work_day.GroupWork.map (modify_func);
+
+				//update individual work
+				work_day.IndividualWork = work_day.IndividualWork.map ((worker) =>
+				{
+					worker.Jobs = worker.Jobs.map (modify_func);
+
+					return worker;
+				});
+
+				return work_day;
+			});
+
+			return state;
 		});
 	}
 
@@ -138,41 +190,15 @@ export default class Schedule extends Component
 		});
 	}
 
-	//called when a service is marked complete. updates all days of same service
+	//called when a service is marked complete to update all days of the service
 	sync_complete = (service_id, is_complete) =>
 	{
-		this.setState ((state) =>
+		this.modify_services ((job) =>
 		{
-			//for every day
-			state.data.schedule = state.data.schedule.map ((work_day) =>
-			{
-				//update group work
-				work_day.GroupWork = work_day.GroupWork.map ((group_job) =>
-				{
-					if (group_job.ServiceID === service_id)
-						group_job.Complete = is_complete;
+			if (job.ServiceID === service_id)
+				job.Complete = is_complete;
 
-					return group_job;
-				});
-
-				//update individual work
-				work_day.IndividualWork = work_day.IndividualWork.map ((worker) =>
-				{
-					worker.Jobs = worker.Jobs.map ((indiv_job) =>
-					{
-						if (indiv_job.ServiceID === service_id)
-							indiv_job.Complete = is_complete;
-
-						return indiv_job;
-					});
-
-					return worker;
-				});
-
-				return work_day;
-			});
-
-			return state;
+			return job;
 		});
 	}
 
