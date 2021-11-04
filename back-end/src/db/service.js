@@ -550,7 +550,7 @@ db_service.patch = function (params)
 /*
 	Delete a service.
 */
-db_service.delete = function (params)
+db_service.delete = function (service_id)
 {
 	return db.query (`delete from Services where ServiceID = ?`, service_id)
 };
