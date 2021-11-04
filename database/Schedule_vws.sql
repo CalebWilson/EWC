@@ -75,8 +75,8 @@ as
 			select count(*) = 0
 			from WeekWork as inside
 			where
-				outside.JobName     = inside.JobName and
-				outside.WorkerName != inside.WorkerName
+				outside.ServiceDayID = inside.ServiceDayID and
+				outside.WorkerName  != inside.WorkerName
 		)
 		and WorkerID is not null
 ;
@@ -94,8 +94,8 @@ as
 			select count(*) > 0
 			from WeekWork as inside
 			where
-				outside.JobName     = inside.JobName and
-				outside.WorkerName != inside.WorkerName
+				outside.ServiceDayID = inside.ServiceDayID and
+				outside.WorkerName  != inside.WorkerName
 		)
 		or WorkerID is null
 ;
