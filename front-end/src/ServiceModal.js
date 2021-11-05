@@ -295,15 +295,16 @@ export default class ServiceModal extends Component
 		</div>
 	)
 
-
 	//add new day to service
 	add_day = () =>
 	{
-		if (!Number.isInteger (this.state.editing_day))
-		{
+		if (
+			!Number.isInteger (this.state.editing_day) &&
+			!Number.isInteger (this.state.editing_worker)
+		){
 			this.setState ((state) =>
 			{
-				//add a day to the Days array with the same workers as the previous day
+				//add day to the Days array with the same workers as the previous day
 				state.service.Days = state.service.Days.concat (
 				{
 					Date: "",
@@ -393,23 +394,30 @@ export default class ServiceModal extends Component
 	{
 		return (() =>
 		{
-			this.setState ((state) =>
-			{
-				//add a worker to the day
-				state.service.Days[day_index].Workers =
-				state.service.Days[day_index].Workers.concat (
+			if (
+				!(
+					this.state.editing_day_workers === day_index &&
+					Number.isInteger (this.state.editing_worker)
+				)
+			){
+				this.setState ((state) =>
 				{
-					WorkerID: null,
-					WorkerName: ""
+					//add a worker to the day
+					state.service.Days[day_index].Workers =
+					state.service.Days[day_index].Workers.concat (
+					{
+						WorkerID: null,
+						WorkerName: ""
+					});
+
+					//edit last worker of the current day
+					state.editing_day_workers = day_index;
+					state.editing_worker
+						= state.service.Days[day_index].Workers.length - 1;
+
+					return state;
 				});
-
-				//edit last worker of the current day
-				state.editing_day_workers = day_index;
-				state.editing_worker
-					= state.service.Days[day_index].Workers.length - 1;
-
-				return state;
-			});
+			}
 		});
 	}
 
@@ -439,13 +447,26 @@ export default class ServiceModal extends Component
 		{
 			return (() =>
 			{
-				//remove the given worker from the given Day
-				this.setState ((state) =>
-				{
-					state.service.Days[day_index].Workers.splice (worker_index, 1);
-					
-					return state;
-				});
+				if (
+					!(
+						day_index    === this.state.editing_day_workers &&
+						worker_index !== this.state.editing_worker
+					)
+				){
+					//remove the given worker from the given Day
+					this.setState ((state) =>
+					{
+						state.service.Days[day_index].Workers.splice (worker_index, 1);
+
+						if (day_index === state.editing_day_workers)
+						{
+							state.editing_day_workers = false;
+							state.editing_worker = false;
+						}
+
+						return state;
+					}, () => {alert(JSON.stringify(this.state));});
+				}
 			});
 		});
 	}
