@@ -6,6 +6,7 @@ import NavArrow       from "./NavArrows";
 import WorkerDropdown from "./WorkerDropdown";
 import Button         from "./Button";
 import ServiceModal   from "./ServiceModal";
+import NavMenu        from "./NavMenu";
 
 import Uplink from "./Uplink";
 
@@ -334,6 +335,9 @@ export default class Schedule extends Component
 						<div></div>
 				}
 				</div>
+
+				{/* nav menu */}
+				<NavMenu />
 
 			</div>
 		);
