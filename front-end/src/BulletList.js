@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 
+import Clickable from "./Clickable";
+
 import "./styles/BulletList.css";
 import "./styles/indent.css";
 
@@ -31,32 +33,42 @@ class BulletItem extends Component
 	render()
 	{
 		const {
-			list_length,
-			action,
-			content
+			add,    //optional
+			edit,   //optional
+			save,   //optional
+			remove, //optional
+
+			editing,
+
+			item,
+
+			render_item,
+			render_edit_item,
+			render_rest,
 		}
 			= this.props;
 
 		return (
 			<div className="bullet-item">
+				<BulletButton
+					add={add}
+					remove={remove}
+				/>
 
 				{
-					//if a list length is provided
-					(list_length !== undefined)
+					editing
 					?
-						//don't allow removal of the last item
-						(list_length === 1)
-						?
-							<BulletButton />
-						: 
-							<BulletButton remove={action} />
+						render_edit_item (item, save)
 					:
-						//no list length means add button
-						<BulletButton add={action} />
+						<span>
+							<Clickable
+								action={edit}
+								content={render_item (item)}
+							/>
+						</span>
 				}
 
-				{content}
-
+				{render_rest (item)}
 			</div>
 		);
 	}
@@ -65,15 +77,45 @@ class BulletItem extends Component
 //class BulletList extends Component
 export default class BulletList extends Component
 {
+	/*
+		props:
+		{
+			string name_singular
+			string name_plural
+
+			array items
+			int editing
+
+			function render_item (obj): content of Clickable
+			function render_edit_item (obj): input element for use in editing
+			function render_rest(): content after the Clickable
+
+			function new_item (array): item to be added given current items
+			function sanitize_input (obj): santized input given raw input
+			function onChange(): callback to be run after input changes
+		}
+	*/
+
+	constructor (props)
+	{
+		super (props);
+
+		this.state =
+		{
+			items: props.items,
+			editing: props.editing
+		};
+	}
+
 	render()
 	{
 		const {
 			name_singular,
 			name_plural,
-			items,
-			map_func,
-			add,
-			remove
+
+			render_item,
+			render_edit_item,
+			render_rest,
 		}
 			= this.props;
 
@@ -84,26 +126,56 @@ export default class BulletList extends Component
 
 				<div className="indent">
 					{
-						items.map ((item_value, item_index) =>
-						(
+						(this.state.items.length === 1)
+						?
 							<BulletItem
-								key={item_index}
-								list_length={items.length}
-								content={map_func (item_value, item_index)}
-								action={remove (item_index)}
+								item={this.state.items[0]}
+								editing={this.is_editing()}
+
+								edit={this.edit (0)}
+								save={this.save (0)}
+
+								render_item={render_item}
+								render_edit_item={render_edit_item}
+								render_rest={render_rest}
 							/>
-						))
+
+						:
+							this.state.items.map ((item, item_index) =>
+							(
+								<BulletItem
+									key={item_index}
+
+									item={item}
+									editing={this.is_editing (item_index)}
+
+									edit={this.edit (item_index)}
+									save={this.save (item_index)}
+									remove={this.remove}
+
+									render_item={render_item}
+									render_edit_item={render_edit_item}
+									render_rest={render_rest}
+								/>
+							))
 					}
 
-					<BulletItem
-						content={
-							<span style={{paddingTop: "0.2rem"}}>
-								{"Add another " + name_singular}
-							</span>
-						}
-						action={add}
-					/>
+					{
+						//add new item
+						this.is_editing()
+						?
+							<div></div>
+						:
+							<div className="bullet-item">
+								<BulletButton add={this.add} />
 
+								<span style={{paddingTop: "0.2rem"}}>
+									{"Add another " + name_singular}
+								</span>
+							</div>
+					}
+
+					{render_rest()}
 
 				</div>
 
@@ -112,5 +184,93 @@ export default class BulletList extends Component
 
 			</div>
 		);
+	}
+
+	get_items = () =>
+	{
+		return this.state.items;
+	}
+
+	is_editing = (index) =>
+	{
+		if (index)
+			return (index === this.state.editing);
+
+		return Number.isInteger (this.state.editing);
+	}
+
+	add = () =>
+	{
+		this.setState ((state) =>
+		{
+			state.items.push (this.props.new_item (state.items));
+
+			state.editing = state.items.length - 1;
+
+			return state;
+		});
+	}
+
+	remove = (item_index) =>
+	{
+		return (() =>
+		{
+			this.setState ((state) =>
+			{
+				state.items.splice (item_index, 1);
+
+				if (item_index === state.editing)
+					state.editing = false;
+
+				return state;
+			});
+		});
+	}
+
+	edit = (item_index) =>
+	{
+		return (() =>
+		{
+			if (!this.is_editing())
+			{
+				this.setState ({ editing: item_index });
+			}
+		});
+	}
+
+	save = (item_index) =>
+	{
+		return ((edit) =>
+		{
+			const clean_value = this.props.sanitize_input (edit.target.value);
+
+			this.setState
+			(
+				(state) =>
+				{
+					state.items[item_index].value = clean_value;
+					state.editing = false;
+
+					return state;
+				},
+
+				() =>
+				{
+					alert (JSON.stringify(this.state));
+					this.setState
+					(
+						(state) =>
+						{
+							if (this.props.sort_items)
+								state.items = this.props.sort_items (state.items);
+
+							return state;
+						},
+
+						this.props.onChange()
+					);
+				}
+			);
+		});
 	}
 }

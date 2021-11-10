@@ -30,7 +30,7 @@ export default class ServiceModal extends Component
 					Complete: false,
 					Days:
 					[{
-						Date: "",
+						value: "", //datetime value
 						Workers: []
 					}]
 				},
@@ -47,9 +47,19 @@ export default class ServiceModal extends Component
 			}
 		;
 
+		state.service.Days = state.service.Days.map ((day) =>
+		(
+			{
+				value: day.Date,
+				Workers: day.Workers
+			}
+		));
+
 		state.service.Days = this.sort_days (state.service.Days);
 
 		this.state = state;
+
+		this.day_list = React.createRef();
 
 	}
 
@@ -86,7 +96,7 @@ export default class ServiceModal extends Component
 
 	has_job_and_date = () =>
 	{
-		return (this.state.service.JobID && this.state.service.Days[0].Date);
+		return (this.state.service.JobID && this.state.service.Days[0].value);
 	}
 
 	sort_days = (days) =>
@@ -95,8 +105,8 @@ export default class ServiceModal extends Component
 		(
 			(day1, day2) =>
 			{
-				console.log (new Date (day1.Date) - new Date (day2.Date));
-				return (new Date (day1.Date) - new Date (day2.Date));
+				console.log (new Date (day1.value) - new Date (day2.value));
+				return (new Date (day1.value) - new Date (day2.value));
 			}
 		);
 
@@ -105,10 +115,21 @@ export default class ServiceModal extends Component
 
 	create = () =>
 	{
+		if
+		(
+			!(
+				this.state.mode === "Add" &&
+				this.state.service.JobID  &&
+				this.day_list.current.get_items()[0].value
+			)
+		){
+			return;
+		}
+
 		let request_body =
 		{
 			JobID: this.state.service.JobID,
-			ServiceDate: this.state.service.Days[0].Date
+			ServiceDate: this.day_list.current.get_items()[0].value
 		};
 
 		Uplink.send_data ("service", "post", request_body)
@@ -211,17 +232,14 @@ export default class ServiceModal extends Component
 
 	save = (close) =>
 	{
-		if (this.has_job_and_date())
+		if (this.state.mode === "Add")
 		{
-			if (this.state.mode === "Add")
-			{
-				this.create();
-			}
+			this.create();
+		}
 
-			else
-			{
-				this.update (close);
-			}
+		else
+		{
+			this.update (close);
 		}
 	}
 
@@ -242,7 +260,7 @@ export default class ServiceModal extends Component
 				return state;
 			},
 
-			() => { this.save(); }
+			this.save
 		);
 	}
 
@@ -294,100 +312,6 @@ export default class ServiceModal extends Component
 
 		</div>
 	)
-
-	//add new day to service
-	add_day = () =>
-	{
-		if (
-			!Number.isInteger (this.state.editing_day) &&
-			!Number.isInteger (this.state.editing_worker)
-		){
-			this.setState ((state) =>
-			{
-				//add day to the Days array with the same workers as the previous day
-				state.service.Days = state.service.Days.concat (
-				{
-					Date: "",
-					Workers: state.service.Days[state.service.Days.length - 1].Workers
-				});
-
-				//edit last day
-				state.editing_day = state.service.Days.length - 1;
-
-				return state;
-			});
-		}
-	}
-
-	//remove a day from service
-	remove_day = (day_index) =>
-	{
-		return (() =>
-		{
-			this.setState ((state) =>
-			{
-				state.service.Days.splice (day_index, 1);
-
-				if (day_index === state.editing_day)
-				{
-					state.editing_day = false;
-				}
-
-				return state;
-			});
-		});
-	}
-
-	//edit the date of a day of a service
-	edit_date = (day_index) =>
-	{
-		return ((edit) =>
-		{
-			//if date value is good
-			if (edit.target.value)
-			{
-				//set the new date value
-				this.setState
-				(
-					(state) =>
-					{
-						state.service.Days[day_index].Date =
-							edit.target.value + "T00:00:00.000"	//reset timestamp to local
-						;
-
-						//stop editing
-						state.editing_day = false;
-
-						//sort days
-						state.service.Days = this.sort_days (state.service.Days);
-
-						return state;
-					},
-
-					//editing date in Add mode sav
-					() =>
-					{
-						//if (day_index === 0)
-						if (this.state.mode === "Add")
-						{
-							this.save();
-						}
-					}
-				);
-			}
-
-			//bad date value, set null
-			else
-			{
-				this.setState ((state) =>
-				{
-					state.service.Days[day_index].Date = null;
-
-					return state;
-				});
-			}
-		});
-	}
 
 	//add new worker to service day
 	add_worker = (day_index) =>
@@ -510,13 +434,14 @@ export default class ServiceModal extends Component
 	}
 
 	//show a day and its workers
-	render_day = (day, day_index) =>
+	old_render_day = (day, day_index) =>
 	(
 		<div>
 
 			{	//edit date
 				day_index === this.state.editing_day
 				?
+
 					<div style={{height: "3rem", paddingBottom: "0.25rem"}}>
 						<input
 							type="date"
@@ -563,6 +488,57 @@ export default class ServiceModal extends Component
 		</div>
 	)
 
+	render_day = (day) =>
+	{
+		console.log (day);
+
+		return (
+			new Intl.DateTimeFormat
+			(
+				"en-US",
+
+				{
+					weekday: "long",
+					month: "long",
+					day: "numeric",
+					year: "numeric"
+				}
+
+			).format (new Date (day.value))
+
+		);
+	}
+
+	render_edit_day = (day, save) =>
+	{
+		return (
+			<div style={{height: "3rem", paddingBottom: "0.25rem"}}>
+				<input
+					type="date"
+					style={{fontSize: "x-large"}}
+					value={ day.value ? day.value.toString().substr(0, 10) : ""}
+					onChange={save}
+
+				/>
+			</div>
+		);
+	}
+
+	new_day = (days) =>
+	{
+		return (
+		{
+			value: "",
+			Workers: days[days.length - 1].Workers
+		});
+	}
+
+	//reset timestamp to local and make nullsafe
+	sanitize_day = (date) =>
+	{
+		return (date ? date + "T00:00:00.0000" : null);
+	}
+
 	//display and edit the final price
 	render_price = () =>
 	{
@@ -577,62 +553,7 @@ export default class ServiceModal extends Component
 			{
 				this.state.mode === "Edit"
 				?
-					<div>
-					{
-						//if editing price
-						this.state.editing_price
-						?
-							<div>
-
-								{/* input */}
-								<div>
-									Final Price: <input
-										type="number"
-										style={{fontSize: "x-large"}}
-										value={this.state.service.FinalPrice}
-										onChange={(edit) =>
-										{
-											this.setState ((state) =>
-											{
-												state.service.FinalPrice = edit.target.value;
-
-												return state;
-											});
-										}}
-										onKeyDown={(key_down) =>
-										{
-											//pressing Enter saves input
-											if (key_down.key === "Enter")
-												save_price();
-										}}
-									/>
-								</div>
-
-								{/* save button */}
-								<Button
-									label="Save"
-									action={save_price}
-								/>
-
-							</div>
-						:
-							<div>
-								{/* not edting price */}
-								<div>
-									Final Price: {this.state.service.FinalPrice}
-								</div>
-
-								{/* change button */}
-								<Button
-									label="Change"
-									action={() =>
-									{
-										this.setState ({ editing_price: true });
-									}}
-								/>
-							</div>
-					}
-					</div>
+					<div></div>
 				:
 					<div></div>
 			} 
@@ -691,15 +612,25 @@ export default class ServiceModal extends Component
 						<br/>
 
 						{/* days and workers */}
-
 						<BulletList
+							ref={this.day_list}
 							name_singular="day"
 							name_plural="Days"
+
 							items={this.state.service.Days}
-							map_func={this.render_day}
-							add={this.add_day}
-							remove={this.remove_day}
+							editing={this.state.mode == "Add" ? 0 : undefined}
+
+							render_item={this.render_day}
+							render_edit_item={this.render_edit_day}
+							render_rest={() => {}}
+
+							sanitize_input={this.sanitize_day}
+							onChange={this.create}
+
+							new_item={this.new_day}
+							sort_items={this.sort_days}
 						/>
+
 
 						<br/>
 						
