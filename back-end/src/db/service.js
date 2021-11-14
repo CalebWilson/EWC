@@ -236,38 +236,7 @@ db_service.patch = function (params)
 		duplicate_service_day_worker: "Duplicate worker on the same day of the same service."
 	};
 
-	//update JobID and ServiceDate
-	let attributes = db.query
-	(
-		`update Services
-			set
-				JobID       = ?,
-				ServiceDate = ?,
-				FinalPrice  = ?,
-				Complete    = ?
-			where ServiceID = ?`,
-
-		[
-			params.JobID,
-			sql_date(params.Days[0].Date),
-			params.FinalPrice,
-			params.Complete,
-			params.ServiceID
-		]
-	);
-
-	//incoming days that are not new will have a ServiceDayID
-	const edited_days = params.Days.filter (
-		(day) => (day.ServiceDayID !== undefined)
-	);
-
-	//the numbers of days that are not new or deleted
-	const edited_day_IDs = edited_days.map ((edited_day) => (edited_day.ServiceDayID));
-
-	//incoming days that are new will have no ServiceDayID
-	const added_days = params.Days.filter (
-		(day) => (day.ServiceDayID === undefined)
-	);
+	console.log (params);
 
 	//protect against null dates
 	let no_null_dates = new Promise ((resolve, reject) =>
@@ -283,6 +252,42 @@ db_service.patch = function (params)
 		resolve (true);
 
 	});
+
+	//update JobID and ServiceDate
+	let attributes = no_null_dates.then (() =>
+	(
+		db.query
+		(
+			`update Services
+				set
+					JobID       = ?,
+					ServiceDate = ?,
+					FinalPrice  = ?,
+					Complete    = ?
+				where ServiceID = ?`,
+
+			[
+				params.JobID,
+				sql_date(params.Days[0].Date),
+				params.FinalPrice,
+				params.Complete,
+				params.ServiceID
+			]
+		)
+	));
+
+	//incoming days that are not new will have a ServiceDayID
+	const edited_days = params.Days.filter (
+		(day) => (day.ServiceDayID !== undefined)
+	);
+
+	//the numbers of days that are not new or deleted
+	const edited_day_IDs = edited_days.map ((edited_day) => (edited_day.ServiceDayID));
+
+	//incoming days that are new will have no ServiceDayID
+	const added_days = params.Days.filter (
+		(day) => (day.ServiceDayID === undefined)
+	);
 
 	//get current Service Days from database
 	let service_days = no_null_dates.then (() =>
@@ -531,8 +536,13 @@ db_service.patch = function (params)
 		service_days
 	])
 
+	.then (() =>
+	{
+		throw "Success";
+	})
+
 	//get the modified service
-	.then (() => 
+	.catch (() => 
 	{
 		return db_service.get (params.ServiceID)
 

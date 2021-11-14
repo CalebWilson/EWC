@@ -151,7 +151,7 @@ export default class BulletList extends Component
 
 									edit={this.edit (item_index)}
 									save={this.save (item_index)}
-									remove={this.remove}
+									remove={this.remove (item_index)}
 
 									render_item={render_item}
 									render_edit_item={render_edit_item}
@@ -193,7 +193,7 @@ export default class BulletList extends Component
 
 	is_editing = (index) =>
 	{
-		if (index)
+		if (Number.isInteger (index))
 			return (index === this.state.editing);
 
 		return Number.isInteger (this.state.editing);

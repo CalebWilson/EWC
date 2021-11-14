@@ -203,7 +203,7 @@ export default class ServiceModal extends Component
 				(day) =>
 				(
 					{
-						...day,
+						Date: day.value,
 						Workers: day.Workers.map ((worker) => (worker.WorkerID))
 					}
 				)
