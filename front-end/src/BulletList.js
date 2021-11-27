@@ -44,7 +44,6 @@ class BulletItem extends Component
 
 			render_item,
 			render_edit_item,
-			render_rest,
 		}
 			= this.props;
 
@@ -68,7 +67,6 @@ class BulletItem extends Component
 						</span>
 				}
 
-				{render_rest (item)}
 			</div>
 		);
 	}
@@ -88,7 +86,6 @@ export default class BulletList extends Component
 
 			function render_item (obj): content of Clickable
 			function render_edit_item (obj): input element for use in editing
-			function render_rest(): content after the Clickable
 
 			function new_item (array): item to be added given current items
 			function sanitize_input (obj): santized input given raw input
@@ -100,11 +97,17 @@ export default class BulletList extends Component
 	{
 		super (props);
 
-		this.state =
+		let state = { editing: props.editing };
+
+		if (props.data.items)
 		{
-			items: props.items,
-			editing: props.editing
-		};
+			state.items = props.data.items.map ((item) =>
+			(
+				{ ...item, ref: React.createRef() }
+			));
+		}
+
+		this.state = state;
 	}
 
 	render()
@@ -115,9 +118,8 @@ export default class BulletList extends Component
 
 			render_item,
 			render_edit_item,
-			render_rest,
 		}
-			= this.props;
+			= this.props.data;
 
 		return (
 			<div>
@@ -128,35 +130,49 @@ export default class BulletList extends Component
 					{
 						(this.state.items.length === 1)
 						?
-							<BulletItem
-								item={this.state.items[0]}
-								editing={this.is_editing()}
+							<div>
+								<BulletItem
+									item={this.state.items[0].value}
+									editing={this.is_editing()}
 
-								edit={this.edit (0)}
-								save={this.save (0)}
+									edit={this.edit (0)}
+									save={this.save (0)}
 
-								render_item={render_item}
-								render_edit_item={render_edit_item}
-								render_rest={render_rest}
-							/>
+									render_item={render_item}
+									render_edit_item={render_edit_item}
+								/>
+
+								<BulletList
+									ref={this.state.items[0].ref}
+									data={this.state.items[0]}
+								/>
+
+							</div>
 
 						:
 							this.state.items.map ((item, item_index) =>
 							(
-								<BulletItem
-									key={item_index}
+								<div>
+									<BulletItem
+										key={item_index}
 
-									item={item}
-									editing={this.is_editing (item_index)}
+										item={item}
+										editing={this.is_editing (item_index)}
 
-									edit={this.edit (item_index)}
-									save={this.save (item_index)}
-									remove={this.remove (item_index)}
+										edit={this.edit (item_index)}
+										save={this.save (item_index)}
+										remove={this.remove (item_index)}
 
-									render_item={render_item}
-									render_edit_item={render_edit_item}
-									render_rest={render_rest}
-								/>
+										render_item={render_item}
+										render_edit_item={render_edit_item}
+									/>
+
+									<BulletList
+										ref={item.ref}
+										data={item}
+									/>
+
+								</div>
 							))
 					}
 
@@ -174,8 +190,6 @@ export default class BulletList extends Component
 								</span>
 							</div>
 					}
-
-					{render_rest()}
 
 				</div>
 

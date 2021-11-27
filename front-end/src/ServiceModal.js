@@ -30,8 +30,12 @@ export default class ServiceModal extends Component
 					Complete: false,
 					Days:
 					[{
-						value: "", //datetime value
-						Workers: []
+						Date: "", //datetime value
+						Workers:
+						[{
+							WorkerID: null,
+							WorkerName: ""
+						}]
 					}]
 				},
 				editing_day: 0,
@@ -46,14 +50,6 @@ export default class ServiceModal extends Component
 				mode: this.props.mode
 			}
 		;
-
-		state.service.Days = state.service.Days.map ((day) =>
-		(
-			{
-				value: day.Date,
-				Workers: day.Workers
-			}
-		));
 
 		state.service.Days = this.sort_days (state.service.Days);
 
@@ -96,7 +92,7 @@ export default class ServiceModal extends Component
 
 	has_job_and_date = () =>
 	{
-		return (this.state.service.JobID && this.state.service.Days[0].value);
+		return (this.state.service.JobID && this.state.service.Days[0].Date);
 	}
 
 	sort_days = (days) =>
@@ -105,8 +101,8 @@ export default class ServiceModal extends Component
 		(
 			(day1, day2) =>
 			{
-				console.log (new Date (day1.value) - new Date (day2.value));
-				return (new Date (day1.value) - new Date (day2.value));
+				console.log (new Date (day1.Date) - new Date (day2.Date));
+				return (new Date (day1.Date) - new Date (day2.Date));
 			}
 		);
 
@@ -120,7 +116,7 @@ export default class ServiceModal extends Component
 			!(
 				this.state.mode === "Add" &&
 				this.state.service.JobID  &&
-				this.day_list.current.get_items()[0].value
+				this.day_list.current.get_items()[0].Date
 			)
 		){
 			return;
@@ -129,7 +125,7 @@ export default class ServiceModal extends Component
 		let request_body =
 		{
 			JobID: this.state.service.JobID,
-			ServiceDate: this.day_list.current.get_items()[0].value
+			ServiceDate: this.day_list.current.get_items()[0].Date
 		};
 
 		Uplink.send_data ("service", "post", request_body)
@@ -203,7 +199,7 @@ export default class ServiceModal extends Component
 				(day) =>
 				(
 					{
-						Date: day.value,
+						Date: day.Date,
 						Workers: day.Workers.map ((worker) => (worker.WorkerID))
 					}
 				)
@@ -395,8 +391,27 @@ export default class ServiceModal extends Component
 		});
 	}
 
+	render_edit_worker = (worker) =>
+	(
+		<div style={{height: "3rem", paddingTop: "0.25rem"}}>
+
+			<WorkerDropdown
+				label=""
+				default={worker.WorkerID}
+				blank={null}
+				/*
+				select_option={
+					this.edit_worker (day_index, worker_index)
+				}
+				*/
+				size="x-large"
+			/>
+
+		</div>
+	);
+
 	//show a worker
-	render_worker = (day_index) =>
+	old_render_worker = (day_index) =>
 	{
 		return ((worker, worker_index) =>
 		(
@@ -504,7 +519,7 @@ export default class ServiceModal extends Component
 					year: "numeric"
 				}
 
-			).format (new Date (day.value))
+			).format (new Date (day.Date))
 
 		);
 	}
@@ -516,7 +531,7 @@ export default class ServiceModal extends Component
 				<input
 					type="date"
 					style={{fontSize: "x-large"}}
-					value={ day.value ? day.value.toString().substr(0, 10) : ""}
+					value={ day.Date ? day.Date.toString().substr(0, 10) : ""}
 					onChange={save}
 
 				/>
@@ -525,13 +540,10 @@ export default class ServiceModal extends Component
 	}
 
 	new_day = (days) =>
-	{
-		return (
-		{
-			value: "",
-			Workers: days[days.length - 1].Workers
-		});
-	}
+	({
+		Date: "",
+		Workers: days[days.length - 1].Workers
+	});
 
 	//reset timestamp to local and make nullsafe
 	sanitize_day = (date) =>
@@ -564,6 +576,33 @@ export default class ServiceModal extends Component
 
 	render()
 	{
+		let days =
+		{
+			name_singular: "day",
+			name_plural: "Days",
+
+			new_item:         this.new_day,
+			sanitize_input:   this.sanitize_day,
+			render_item:      this.render_day,
+			render_edit_item: this.render_edit_day,
+			sort_items:       this.sort_days,
+
+			//dates and workers
+			items: this.state.service.Days.map ((day) =>
+			({
+				value: day.Date,
+
+				name_singular: "worker",
+
+				new_item:         (workers) => ({ WorkerID: null, WorkerName: "" }),
+				render_item:      (worker) => (worker.WorkerName),
+				render_edit_item: this.render_edit_worker,
+
+				//worker names
+				items: day.Workers.map ((worker) => ({ value: worker }))
+			}))
+		};
+		
 		return (
 
 			<div className="service-modal">
@@ -614,23 +653,13 @@ export default class ServiceModal extends Component
 						{/* days and workers */}
 						<BulletList
 							ref={this.day_list}
-							name_singular="day"
-							name_plural="Days"
 
-							items={this.state.service.Days}
-							editing={this.state.mode == "Add" ? 0 : undefined}
+							data={days}
 
-							render_item={this.render_day}
-							render_edit_item={this.render_edit_day}
-							render_rest={() => {}}
+							editing={this.state.mode === "Add" ? 0 : undefined}
 
-							sanitize_input={this.sanitize_day}
 							onChange={this.create}
-
-							new_item={this.new_day}
-							sort_items={this.sort_days}
 						/>
-
 
 						<br/>
 						
